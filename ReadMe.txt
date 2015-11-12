@@ -35,11 +35,10 @@ CALTTubes have been tested on the machine having 4 GB of RAM and Intel® Xeon 51
 
 Here is the list of the software’s that should be installed on the machine
 
-1.	Windows Server
-2.	PHP 5
-3.	My SQL 5.0 Server 
-4.	WAMP Server
-5.      Adobe Flex Builder 3.0
+1.	PHP 5
+2.	My SQL 5.0 Server 
+3.	WAMP Server or Windows Server
+4.      Adobe Flex Builder 3.0
 
 
 Technical Steps to Install the CALTTubes
