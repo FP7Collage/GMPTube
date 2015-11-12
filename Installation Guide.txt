@@ -29,11 +29,11 @@
  Technical Guide to deploy CALTTubes
 ------------------------------------------------------------------
 
-Softwareís Requirement to Deploy the CALTTubes
+Software‚Äôs Requirement to Deploy the CALTTubes
 
-CALTTubes have been tested on the machine having 4 GB of RAM and IntelÆ Xeon 5130 @2.00 GHZ. Ideally it would be good to have such a powerful machine as video streaming requires expensive CPU Usage.
+CALTTubes have been tested on the machine having 4 GB of RAM and Intel¬Æ Xeon 5130 @2.00 GHZ. Ideally it would be good to have such a powerful machine as video streaming requires expensive CPU Usage.
 
-Here is the list of the softwareís that should be installed on the machine.
+Here is the list of the software‚Äôs that should be installed on the machine.
 
 1.	Windows Server
 2.	PHP 5
@@ -57,12 +57,12 @@ Copy the prototyping folder to the root directory of your server. (For WAMP Inst
 
 Step2: 
 Create New User to access MYSQL database. 
-Name of the User: ìdemoî
-Password: ìdemoî
+Name of the User: ‚Äúdemo‚Äù
+Password: ‚Äúdemo‚Äù
 
 Step3:
 Restore MYSQL Database from InnoTube.sql (Created Database Name will be ostube)
-Assign all the Available Database Privileges to ìdemoî user.  
+Assign all the Available Database Privileges to ‚Äúdemo‚Äù user.  
 You can use MySql Admin to assign all the privileges (SELECT, INSERT, UPDATE, DELETE, etc) in the User Administrator Section. 
 
 Step4: (Already added in the given package)
@@ -74,7 +74,7 @@ $ffmpegaddress  = "C:\\wamp\\www\\prototyping\\GMPWin\\GraphData\\ffmpeg\\";
 
 
 Step5:  (Already added in the given package)
-Open InnoTube/GraphData/ConnTube.php using some text editor
+Open GMPWin/GraphData/ConnTube.php using some text editor
 Change the $host parameter to your server name
 
 $host		=	"localhost";
@@ -94,19 +94,13 @@ Open gmpwin/GraphData/constant.xml using some text editor
 Change the serverName to your host name
 <ServerName>localhost </ServerName>
 
-Step8:
-
-Changes In the php.ini
-
+Step8: Changes In the php.ini
 To make the upload work for larger video, you need to change the following parameter in php.ini file.
-
 For wamp server, php.ini file is located in the Apache2 directory for example (C:\wamp\Apache2\bin)
-
 post_max_size = 100M
 upload_max_filesize = 100M
 session.gc_maxlifetime = 28800
 
-
-You are all done for deploying CALTtube on your server
+You are all done.
 
 
