@@ -1,37 +1,9 @@
-/*
-	 * Copyright (c) 2015, CEDEP France,
- 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
-         * All rights reserved.
-	 * Redistribution and use in source and binary forms, with or without modification, 
-	 * are permitted provided that the following conditions are met:
-	 *
-	 *  * Redistributions of source code must retain the above copyright notice, 
-	 *    this list of conditions and the following disclaimer. 
-	 *  * Redistributions in binary form must reproduce the above copyright notice, 
-	 *    this list of conditions and the following disclaimer in the documentation
-	 *    and/or other materials provided with the distribution. 
-	 *  * Neither the name of the COLLAGE Group nor the names of its 
-	 *    contributors may be used to endorse or promote products derived from this 
-	 *    software without specific prior written permission. 
-	 *
-	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
-	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
-	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
- 
- Technical Guide to deploy CALTTubes
+Technical Guide to deploy GMPTube
 ------------------------------------------------------------------
 
-Software’s Requirement to Deploy the CALTTubes
+Software’s Requirement to Deploy the GMPTube
 
-CALTTubes have been tested on the machine having 4 GB of RAM and Intel® Xeon 5130 @2.00 GHZ. Ideally it would be good to have such a powerful machine as video streaming requires expensive CPU Usage.
+GMPTube has been tested on the machine having 4 GB of RAM and Intel® Xeon 5130 @2.00 GHZ. Ideally it would be good to have such a powerful machine as video streaming requires expensive CPU Usage.
 
 Here is the list of the software’s that should be installed on the machine
 
@@ -41,15 +13,15 @@ Here is the list of the software’s that should be installed on the machine
 4.      Adobe Flex Builder 3.0
 
 
-Technical Steps to Install the CALTTubes
+Technical Steps to Install the GMPTube
 
 Set up PHP and MySQL on windows machine. You can use WAMP to do the installation if you do not plan to install PHP and MYSQL separately.
 
 WAMP can be downloaded from http://www.wampserver.com/en/download.php
 
-After installing PHP and My SQL, Follow the steps below to deploy the CALTTube Package.
+After installing PHP and My SQL, Follow the steps below to deploy the GMPTube Package.
 
-Download the CALTTube package.
+Download the GMPTube package.
 
 Step1:
 Copy the prototyping folder to the root directory of your server. (For WAMP Installation, you can copy prototyping\GMPWin folder to www folder)
