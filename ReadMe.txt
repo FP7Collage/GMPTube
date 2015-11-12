@@ -38,8 +38,7 @@ Here is the list of the software’s that should be installed on the machine.
 1.	Windows Server
 2.	PHP 5
 3.	My SQL 5.0 Server 
-4.	InnoTube Package
-5.	WAMP Server
+4.	WAMP Server
 
 
 Technical Steps to Install the CALTTubes
