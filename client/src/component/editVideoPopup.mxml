@@ -1,0 +1,924 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<mx:Canvas xmlns:toolbox="com.advancedlist.flextoolbox.controls.*" xmlns:inputs="net.srirangan.inputs.*" xmlns:ns1="component.*" xmlns:ns2="fabulousFlex.*"
+	xmlns:mx="http://www.adobe.com/2006/mxml" verticalPageScrollSize="20" verticalScrollPolicy="auto" horizontalScrollPolicy="off"
+	backgroundColor="#FFFFFF"  creationComplete="updateFields()" width="695" height="487">
+					<mx:Button x="591"  y="325" label="{submitRM}" id="btnUpload" click="{submitVideo()}" width="76"/>				
+					<mx:Form id="myForm_basic" backgroundColor="#ffffff" fontWeight="bold" color="#ffffff" backgroundAlpha="0.0" height="100%" width="567" horizontalScrollPolicy="off" verticalScrollPolicy="off">	
+<!--					 	<mx:FormItem label="Select video" width="535" color="#000000" id="formitem2" fontWeight="bold" backgroundAlpha="0.0">
+							<mx:ComboBox enabled="false" close="newvideo_title.text=parent_video.selectedLabel" labelField="@name" dataProvider="{videolist}" cornerRadius="10" id="parent_video" width="100%" color="#FFFFFF"></mx:ComboBox>
+						 </mx:FormItem>					 
+-->					 	<mx:FormItem label="{titleM}" width="535" color="#000000" id="formitem3">
+					 	      <mx:TextInput id="newvideo_title" width="100%" editable="true" color="#000000" height="100%"/>  
+					 	  </mx:FormItem>
+<!--
+radio buttons to show the right visibility
+-->	
+	
+	
+		<mx:FormItem label="{visibilityM}" width="535" color="#000000"  visible="{app.privacyEnabled}" height="37">
+			<mx:HBox width="100%" verticalAlign="middle" verticalScrollPolicy="off" horizontalScrollPolicy="off" height="34" >
+				<mx:RadioButtonGroup id="videoPyRad"/>
+				<mx:RadioButton id="everybody" label="{v1042}" textRollOverColor="black" value="#EVERYBODY#" groupName="videoPyRad" />
+				<mx:RadioButton id="onlyme" label="{v1043}" textRollOverColor="black" value="#AUTHORONLY#" groupName="videoPyRad"/>
+				<mx:RadioButton id="groups" label="{v1044}" textRollOverColor="black" value="#GROUPS#" groupName="videoPyRad" enabled="{groupsAvailable}"/>
+				<mx:ComboBox id="videoPyGroups" width="145"  dropdownWidth="260" textRollOverColor="black" labelField="text"
+					enabled="{videoPyRad.selectedValue == '#GROUPS#'}">
+					<mx:itemRenderer>
+						<mx:Component>
+							<mx:HBox click="data.isSelected=!data.isSelected" horizontalScrollPolicy="off">
+								<mx:CheckBox label="" selected="{data.isSelected}"/>
+								<mx:Label text="{data.gname}"/>
+							</mx:HBox>
+						</mx:Component>
+					</mx:itemRenderer>
+				</mx:ComboBox>
+			</mx:HBox>
+		</mx:FormItem>						 	 
+					 	 <mx:FormItem  label="{urlM}" width="535" color="#000000" id="formitem99">
+					 	  	 <mx:TextInput text="{data.@url.toString()}" editable="false" width="347" id="videourl" visible="true"/>
+					 	  </mx:FormItem>					    						    
+					    <mx:FormItem label="{channelM}"  width="535" color="#000000">
+					        <mx:ComboBox id="vid_category" width="159" color="#FFFFFF" dataProvider="{Application.application.video_catagories}">
+								<!--<mx:dataProvider>
+									<mx:Array>
+										<mx:Object label="{Application.application.videoCategory_CDLabel}" data="{Application.application.videoCategory_CDLabel}"/>
+										<mx:Object label="{Application.application.videoCategory_CDOppLabel}" data="{Application.application.videoCategory_CDOppLabel}"/>
+										<mx:Object label="{Application.application.videoCategory_CDExpertsLabel}" data="{Application.application.videoCategory_CDExpertsLabel}"/>
+										<mx:Object label="{Application.application.videoCategory_CDExpertsLabel}" data="{Application.application.videoCategory_CDExpertsLabel}"/>
+										
+									</mx:Array>
+								</mx:dataProvider>-->
+					        </mx:ComboBox>
+					    </mx:FormItem>				
+					    
+					    
+					    
+					    <!-- start for eGovtube only  -->
+ <!--					<mx:FormItem label="{v1058}"  color="#000000">
+ 						
+ 									<mx:VBox width="100%">
+    									<mx:Text selectable="false" color="blue" width="100%" height="100%" text="{v1070}" />    
+									</mx:VBox>					               
+ 				
+ 									<mx:ComboBox labelField="@name" dataProvider="{app.resTypeList}"  id="resType"  ></mx:ComboBox>							
+ 						</mx:FormItem>
+ 							
+ 						<mx:FormItem label="{v1059}" color="#000000">
+ 									<mx:VBox width="100%">
+    									<mx:Text selectable="false" color="blue" width="100%" height="100%" text="{v1071}" />    
+									</mx:VBox>	
+									<mx:ComboBox labelField="@name" dataProvider="{app.servTypeList}" rowCount="8" dropdownWidth="500"  id="servType"  ></mx:ComboBox>												
+ 						</mx:FormItem>
+-->						
+ 					<!-- end for eGovtube only  --> 
+ 					    
+				
+					    
+					    <mx:FormItem label="{tagsM}" width="535" height="167" color="#000000" >  
+					    	<mx:Label text="{youSeATM}" />
+					    	<toolbox:CheckBoxList alternatingItemColors="[0xEEEEEE, 0xDFDFDF]" labelField="@name" enabledField="enabled" dataProvider="{tagslist}" height="84" width="100%" rowHeight="20" id="existing_tags" fontSize="10" backgroundAlpha="0.0" color="#000000" borderStyle="solid"/>
+					    	<mx:Label text="{orAddNewIM}" />
+					    	<mx:TextInput id="newvid_tags"  height="100%" width="100%" color="#000000"/>
+					    </mx:FormItem> 						    
+					   
+<!--					    <mx:FormItem label="Submitted by"  width="535" color="#000000">
+					        <mx:TextInput text="{app.Univ_LoginItem.id}" id="vid_uploadedby"  width="100%" editable="false" color="#000000" height="100%"/>
+					    </mx:FormItem>						    
+-->					    <mx:FormItem label="{descM}" width="535" height="85" color="#000000">
+					        <mx:TextArea id="vid_description" verticalScrollPolicy="auto"  width="436"  height="78" color="#000000"/>  
+					    </mx:FormItem>						   
+					   	<mx:FormItem label="{authorsM}" width="535" height="120" color="#000000">
+						   	<mx:TextArea id="default_author" text="{displayAuthorlist}" width="100%" editable="false"  height="30"  color="blue"/>
+					     	<toolbox:CheckBoxList  labelField="@name" enabledField="enabled" dataProvider="{app.people_list}" width="100%" rowHeight="20" id="video_authors" fontSize="10" backgroundAlpha="0.0" color="#000000" alternatingItemColors="[0xEEEEEE, 0xDFDFDF]" height="84"/>
+					   	   
+					    </mx:FormItem>						    
+					    <mx:FormItem label="{isConnTM}" width="535" height="86" color="#000000">					        
+					        <toolbox:CheckBoxList labelField="@name" allowMultipleSelection="true" id="videos_inspiration" dataProvider="{app.videos_list}"  enabledField="enabled" width="100%" rowHeight="20" backgroundAlpha="0.0" color="#000000" alternatingItemColors="[0xEEEEEE, 0xDFDFDF]" height="84"/>
+  					    </mx:FormItem>
+					    
+					    
+ 					
+ 						
+					
+			
+			<!-- start for IFR only  -->
+					 		
+ 					<!--<mx:FormItem label="Faculty Areas"   color="#000000"> 					                           									
+ 									<mx:ComboBox labelField="@name" dataProvider="{facultyAreaTypeList}"  id="facultyAreaType"  ></mx:ComboBox>							
+ 						</mx:FormItem>
+ 					-->	
+ 			<!-- End for IFR only  --> 
+					      
+					    
+					      
+				<!--					    
+
+							<mx:FormItem label="External Links " width="538" height="135" fontWeight="bold" color="#030000">
+					        <mx:Text width="347" text="(Please Start Each New Link in a New Line)" color="#030303"/>
+					        <mx:TextArea height="105" width="345" id="externalLinks"/>
+					    </mx:FormItem>
+					    <mx:FormItem label="Upload Documents" width="538" height="126" color="#040404">
+					        <mx:Button label="Browse" height="23" width="113" id="uploadDocsBrowse" click="onBrowseUploadDocuments()"/>
+					        <mx:Label text="Already Uploaded Documents for this Video:"/>
+					        <mx:Text width="329" id="uploadDocs_progressText" height="73"/>
+					    </mx:FormItem>
+				-->			
+				
+						</mx:Form>	
+				
+				<!--	<mx:RadioButtonGroup id="other_uploadtype" itemClick="handleCard(event);"/>
+					<mx:RadioButton x="414.65" y="10" selected="false" label="YES" groupName="other_uploadtype" width="64.2" height="22" labelPlacement="right" fontWeight="bold" fontSize="15"/>
+					<mx:RadioButton x="486.85" y="10" label="NO" selected="true" groupName="other_uploadtype" fontWeight="bold" width="64" height="22" fontSize="15"/>
+					<mx:Label x="93" y="10" text="If the video is a newer version of an existing video" color="#000000" id="label0" width="296.4" fontWeight="bold"/>
+					-->				
+
+	<mx:Image source="{data.@picture.toString()}" x="575" y="57" width="110" height="97"/>
+		<mx:HTTPService id="add_video_node" showBusyCursor="true" resultFormat="xml"
+				url="{app.ServerPath}GraphData/change.php" useProxy="false" method="POST"
+			    fault="Alert.show(event.fault.faultString, 'Opps...');" >
+		</mx:HTTPService>
+					
+				<!--</ns1:GradientCanvas>-->	
+				
+				
+<mx:Script source=".././Asfiles/as_constants.as" />				
+	<mx:Script>
+		<![CDATA[	
+			import com.byteencoder.Base64;
+      		import mx.graphics.codec.JPEGEncoder;
+      		
+			import mx.events.ItemClickEvent;    
+            import mx.core.Application;
+			import mx.managers.CursorManager;
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.ItemClickEvent;
+			import mx.rpc.events.ResultEvent;
+			import flash.net.FileReference;
+			import mx.managers.PopUpManager;
+			
+			import com.adobe.flex.extras.controls.springgraph.Item;
+			
+			
+			[Bindable]public var app:Tentube=Tentube(Application.application);
+			
+			
+			
+			[Bindable] public var facultyAreaTypeSel : String;
+			[Bindable] public var facultyAreaTypeList:Array=new Array(
+			new XML('<area id="" name="'+   '"></area>'),
+			new XML('<area id="1" name="'+ facarea1  + '"></area>'),
+			new XML('<area id="2" name="'+ facarea2 + '"></area>'),
+			new XML('<area id="3" name="'+ facarea3 + '"></area>'),
+			new XML('<area id="4" name="'+ facarea4 + '"></area>'),
+			new XML('<area id="4" name="'+ facarea5 + '"></area>'),
+			new XML('<area id="6" name="'+ facarea6 + '"></area>'),
+			new XML('<area id="7" name="'+ facarea7 + '"></area>'),
+			new XML('<area id="8" name="'+ facarea8 + '"></area>'),
+			new XML('<area id="9" name="'+ facarea9 + '"></area>'),			
+			new XML('<area id="10" name="'+ facarea10 + '"></area>'),
+			new XML('<area id="11" name="'+ facarea11 + '"></area>'),
+			new XML('<area id="12" name="'+ facarea12 + '"></area>'),
+			new XML('<area id="13" name="'+ facarea13 + '"></area>'),
+			new XML('<area id="14" name="'+ facarea14 + '"></area>'),
+			new XML('<area id="15" name="'+ facarea15 + '"></area>'),
+			new XML('<area id="16" name="'+ facarea16 + '"></area>'),		
+			new XML('<area id="17" name="'+ facarea17 + '"></area>')			
+			);
+					
+			
+			
+	
+				
+		
+			[Bindable]public var displayAuthorlist:String;
+			
+			[Bindable]public var videolist:Array 	= new Array();
+			[Bindable]public var peoplelist:Array 	= new Array();
+			[Bindable]public var tagslist:Array 	= new Array();
+			
+			[Bindable]private var video_url:String;		
+			[Bindable]private var thumbnail_url:String;	
+			
+			[Bindable]private var groupsAvailable:Boolean;
+			// for appending interests and competences
+			[Bindable]private var xmldata:Object;
+			public var newxml:XML ;
+			/** the following variables store some of the attributes of the video */
+			public var randomname:String;	//  a 10 letter word randomly generated for video name					
+			public var authors_list:String;			
+			public var inspirations_list:String;
+			public var documents_list_for_upload:String = new String("");
+			public var documents_list_for_display:String = new String();
+			public var vidtags_list:String;		
+			public var relatedVideos: Array= new Array();
+			private var sourcetype:String;	// YTB / FMS
+			public var relatedAuthors: Array= new Array(); 
+			
+			private function updateFields():void{
+				
+				// sort the people list
+			//	app.people_list.sortOn("@id",Array.CASEINSENSITIVE);
+				
+				newvideo_title.text = data.@name.toString();
+				switch(data.@category.toString()){
+					case Application.application.videoCategory_CDLabel: 
+						vid_category.selectedIndex=0;
+						break;
+					case Application.application.videoCategory_CDOppLabel:
+						vid_category.selectedIndex=1;
+						break;
+					case Application.application.videoCategory_CDExpertsLabel:
+						vid_category.selectedIndex=2;
+						break;
+					case Application.application.label_fourth_videoCategory:
+							vid_category.selectedIndex=3;
+						break;
+					case Application.application.label_fifth_videoCategory:
+							vid_category.selectedIndex=4;
+						break;
+					case Application.application.label_sixth_videoCategory:
+							vid_category.selectedIndex=5;
+						break;	
+							
+						
+					default:
+						vid_category.selectedIndex=0;
+				}
+				//switch case added to show the right visibility
+				switch(data.@privacy.toString())
+				{
+					case '#EVERYBODY#':
+					everybody.selected= true;
+					break;
+					case '#AUTHORONLY#':
+					onlyme.selected= true;
+					break;
+					default :
+					groups.selected=true;
+					
+				}
+				//newvid_tags.text = app.getTagname2(data);
+				newvid_tags.text =  data.@tags.toString();
+				vid_description.text = data.@description.toString();
+				getGListService.send();
+				
+				// to append interests and competences
+				
+            	// the following lines are added to append interets and compentences to the tagslist
+            //	app.interestslist 	= 	list.split(',');   	
+		   	//		intslist			=	app.interestslist;
+		   			var i:int;	
+		   			for  (i=0;i< app.tags_list.length;i++) {
+   				        tagslist.push(app.tags_list[i].@name.toString());
+   		        	//	Alert.show(competencesArray[i].@name,"future name");
+   				        
+   			      }		
+		   			loaduserinterestsvideo();
+		   		
+		 // populate the checkbox list(is related to)
+		 
+		 //first get the list of the realated videos
+		 var edgeName: String;
+		var edgeToId : String;
+		var edgeFromId: String;
+		var videoName : String;
+		var loopVideoName: String;
+		
+		  i=0;
+		 		for each(var li:Object in videos_inspiration.dataProvider)
+		 		{
+		 			
+		 			li.selected=false;
+		 			relatedVideos.push(li);
+		 			i++;
+		 		}
+		 		
+		 	  i=0;
+		 		for each(var li:Object in video_authors.dataProvider)
+		 		{
+		 			
+		 			li.selected=false;
+		 			relatedAuthors.push(li);
+		 			i++;
+		 		}	
+		 		
+		 		
+		 		
+		 for each( var edge:XML in app.edgeList_Xml)
+		 {
+		 	edgeName=edge.@name.toString();
+		 	edgeToId=edge.@toID.toString();
+			edgeFromId=edge.@fromID.toString();
+		 	if(edgeName=="Is Connected To") 		 	{
+		 		if(edgeToId==data.@id.toString())
+		 		videoName=getVideoNameById(edgeFromId);
+		 		else if(edgeFromId==data.@id.toString())
+				videoName=getVideoNameById(edgeToId);
+		 		else continue;
+		 		//videos_inspiration.data;
+		 		
+		 		i=0;
+		 		for each(var li:Object in videos_inspiration.dataProvider)
+		 		{
+		 			
+		 			loopVideoName=li.@name.toString();
+		 			if(loopVideoName==videoName)
+		 			{
+		 			li.selected=true;
+		 			relatedVideos[i]=li
+		 			}
+		 			//else li.selected=false;
+		 			
+		 			
+		 			//var genxml:XML=new XML(li);
+		 			//videos_inspiration.selectedIndices[i]=1;
+		 			i=i+1;
+		 		}
+		 	
+		 	}
+		 	//videos_inspiration.selectedItems  =  videos_inspiration.dataProvider;
+		 }
+		 relatedVideos.sortOn("@name");
+		 videos_inspiration.dataProvider=relatedVideos;
+		 
+		 for each(var li:Object in videos_inspiration.dataProvider)
+		 		{
+		 			
+		 			li.selected=false;
+		 			//relatedVideos.push(li);
+		 			//i++;
+		 		}
+		 		
+		// for updating the co-authors in the list of the edit video form
+		
+		//video_authors		
+		displayAuthorlist = new String();
+				i=0;
+				var loopAuthorName:String;
+				var tempAuthorList:String;	
+				var matchFound :int;
+				tempAuthorList = data.@authors.toString();				
+		 		for each(var li:Object in video_authors.dataProvider)
+		 		{
+		 			loopAuthorName=li.@id.toString();
+		 			matchFound = tempAuthorList.indexOf(loopAuthorName,0); 
+		 			if(matchFound >=0)
+		 			{
+		 			li.selected=true;
+		 			relatedAuthors[i] = li;
+		 			  if (displayAuthorlist == ""){
+		 				 displayAuthorlist = li.@name.toString();
+		 		     	}else{
+		 			   displayAuthorlist = li.@name.toString() + "," + displayAuthorlist;
+		 			  }
+		 			}
+		 			i=i+1;
+		 		}
+		 
+		relatedAuthors.sortOn("@name");
+		video_authors.dataProvider=relatedAuthors;
+		 		
+				 		
+/// Start of special code for eGovtube
+
+/*
+	
+	 	var servVal:int = parseInt(data.@servType.toString());
+	 	 	 	var i =0;	
+		 		for each(var li:Object in servType.dataProvider)
+		 		{
+		 			if(servVal== parseInt(li.@id.toString())){
+		 			  servType.selectedIndex =i;		 			
+		 			}
+		 			i = i + 1;
+		 		}
+		 		
+		 		
+		var resVal:int = parseInt(data.@resType.toString());
+	 	 	 	var i =0;	
+		 		for each(var li:Object in resType.dataProvider)
+		 		{
+		 			if(resVal== parseInt(li.@id.toString())){
+		 			  resType.selectedIndex =i;		 			
+		 			}
+		 			i = i + 1;
+		 		}
+	 	 		
+*/					
+			 
+/// End of special code for eGovtube
+		
+/*		if (Application.application.parameters.tubeName == "IFR"){
+			  facultyAreaType.selectedIndex = parseInt(data.@facultyAreaType.toString());  // -13 prev
+			}
+				
+*/						
+		 		
+		 }
+		
+		
+		 
+		 
+		 private function getVideoNameById(videoId:String):String{
+		
+		var videoName: String;
+		var tempVideoId : String;
+		for each ( var videodata:XML in app.videos_list ){
+			tempVideoId = videodata.@id.toString();
+			if (tempVideoId == videoId ){
+			   videoName = videodata.@name.toString();
+			   return videoName;
+			}
+			
+		}
+		return "";
+	}	
+		 
+		   		public function appendtotagslist():void{	
+		   			var i:int;
+		   			for  (i=0;i< app.interestslist.length;i++) {
+   				        tagslist.push(app.interestslist[i].toString());
+   		        	//	Alert.show(competencesArray[i].@name,"future name");
+   				        
+   			      }					
+		   	//		intslist.concat(tagslist);
+		 /*  			app.competencesArray;
+		   			for  (i=0;i< app.competencesArray.length;i++) {
+   				        tagslist.push(app.competencesArray[i].@name.toString());
+   				 }
+*/   		        
+   		        tagslist = app.removeDupli(tagslist);
+   		        tagslist.sort();
+   		        	//till here
+				
+				
+			}
+			
+			
+			public function loaduserinterestsvideo():void{	
+				app.loadinterests.url 	= app.ServerPath + app.graphData + "loadinterests.php";	
+				app.loadinterests.addEventListener(ResultEvent.RESULT,loadint_resp);			
+		     	app.loadinterests.send();	
+		     //	xmldata=app.loadinterests.lastResult;
+		     //	app.loadinterests.clearResult();
+		  	 //   newxml = 	new XML(xmldata);
+		     //	var list:String		=	newxml.rsp.interests;
+		   	//		app.interestslist 	= 	list.split(','); 
+			}
+			
+			/** event listener for loadinterests http request 
+			 * 	This will load the list of interests which the users had entered.
+			 *  		
+			 *	
+			 * **/
+			 
+			private function loadint_resp(r:ResultEvent):void{
+	   			try{
+	   				if ( r.result.rsp.interests == null )		
+	   					return;
+	   				var list:String		=	r.result.rsp.interests;
+		   			app.interestslist 	= 	list.split(',');   	
+		   			appendtotagslist();
+		   			//intslist			=	app.interestslist;
+		
+	   			}
+		        
+   			      	
+	   			
+	   			catch(e:Error){
+	   				trace('Unable to load "control panel" table in database','Contact administrator');
+	   			}	
+	   			return;
+	    	}
+		
+			
+			
+/*           	private function tabchanged():void{
+           		if ( typestab.selectedIndex == 2 ){
+           			recordinfo.visible		=	true;
+					recordinfoimg.visible	=	true;
+           		}
+           		else{
+           			recordinfo.visible		=	false;
+					recordinfoimg.visible	=	false;
+           		}
+           	} */
+            
+            /**  whenever the window gets focus, we do the following things, go to mainpage 
+            		,get a 10 letter word which ll be used to name the video.
+            */	
+/* 			private function addme():void{
+            	currentState		= 	'mainpage';       	
+            	videolist			=	app.videos_list;
+            	tagslist			=	app.tags_list;
+            	
+            	for each ( var ppl:XML in app.people_list ){
+            		if ( ppl.@id.toString() != app.Univ_LoginId ) 
+            			peoplelist.push(ppl);
+            	}
+            			
+				sourcetype			= 	'';
+				thumbnail_url		= 	'';
+				video_url			= 	'';
+				onlyname			= 	'';
+				var http_ser:HTTPService 	= 	new HTTPService();
+				http_ser.url				= 	app.ServerPath + 'GraphData/randomString.php';
+				http_ser.useProxy			=	false;
+				http_ser.resultFormat		=	'object';
+				http_ser.addEventListener(ResultEvent.RESULT,randomString);
+				http_ser.send();	
+            } */
+			
+			/** if there is an error, in getting the 10 letter word, then we alert the user  */
+			public function randomString(r:ResultEvent):void{
+				try{
+			   		randomname	=	r.result.rsp.name;
+			 	}
+			 	catch(e:Error){
+			 		trace('An unexpected error had occured. Please contact the administrator','Error !');
+			 		app.currentState	=	'new_ui';
+			 	}
+		    }	
+			
+			private function groupsListResult(event:ResultEvent):void {
+				var grouplisttotal:String = event.result.rsp.message;
+				var groupsArray:Array = new Array();
+				
+				if(grouplisttotal==''){
+					Alert.show('Unable to Load data from server !!');
+					groupsAvailable = false;
+					return;
+				} else if(grouplisttotal=='NoGroup'){
+					groupsAvailable = false;
+					return;
+				} else
+					groupsAvailable = true;
+				var allrecords:Array=grouplisttotal.split("#@#");
+				
+				for(var i:Number=0;i<allrecords.length;i++){
+					var str:String=allrecords[i].toString();
+					if(str=='') break;
+					var eachrecord:Array = str.split("%@%");
+
+					var obj:Object=new Object();
+					obj.gid=eachrecord[0].toString();
+					obj.gname=eachrecord[1].toString();
+					obj.isSelected=false;
+					obj.text=groupsAvailable ? 'Select Groups' : 'No Groups';
+					groupsArray.push(obj);
+				}
+				videoPyGroups.dataProvider = new ArrayCollection(clone(groupsArray) as Array);
+			}
+			
+			private function getPyValue(pyval:String, pyGroups:ArrayCollection):String {
+				if(pyval == '#EVERYBODY#' || pyval == '#AUTHORONLY#')
+					return pyval;
+				else if(pyval == '#GROUPS#') {
+					for each(var obj:Object in pyGroups) {
+						if(!obj.isSelected)
+							continue;
+						pyval += obj.gid + ',';
+					}
+					if(pyval == '#GROUPS#')
+						return pyval;
+					else
+						return pyval.substr(0, pyval.length - 1);
+				} else return '#EVERYBODY#';
+			}
+			
+			// FUNCTION TO CLONE AN OBJECT.
+			private function clone(source:Object):* {
+				var myBA:ByteArray = new ByteArray();
+				myBA.writeObject(source);
+				myBA.position = 0;
+				return(myBA.readObject());
+			}
+
+            
+/*             private function handleCard(event:ItemClickEvent):void {
+				clearfields();
+	            if (event.currentTarget.selectedValue == "YES") {
+	            	parent_video.enabled = true;
+	            	newvideo_title.text		= parent_video.selectedLabel;	
+	            	newvideo_title.editable = false;    	
+	            } 
+	            else{
+	            	parent_video.enabled = false;
+	            	newvideo_title.editable = true;
+	            }      
+	        } */
+	        
+	        private function clearfields():void{
+				videos_inspiration.selectedIndices 	= new Array();
+				video_authors.selectedIndices		= new Array();
+				authors_list 			= '';	
+				inspirations_list 		= '';
+				newvideo_title.text 	= '';
+				newvid_tags.text 		= '';			
+				vid_description.text	= '';
+				return;
+			}
+			 
+			/**  both the following url's 
+					http://www.youtube.com/watch?v=G_bxlLPpuNg&feature=related 
+					http://www.youtube.com/watch?v=wd6ksEx3rZw  
+				 are valid youtube url's.
+				 1. we check if url entered by the user falls into one of these types,
+				 2. we check if the same url exists in our index, thats done by VideoExists(newurl:String)
+				  function
+			*/ 
+
+/*             private function validateUrl():void{
+				var url:String 		= 	data.@url.toString() ;
+				if ( url == '' )
+					return;
+	
+				var valid:Boolean	=	false;
+				url 				= 	url.replace(" ","");
+				url 				= 	url.replace("&feature=related","");
+				
+				if ( (url.length != 42 ) || ( url.indexOf('http://www.youtube.com/watch?v=') !=0) ){	
+					Alert.show('Please check the YouTube url.','Error !');
+					return ;
+				}
+				
+				var temp_video_url:String = url.replace("/watch?v=","/v/");		
+				if ( VideoExists(temp_video_url) ){
+					return;
+				}
+					
+				video_url 		= 	temp_video_url;							
+				thumbnail_url 	= 	temp_video_url.replace('http://www.youtube.com/v/','http://img.youtube.com/vi/');
+				thumbnail_url 	= 	thumbnail_url + '/default.jpg'; 
+
+				sourcetype						=	'YTB';		
+	//			youtube_url.text				=	'';
+				this.currentState					= 	'infopage';
+				newvideo_title.text 			= 	'';
+				newvideo_title.enabled 			= 	true;				
+				//parent_video.selectedIndex	=	0;
+				
+				return ;
+			} */
+			
+			private function VideoExists(newurl:String):Boolean{
+				var temp_videoslist:Array = new Array();
+				temp_videoslist = app.videos_list;
+				for each ( var info:Object in temp_videoslist ) {
+					if ( info.@url.toString() == newurl ){
+						var category:String = info.@category.toString();
+						var name:String 	= info.@name.toString();
+						Alert.show(videoAEUNM + name + inTheCatM + category ,'YouTube url');
+						return true;
+					}
+				}
+				return false;
+			}
+			
+			/** this function acts as a validator for the info provided about the video.
+				1. the user gets to enter only the name and tags. he selects authors and inspiration
+				  	videos, so, we just need to check these, 
+				2. for tags, we have slightly eloborate way, we strip of the white spaces in the list,
+					check if the tag already exists with different letter format, and then add it to final
+					list, if this final list is empty, we ask the user to enter some tags
+					
+				  */
+			private function infoValid():Boolean{
+        		if ( newvideo_title.text == '') {
+        			Alert.show(plzEVNM,incomInfoM);
+        			return false;
+        		}
+        		
+        		var temp_str:String 	= 	newvid_tags.text ;
+        		var uniq_arr:Array		=	new Array();	
+        		vidtags_list = new String();		
+        		
+        		// extracting from list box
+
+        		for each(var sel_item:Object in existing_tags.selectedItems){
+        			if ( tagAlreadyExists( sel_item..toString() ,uniq_arr) == false  )
+        				uniq_arr.push( sel_item.toString() );
+        		}
+        		
+        		
+        		// extracting from input text
+	
+        		var entered_arr:Array 	= 	new Array();
+        		entered_arr				=	temp_str.split(',');
+        		for each ( var single:String in entered_arr ){	
+        			var patt:RegExp = new RegExp(' ','ig');
+        			var patt2:RegExp= new RegExp('\r','ig');  
+ //       			single			=	single.replace(patt,''); 
+        			single			=	single.replace(patt2,''); 
+        			if ( (single != '') && ( tagAlreadyExists(single,uniq_arr)==false ) )
+        				uniq_arr.push( single );	
+        		}
+        		
+        		
+        		for each ( var indiv:String in uniq_arr )
+        			vidtags_list = indiv + ',' + vidtags_list;
+        		
+        		vidtags_list = vidtags_list.slice(0,vidtags_list.length-1);	
+        		
+        		// to get rid of mandatory tags
+        	/* 	if ( vidtags_list == '' ){
+        			Alert.show('Please select a tag or add a new one','Incomplete information');
+        			return false;
+        		} */
+			//	Alert.show(vidtags_list);
+				return true;
+		
+        	}
+        	
+        	private function tagAlreadyExists(tag:String,existing:Array):Boolean{
+				tag = tag.toUpperCase();
+				for each ( var t_str:String in existing ){
+					if ( tag == t_str.toUpperCase() )
+						return true;
+				}
+				return false;		
+			}
+			
+        	
+        	/** the user clicks submit button, after validating the information, we save it to
+        			server, */
+			private function submitVideo():void{
+				if ( infoValid() == false )
+					return;	
+								
+				authors_list 		= getAuthors();
+				inspirations_list 	= genInspirations();
+				SavetoServer ();
+				return;
+			}
+			
+			
+			/** returns a list of video id's delimited by comma,  
+						Video100,Video19,Video16 they are the inspirations of the new video
+			*/
+			private function genInspirations():String{
+				var temp_inspirations:String = new String();
+				var t_array:Array = videos_inspiration.selectedItems;
+				
+				
+				
+				for each(var sel_item:Object in t_array)
+					temp_inspirations = sel_item.@id + ',' + temp_inspirations;
+					
+				temp_inspirations = temp_inspirations.slice(0,temp_inspirations.length-1);
+				return temp_inspirations;
+			}
+			
+			
+			/** returns a list of people id's delimited by comma,  
+					they are the authors of the new video
+			*/	
+			private function getAuthors():String{
+				var temp_authors:String = new String(data.@submittedby.toString());			
+				var t_array:Array = video_authors.selectedItems;		
+				for each(var sel_item:Object in t_array)
+					temp_authors = sel_item.@id + ',' + temp_authors;
+				
+				//temp_authors = temp_authors.slice(0,temp_authors.length-1);	
+				//	katrina.maxwell@insead.edu,nicholas.leck@insead.edu						
+				return temp_authors;
+			}
+			
+			
+			
+			
+			
+						
+			/** we put all the video attributes into the urlvariables and send it.  */
+			private function SavetoServer():void
+			{																			
+				var variables:URLVariables = new URLVariables();
+				variables.action        =   "modifyvideo";	
+				variables.id			=	data.@id.toString();			
+				variables.nodename 		=   newvideo_title.text ;
+				variables.tags 			=   vidtags_list  ;
+				//variables.submittedby 	=  	app.Univ_LoginItem.id ;
+				variables.category 		=   vid_category.selectedLabel  ;
+				//variables.picture	 	=  	thumbnail_url;
+				variables.url 			=   videourl.text  ;	
+				variables.authors 		=   authors_list  ;	
+				//Alert.show(documents_list_for_upload,"Documents List");
+				//variables.docLinks      =   documents_list_for_upload;
+				//Alert.show(externalLinks.text,"External Links");
+				//variables.externalLinks =   externalLinks.text;
+				variables.hasinspired 	=   inspirations_list  ;	
+				//variables.sourcetype	=	sourcetype;
+				variables.description	=	vid_description.text;
+				
+				variables.video_py = getPyValue(videoPyRad.selectedValue.toString(), videoPyGroups.dataProvider as ArrayCollection);
+				
+				
+// START for egovtube
+/*				
+
+				   		variables.resType = resType.selectedItem.@id.toString();;
+						variables.servType = servType.selectedItem.@id.toString();
+
+*/					
+// END for egovtube		
+		 			
+					
+
+/*					if (Application.application.parameters.tubeName == "IFR"){
+				   		variables.facultyAreaType = facultyAreaType.selectedItem.@id.toString();;
+						}
+						
+*/						
+					
+			// * addition type can be 'NEW VIDEO' or 'VERSIONING'
+/* 				if ( other_uploadtype.selectedValue == 'NO' ){
+					variables.additiontype 		=   'NEW VIDEO' ;	
+				}
+				else{
+					variables.additiontype 		=   'VERSIONING';	
+					// if the selected video has no parent video, then the selected one itself
+					// becomes the parent video
+					var strParent:String		= parent_video.selectedItem.@parentvideo.toString();
+					if ( strParent != '' )
+						variables.parentvideo	=   parent_video.selectedItem.@parentvideo.toString();
+					else
+						variables.parentvideo	=   parent_video.selectedItem.@id.toString();		
+					
+				}		 */				
+  				add_video_node.clearResult();
+  				add_video_node.addEventListener(ResultEvent.RESULT,NewVideoAdded);
+				add_video_node.request = variables;
+				add_video_node.send();
+			 	return;
+			}
+			private function NewVideoAdded(r:ResultEvent):void{
+				try{
+					var response:XML	=	new XML(r.result);
+					var Message:String 	= 	response..message;
+					if ( Message == 'Success' ){
+						Alert.show(chngSavedM ,successAlert);
+						app.onAppCreationComplete();
+						CursorManager.removeBusyCursor();
+						app.select_centre	=	true;
+						app.centre_id		=	response.entity;
+						videourl.text	=	 '';
+						clearfields();
+						//app.currentState='new_ui';
+						PopUpManager.removePopUp(this);	
+					}
+					else
+						Alert.show('Nodes and Edges are not created properly.Please check it.');
+						PopUpManager.removePopUp(this);
+					return;
+				}
+				catch(e:Error){
+					// take care ;
+					trace (e.message);
+					PopUpManager.removePopUp(this);
+				}
+			}
+            
+		]]>
+
+	</mx:Script>
+	<mx:Button x="591" y="391" label="{cancelM}" click="PopUpManager.removePopUp(this)" width="76"/>
+		
+	<mx:HTTPService id="getGListService" url="{app.ServerPath + 'GraphData/groupmanager.php'}" result="{groupsListResult(event)}">
+		<mx:request xmlns="">
+			<action>getgrouplist</action>
+		</mx:request>
+	</mx:HTTPService>
+</mx:Canvas>

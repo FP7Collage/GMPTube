@@ -1,0 +1,160 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel  xmlns:mx="http://www.adobe.com/2006/mxml" width="500" height="500"  x =
+"300" title="{updateNM}" backgroundAlpha="1.0" >
+	<mx:Canvas width="479" height="23">
+		<mx:Button label="{closeM}" click="closeonclick(event);" width="111" x="368"/>
+	</mx:Canvas>
+	
+	<mx:Text text="{titleM}" color="white"/>
+	<mx:TextArea id = "titlename" width="463" height="33"  text="{Application.application.title_tck}" />
+	<mx:Text text="{descM}" width="81" color="white" />
+	<mx:TextArea id = "descriptionname" width="463" height="222" text="{Application.application.desc_tck }"/>
+	<mx:Label text="Isactive" width="92" color="white"/>
+	<mx:Canvas width="479" height="23">
+		<mx:RadioButton id="rbc2" label="No" groupName="radgroup1" color="white" x="89" y="0"/>
+		<mx:RadioButton id="rbc1" label="yes" groupName="radgroup1" selected="{Application.application.isactive_tck}" color="white" x="10" y="0"/>
+	</mx:Canvas>
+	<mx:Button label="Post"  click="closeaddnews(event);" />
+	
+	<mx:HTTPService id="getnewsService" url="{app.ServerPath + 'GraphData/news.php'}" useProxy="false" fault="{loadconstantsFault();}" result="suceess_showresponse();"
+				method="POST" showBusyCursor="true" >
+				<mx:request xmlns="">
+					<action>editnews</action>
+					<id>{Application.application.id_tck}</id>
+					<title>{titlename.text}</title>
+					<description>{descriptionname.text}</description>
+					<isactive>{rbc1.selected}</isactive>
+				</mx:request>
+	</mx:HTTPService>
+
+	
+  <mx:Script source=".././Asfiles/as_constants.as" />	
+	
+	<mx:Script>
+	<![CDATA[
+			import mx.core.Application;
+			import mx.controls.Alert;
+			import flash.display.*;
+            import flash.events.*;
+            import flash.net.*;
+            import flash.text.TextField;
+            import flash.text.TextFieldAutoSize;
+            
+            import flash.text.TextFormat;
+            import flash.utils.*;
+			import mx.containers.ControlBar;
+            import mx.containers.Panel;
+            import mx.containers.VBox;
+            import mx.controls.Button;
+            import mx.controls.Label;
+            import mx.controls.Spacer;
+            import mx.controls.TextInput;
+            import mx.managers.PopUpManager;
+            import mx.rpc.events.ResultEvent;
+			import mx.rpc.http.mxml.HTTPService;
+			
+	   	 [Bindable]public var app:Tentube=Tentube(Application.application);
+	   
+	 private var Pnlpopper1:Panel = new Panel();
+	
+	
+	  [Bindable]
+            public var selectedItem:Object;  
+	  
+	  
+	  [Bindable]
+            public var deletenewsstr:String ;  
+            
+            
+	 private function loadconstantsFault():void{
+			trace("loadconstantsFault()");}
+	 
+	   private function suceess_showresponse():void
+	   
+            {	
+            	
+            	var lblpop:Label = new Label();
+            	lblpop.text = sucUpM;
+            	lblpop.setStyle("color", app.colorreturn());
+            	var btnpop:Button = new Button();
+            	btnpop.label = closeM;
+            	btnpop.addEventListener(MouseEvent.CLICK, closePop1);
+            	Pnlpopper1 = Panel(PopUpManager.createPopUp(Application.application.upperBox,Panel,false));
+            	Pnlpopper1.x = 500;
+            	Pnlpopper1.y = 400;
+            	Pnlpopper1.height = 100;
+            	Pnlpopper1.width = 200;
+            	Pnlpopper1.title = statusM;
+            	//paneldisp.title = label.text;
+            	//label.visible = true;
+            	Pnlpopper1.addChild(lblpop);
+            	Pnlpopper1.addChild(btnpop);	
+            	
+           
+          
+            } 
+	 
+       private function closeonclick(event:MouseEvent):void{
+   
+       	PopUpManager.removePopUp(this); 		
+	    }
+	    
+	  private function closePop1(event:MouseEvent):void{
+       	
+    //var tick2:TickerFormatTester  = new TickerFormatTester();
+       	PopUpManager.removePopUp(Pnlpopper1);
+	   	PopUpManager.removePopUp(Application.application.Panup);
+	   //Application.application.closethis2(event);
+	   	     	
+	   		
+	    }
+	  
+	    
+	     private function closeaddnews(event:MouseEvent):void{
+	   getnewsService.send();		
+	 //var tick3:TickerFormatTester = new TickerFormatTester();
+      PopUpManager.removePopUp(this);
+      PopUpManager.removePopUp(Application.application.Panup);
+	    	     			
+	    }
+	    
+            
+		]]>
+	
+	</mx:Script>
+	<mx:RadioButtonGroup id="radgroup1"/>
+</mx:Panel>
+

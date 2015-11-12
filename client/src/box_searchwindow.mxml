@@ -1,0 +1,315 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" horizontalAlign="center"
+	verticalAlign="middle" close="PopUpManager.removePopUp(this);app.SearchWindowOpen = false"
+	title="{searchPM}" layout="absolute" height="112" width="686" creationComplete="createListeners()" showCloseButton="true">
+	<mx:Label x="10" y="12" text="{showM}" color="{app.colorreturn()}" fontWeight="bold"/>	
+	<mx:Button x="51" y="40" label="{queryM}" click="Formquery();" color="{app.colorreturn()}" fontWeight="bold"/>
+	
+	<mx:ComboBox x="51" y="10" width="177.5" id="actions" rowCount="9" dataProvider="{s_ActionsList}"></mx:ComboBox>
+	
+	<mx:ComboBox toolTip="{StartNodes.selectedLabel}" x="236.5" y="10" width="189" id="StartNodes" labelField="@name" rowCount="20" dataProvider="{combonodeslist}"></mx:ComboBox>		
+	<mx:ComboBox visible="true" x="433.5" y="10" width="228.5" id="Seconddegree"  dataProvider="{s_SecondDegreeCombo}"></mx:ComboBox>
+	<mx:CheckBox visible="true" x="433.5" y="40" label="{includeM}" id="secdegreesearch" selected="false" click="EnableSecondDegree()" color="#FFFFFF"/>
+	 
+<mx:Script source="Asfiles/as_constants.as" />	 
+	<mx:Script>
+		<![CDATA[
+			import mx.events.DropdownEvent;
+			import mx.controls.Alert;
+			import mx.core.Application;
+			import mx.managers.PopUpManager;
+			
+			import com.adobe.flex.extras.controls.springgraph.Item; 
+			[Bindable]public var app:Tentube=Tentube(Application.application); 
+
+
+			/** these are the list of actions. they are shown in the 1st combo box ( actions:combo box ) **/
+			[Bindable]
+		//	public var s_ActionsList:Array=new Array('People who know','People who have seen','Videos seen by','Videos submitted by','Videos tagged with','Tags of video','Previous Version of video','Videos which has inspired');
+			public var s_ActionsList:Array=new Array(v1004,v1005,v1006,v1007,v1008,v1009,v1010,v1011,v1012);
+			
+			/** based on selected item in actions:combo box, 
+				either people_list or videos_list or tags_list is put into this array
+				and shown in the 2nd combo box		**/
+			[Bindable]public var combonodeslist:Array=new Array();
+			
+			
+			/** based on the selected item in actions:combo box, contents of this array is changed
+				and shown in the last combo box	
+				this is also a list of actions **/
+			[Bindable]public var s_SecondDegreeCombo:Array=new Array();
+				
+			[Bindable]public var people_list:Array=new Array();	
+			[Bindable]public var videos_list:Array=new Array();	
+			[Bindable]public var tags_list:Array=new Array();	
+					
+			
+			private function createListeners():void
+			{
+				actions.addEventListener(DropdownEvent.CLOSE,ChangeActions);
+				people_list			=	app.people_list;
+				videos_list			=	app.videos_list;
+				tags_list			=	app.tags_list;
+				combonodeslist		=	people_list;
+ 				s_SecondDegreeCombo	=	[v1013 , v1014];
+				Seconddegree.enabled=	false; 
+			}
+	
+			/**  this function is called when user clicks Query
+				 we form a query and call the Neighbourhood() function in as_visualization.as file
+				 
+				 Query format:
+				 	its formed as an array ( right can combine only 2 different searches )
+				 	
+				 	eg: 
+						1st combo box : "Videos submitted by" 
+						2nd combo box :  albert1  						( albert1 is the user id )
+						3rd combo box : "People who have seen them" 
+						
+				 		then, 	queryarray[0] =	'Videos@Has seen'
+				 				queryarray[1] = 'Videos@Has submitted'
+				 
+				 all possible combinations of query are hardcoded
+				 some of the queries:
+				 
+				 1. show  videos tagged with "Idea" ( tag ) and people who have seen them
+				 2. show  videos tagged with "Idea" ( tag ) and people who submitted them
+				 3. show  people who have seen "Video11" ( video ) and other videos seen by them
+				 etc..
+			**/
+	
+			private function Formquery():void
+			{
+				var queryarray:Array=new Array();	
+
+				if ( secdegreesearch.selected == true ){
+					switch( Seconddegree.selectedLabel ){
+						case v1015:
+							queryarray.push('Tags@All');
+							break;
+						case v1016:
+							queryarray.push('Videos@All');
+							break;
+						case v1017:
+							queryarray.push('People@Has submitted');
+							break;
+						case v1014:
+							queryarray.push('Videos@Has submitted');
+							break;
+							
+						case v1013:
+							queryarray.push('Videos@Has seen');
+							break;
+							
+						case v1018:
+							queryarray.push('Videos@Has seen');
+							break;
+									
+						case v1019:
+							queryarray.push('People@Has submitted');
+							break;
+							
+						case v1020:
+							queryarray.push('Videos@Is previous version');
+							break;
+							
+						/*case 'videos which has inspired it':
+							queryarray.push('Videos@Has inspired');
+							break;
+								
+						case 'videos which inspired them':
+							queryarray.push('Videos@Has inspired');
+							break;
+							
+							*/
+							
+						case v1011:
+							queryarray.push('Videos@Is Connected To');
+							break;
+								
+				/*		case 'videos which are related to':
+							queryarray.push('Videos@Is Connected To');
+							break;
+					*/			
+						
+						case v1021:
+							queryarray.push('People@Knows');
+							break;
+						//for interests
+						case v1022:
+							queryarray.push('People@Has Interest');
+							break;	
+							
+						default:
+							queryarray.push('People@Has seen');
+							break;
+					}
+				} 
+				
+ 	
+				switch( actions.selectedItem.toString() )
+				{
+					case v1004:
+						queryarray.push('People@Knows');
+						break;
+					// for interest
+					case v1012:
+						queryarray.push('Tags@Has Interest');
+						break;	
+					case v1005:
+						queryarray.push('People@Has seen');
+						break;
+					case v1006:
+						queryarray.push('Videos@Has seen');
+						break;
+					case v1007:
+						queryarray.push('Videos@Has submitted');
+						break; 
+					case v1008:
+						queryarray.push('Videos@All');
+						break;
+					case v1009:
+						queryarray.push('Tags@All');
+						break;
+		
+					case v1010:
+						queryarray.push('Videos@Is previous version');
+						break;
+					/*case 'Videos which has inspired':
+						queryarray.push('Videos@Has inspired');
+						*/
+					case v1011:
+						queryarray.push('Videos@Is Connected To');
+						
+						
+						break;
+				}
+				
+   				
+   				var BaseIds:Array=new Array();	
+   				
+   				if ( StartNodes.selectedItem == null ){
+   					Alert.show('Cannot perform query','Error !');
+   					return;
+   				} 
+   				BaseIds.push( StartNodes.selectedItem.@id.toString() );
+				
+				app.new_current_id=BaseIds[0];
+        		app.setCurrentItem(new TimerEvent(TimerEvent.TIMER_COMPLETE));
+   			    app.clearhistory();
+   				app.Neighbourhood(BaseIds,queryarray,false);
+   				app.drawNodesEdges();
+                app.savecurrentdisplay();
+				queryarray=null;
+			}
+			
+			
+		 private function ChangeActions(e:Event):void
+		 {
+		  	switch( ComboBox(e.target).selectedLabel){
+		  		case v1004:	
+		  	 		combonodeslist=people_list;
+		  	 		s_SecondDegreeCombo=[v1006 , v1007];
+		  	 	break;
+		  		//for including interests
+		  		case v1012:	
+		  	 		combonodeslist=people_list;
+		  	 		s_SecondDegreeCombo=[v1022];
+		  	 	break;
+		  		case v1005:	
+		  	 		combonodeslist=videos_list;
+		  	 		s_SecondDegreeCombo=[v1021,v1018 , v1014];
+		  	 	break;
+		  	 	case v1006:	
+		  	 		combonodeslist=people_list;
+		  	 		s_SecondDegreeCombo=[v1015 , v1017];
+		  	 	break;
+		  	 	case v1007:	
+		  	 		combonodeslist=people_list;
+		  	 		s_SecondDegreeCombo=[v1015, v1023];
+		  	 	break;
+		  	 	case v1008:	
+		  	 		combonodeslist=tags_list;
+		  	 		s_SecondDegreeCombo=[v1023,v1017];
+		  	 	break;
+		  	 	case v1009:
+		  	 		combonodeslist=videos_list;
+		  	 		s_SecondDegreeCombo=[v1016];
+		  	 	break;
+		  	 		  	 		
+		  	 	case v1010:
+		  	 		combonodeslist=videos_list;
+		  	 	//	s_SecondDegreeCombo=['people who have seen them','the user who submitted it','its previous version','videos which has inspired it','their tags'];
+		  	 		s_SecondDegreeCombo=[v1023,v1017,v1020,v1011,v1015];
+		  	 	break;	
+		  	 	
+		  	 /*	case 'Videos which has inspired':
+		  	 		combonodeslist=videos_list;
+		  	 		s_SecondDegreeCombo=['people who have seen them','the user who submitted each of it','its previous version','videos which inspired them','their tags'];
+		  	 		*/
+		  	 		case v1011:
+		  	 		combonodeslist=videos_list;
+		  	 		s_SecondDegreeCombo=[v1023,v1017,v1020,v1011,v1015];
+		  	 	
+		  	 		
+		  	 	break;	
+		  	 	
+		  	 }
+		 }
+		 
+  	  	/**  to disable the 2nd degree search  **/
+  	  	
+		 private function EnableSecondDegree():void{
+	  		if ( secdegreesearch.selected == false) {
+	  			Seconddegree.enabled=false;
+	  		}
+		  	else 
+		  		Seconddegree.enabled=true;
+		 }  
+		  
+		  
+		]]>
+	</mx:Script>
+
+</mx:TitleWindow> 
+
+
+
+
+
+
+
+
+
+
+

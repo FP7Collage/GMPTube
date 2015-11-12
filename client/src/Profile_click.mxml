@@ -1,0 +1,197 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="connectCamera2(null);" showCloseButton="true" close="app.Closethispop3(null);" verticalScrollPolicy="off" horizontalScrollPolicy="off" layout="vertical" width="374" height="330">
+<mx:VBox width="320" id="RecNow2">
+	<mx:VideoDisplay id="vcLocal"  width="320" height="240" />
+</mx:VBox>
+<mx:VBox width="100%">
+	<mx:HBox width="100%">
+		<mx:Button click="takePhotoshot2(event);" id="btnCameraPhoto" label="{takePicM}" icon="@Embed(source='media/camera.png')"/>
+		<mx:Button click="selectPhoto(event);" id="btnSelectPhoto" label="{finalPicM}"  visible="false" y="250"/>
+		<mx:Button click="cancelPhoto(event);" id="btnCancelPhoto" label="{rejectM}" visible="false" y="290"/>
+
+		<!--<mx:Text selectable="false" visible="true" id="recordinfo" text="Instruct" width="228" height="307"/>
+--></mx:HBox>
+</mx:VBox>
+
+<mx:Script source="Asfiles/as_constants.as" />
+	<mx:Script>
+		<![CDATA[
+				
+			import com.byteencoder.Base64;
+      		import mx.graphics.codec.JPEGEncoder;
+			import mx.events.ItemClickEvent;
+            import mx.core.*;
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.ItemClickEvent;
+		[Bindable]public var app:Tentube=Tentube(Application.application); 
+		[Bindable]private var camera:Camera = null;
+		
+		
+		public var jpgBytes:ByteArray;
+		public function connectCamera2(event:MouseEvent):void{
+				/*
+				if ( app.fms_nc.connected == false){
+					app.displayconnstatus = true;
+					app.fmsConnect();
+					return;
+				}
+				*/
+				//  Camera.names returns the number of cameras attaced to system			
+				if ( Camera.names.length == 0){
+					Alert.show(webCamNotM,errM);
+					return;
+				}
+				
+				// adding the new staage , new code for camera settings
+				// stage.scaleMode = StageScaleMode.NO_SCALE;
+
+
+//				Security.showSettings(SecurityPanel.CAMERA);
+				camera 				=	Camera.getCamera();		
+				if ( camera == null ){
+					Alert.show(unableAttCamM,errM);
+					return;
+				}
+				
+				
+				setCameraWell2();
+				//camera.setmode(320,240,15);
+				//camera.setMode(640,480,15);
+				vcLocal.attachCamera(camera);
+				//var btnstp:Button = new Button();
+				//btnstp.addEventListener(MouseEvent.CLICK, takePhotoshot2);
+				//RecNow.addChild(btnstp);
+				//takePhotoshot2();
+				//camera.addEventListener(ActivityEvent.ACTIVITY, activityHandler);
+			//	stage.addEventListener(MouseEvent.CLICK, setCameraWell);
+					
+							    
+				
+				return;
+			}
+			
+			
+			public function setCameraWell2():void{
+				if(camera ==  null){
+					Alert.show(unableAttQuCamM,errM);
+					return;
+				}
+				//vcLocal.width = camera.width;
+				//vcLocal.height = camera.height;
+				vcLocal.width = 160;
+				vcLocal.height = 240;;
+				camera.setMode(160, 240, app.camera_fps);
+				
+				
+				/*switch (camera.width) {
+                case 160:
+                camera.setMode(320, 240, 15); 
+                break;
+                case 320:
+                camera.setMode(640, 480, 15); 
+                break;
+                default:
+                camera.setMode(160, 120, 15); 
+                break;
+               
+             }  */
+  
+           camera.setQuality(app.camera_bandwidth,app.camera_quality);
+				
+			}
+			
+			 private function takePhotoshot2(event:MouseEvent):void {
+            	
+            	//btnCamera.visible	=	true;
+            	//btnStop.visible		=	false;
+             	//nsPublish.attachCamera(null);
+             	var snapshotHolder:UIComponent = new UIComponent();             	
+             	
+             	
+             	var bmd:BitmapData 			= new BitmapData(vcLocal.width,vcLocal.height);
+				var snapshotbitmap:Bitmap = new Bitmap(bmd);
+             	snapshotHolder.addChild(snapshotbitmap);
+             	RecNow2.removeAllChildren();
+             	RecNow2.addChild(snapshotHolder);
+				
+                bmd.draw(vcLocal);
+				var jpgEncoder:JPEGEncoder 	= new JPEGEncoder(75);
+		        jpgBytes	= jpgEncoder.encode(bmd);
+		        //uploadPhoto(jpgBytes);
+		        //vcLocal.pause();
+		        // to remove the camera after the upload
+             	//vcLocal.attachCamera(null);
+             	//btnRecord.visible=false;
+             	//btnCameraPhoto.enabled = false;
+             	btnCameraPhoto.visible = false;
+             	btnCancelPhoto.visible = true;
+             	btnSelectPhoto.visible = true;
+		    }
+		    
+		     private function cancelPhoto(event:MouseEvent):void {
+		     RecNow2.removeAllChildren();
+		     RecNow2.addChild(vcLocal);
+		     btnCameraPhoto.visible = true;
+             btnCancelPhoto.visible = false;
+             btnSelectPhoto.visible = false;
+		     connectCamera2(null);
+		     }
+		      private function selectPhoto(event:MouseEvent):void {
+		      uploadPhoto();
+		      return;}
+		      
+		      private function uploadPhoto():void {
+				var request:URLRequest = new URLRequest(app.ServerPath + 'GraphData/uploadLivePhoto.php');
+				var vars:URLVariables = new URLVariables();
+				vars.id 		= app.Univ_LoginId;
+				vars.bindata 	= Base64.encodeByteArray(jpgBytes);
+				request.method 	= "POST";
+				var loader:URLLoader = new URLLoader();
+				loader.addEventListener(Event.COMPLETE, uploadPhotoHandler);
+				request.data = vars;
+				
+				loader.load(request);
+				
+				cancelPhoto(null);
+			}
+			public function uploadPhotoHandler(event:Event):void {
+       	 		// thumbnail picture uploaded.
+				app.onAppCreationComplete();
+       	 		Alert.show(photoChangedM,successAlert);
+      		
+      		}
+			
+		]]>
+	</mx:Script>
+</mx:TitleWindow>

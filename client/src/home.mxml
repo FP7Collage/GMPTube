@@ -1,0 +1,418 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"  xmlns:ns2="*" width="100%" height="800" horizontalScrollPolicy="off" verticalScrollPolicy="off"  creationComplete="init();">
+	
+	<!--<mx:Style>
+	 HSlider {
+            
+        }
+		
+	</mx:Style>-->
+	
+	
+	
+	<mx:VBox id="vboxmain" borderColor="Red" borderThickness="5" horizontalAlign="center" width="100%" height="100%">
+	
+	<mx:HBox horizontalGap="10" id="hboxMain" width="90%" >		
+	
+	<!--<mx:Image source="@Embed(source='media/Ulead.png')" id="imgmain" top="30" height="100%" width="100%" verticalAlign="middle" horizontalAlign="left"  />-->
+	
+		<!--<mx:Image source="@Embed(source='media/leapfinal01.png')" id="imgmain" top="30" height="100%" width="100%" verticalAlign="middle" horizontalAlign="left"  />-->
+	<mx:VBox>
+	<mx:Spacer width="100%"  height="5">		
+	</mx:Spacer>
+	
+	<mx:HBox>
+	<mx:Spacer width="10">
+		
+	</mx:Spacer>
+	<mx:Image  source="{app.homePageLogo}"  click="{app.openHomePageLogoUrl();}" id="imgmain"  verticalAlign="middle" horizontalAlign="left"   />
+		
+	</mx:HBox>
+		
+	</mx:VBox>	
+	
+	
+	<mx:Spacer id="spacer1">		
+	</mx:Spacer>		
+	
+	<ns2:form_login_home id="loginForm" horizontalAlign="center" verticalAlign="middle"  width="650">
+				</ns2:form_login_home>
+	
+	
+	
+	</mx:HBox>
+
+	<mx:Spacer width="100%"  height="2">
+		
+	</mx:Spacer>
+	
+	<mx:HBox>
+			<mx:LinkButton id="myProfile" textDecoration="underline" fontWeight="bold" fontSize="20" label="My Profile" click="{openMyProfile();}" />
+			<mx:LinkButton id="myNetwork" textDecoration="underline" fontWeight="bold" fontSize="20" label="My Network" toolTip="Bring me to my network map" click="{openMyNetwork();}" />
+			<mx:LinkButton id="networks" textDecoration="underline" fontWeight="bold" fontSize="20"  label="Networks" toolTip="Show me the network of the most seen video as sample network" click="{openNetworks();}" />			
+			<mx:LinkButton id="meetings" textDecoration="underline" fontWeight="bold" fontSize="20"  label="Meetings" click="{openMeetings();}" />
+			
+		
+			
+		
+	</mx:HBox>
+	
+	<mx:Spacer width="100%"  height="7">
+		
+	</mx:Spacer>
+	
+	
+	<mx:HBox horizontalGap="10" borderColor="red" borderThickness="2" verticalGap="10"  width="100%" horizontalAlign="center">
+<!--	#0B376B  -->
+		<mx:VBox horizontalAlign="center" borderColor="White" color="#ffffff"  borderThickness="2" backgroundColor="#0B376B" verticalAlign="middle">
+			<mx:Label  text="{app.firstChannel}"  fontWeight="bold" paddingTop="5" color="white" height="26"  fontSize="12" ></mx:Label>
+			<mx:List borderThickness="1" borderColor="black" height="230" width="270"   id="homeVideos1"
+					 dataProvider="{app.cd_general_Xml}"   itemRenderer="component.homeVideoBox"  >										
+			</mx:List>
+		</mx:VBox>
+		
+		<mx:VBox horizontalAlign="center" borderColor="White" color="#ffffff" borderThickness="2" backgroundColor="#0B376B" verticalAlign="middle">
+			<mx:Label  text="{app.secondChannel}"  paddingTop="5" fontWeight="bold" color="white" height="26"   fontSize="12" ></mx:Label>
+			<mx:List borderThickness="1" borderColor="black" height="230" width="270" id="homeVideos2"
+				 dataProvider="{app.cd_oppurtunity_Xml}"   itemRenderer="component.homeVideoBox" >										
+			</mx:List>	
+		</mx:VBox>
+			
+		<mx:VBox horizontalAlign="center"  color="#ffffff" borderColor="White" backgroundColor="#0B376B" borderThickness="2">
+			<mx:Label text="{app.thirdChannel}" paddingTop="5" fontWeight="bold" color="white" height="26"  fontSize="12" ></mx:Label>
+			
+			<mx:List borderThickness="1" borderColor="black"  height="230" width="270" id="homeVideos3"
+				 dataProvider="{app.cd_experts_Xml}"   itemRenderer="component.homeVideoBox" >										
+			</mx:List>
+			
+		</mx:VBox>
+			
+			
+	</mx:HBox>
+	<!--<mx:HBox width="100%"  verticalScrollPolicy="off" paddingTop="0" horizontalGap="0" verticalAlign="top" horizontalAlign="center"  height="30">
+		
+	</mx:HBox>
+	-->
+	<mx:Spacer width="100%"  height="7"> </mx:Spacer>
+	<mx:Label  text="{app.membersLabel}"  paddingTop="5" fontWeight="bold" color="white" height="26"   fontSize="16" ></mx:Label>		
+	
+	
+	<!--<mx:HBox id="peopleList"  verticalScrollPolicy="off" paddingTop="0" horizontalGap="0" verticalAlign="top" horizontalAlign="center"  height="97">
+	
+		<mx:HorizontalList  width="100%" dataProvider="{app.people_listXMLListCollection}"  columnCount="8"  maxRows="1" itemRenderer="component.profilebox" id="tp1" rowCount="1" horizontalScrollPolicy="on" verticalScrollPolicy="off" height="93" left="100" right="100" >		
+		</mx:HorizontalList>
+	</mx:HBox>
+	-->
+	
+		
+	 <!--   <mx:HBox id="peopleList"  verticalScrollPolicy="off" paddingTop="0" horizontalGap="0" verticalAlign="top" horizontalAlign="center" horizontalScrollPolicy="off"  height="97">-->
+   
+        <mx:HorizontalList id="tp1"
+                dataProvider="{app.people_listXMLListCollection}"
+                itemRenderer="component.profilebox"
+                verticalScrollPolicy="off"
+                horizontalScrollPolicy="off"              
+                columnCount="7"                
+                rowCount="1"
+                borderSkin="{null}" />
+                  	
+     <!--    </mx:HBox>-->      
+        
+        <mx:ControlBar>
+        <mx:LinkButton   textDecoration="underline" fontWeight="bold"  label="Previous" click="prev();" />
+         
+            <mx:HSlider id="slider"
+                    minimum="0"
+                    maximum="{tp1.maxHorizontalScrollPosition}"
+                    value="{tp1.horizontalScrollPosition}"
+                    liveDragging="true"
+                    snapInterval="1"
+                    tickInterval="8"                    
+                    tickColor="red"
+                    tickLength="0.5"
+                    tickThickness="3"                    
+                    showDataTip="false"     
+                    width="100%"                                
+                   	change="slider_change(event);" />
+           <mx:LinkButton  textDecoration="underline" fontWeight="bold"  label="Next" click="next();" />         
+           
+        </mx:ControlBar>
+ 	
+           
+    
+ 
+    
+    
+	
+	
+	
+	
+	
+	
+	<mx:Spacer width="100%"  height="10">		
+	</mx:Spacer>
+	
+	<mx:VBox width="100%" height="100%" fontSize="11" horizontalGap="0" color="#FFFFFF" horizontalAlign="left"  fontFamily="Verdana" >
+		<mx:HBox paddingLeft="30" color="#FFFFFF" horizontalGap="-3">
+			<mx:Label paddingTop="2" text="Send an email to"></mx:Label>
+			<mx:LinkButton label="Technical Support" textDecoration="underline" fontWeight="bold" click="navigateToURL(new URLRequest('mailto:pkmittal82@gmail.com'), 'quote')"/>	
+		</mx:HBox>
+		<mx:HBox paddingLeft="30" color="#FFFFFF" horizontalGap="-3">
+		<mx:Image source="@Embed(source='media/insead.png')"   visible="true"  verticalAlign="middle" horizontalAlign="left"  />
+		
+		</mx:HBox>
+		<mx:HBox paddingLeft="30" color="#FFFFFF" horizontalGap="-3">
+		<mx:LinkButton icon="@Embed(source='/media/privacy.jpg')" id="privacyId"  toolTip="{v1085}"  click="{app.openPrivacyLink();}" horizontalCenter="0" verticalCenter="160" />
+		</mx:HBox>
+		
+	<!--	<mx:HBox paddingLeft="30" horizontalGap="-3" color="#FFFFFF">
+			<mx:LinkButton  label="Schlumberger" textDecoration="underline" click="navigateToURL(new URLRequest('http://www.slb.com/'), 'quote')"/>
+			<mx:Label paddingTop="2"  text="&amp;"></mx:Label>
+			<mx:LinkButton  label="INSEAD" textDecoration="underline" click="navigateToURL(new URLRequest('http://www.insead.edu'), 'quote')"/>
+			<mx:Label paddingTop="2" text="2011-12."></mx:Label>
+		</mx:HBox>-->
+	</mx:VBox>
+	
+	</mx:VBox>			
+	
+
+<mx:Script source="Asfiles/as_constants.as" />	
+	
+		<mx:Script>
+			<![CDATA[
+				import mx.controls.Alert;
+				
+				import mx.core.Application;
+				import mx.events.ItemClickEvent;
+				import mx.events.ListEvent;
+				import mx.events.FlexEvent;
+				import mx.events.CloseEvent;
+				import mx.events.SliderEvent;
+				
+				
+				
+							
+				[Bindable] public var app:Tentube=Tentube(Application.application);
+				
+							
+
+            private function prev():void {
+                var pos:int = tp1.horizontalScrollPosition-8;
+                var min:int = 0;
+                var value:int = Math.max(min, pos);
+                tp1.horizontalScrollPosition = value;
+                slider.value = value;
+            }
+
+            private function next():void {
+                var pos:int = tp1.horizontalScrollPosition+8;
+                var max:int = tp1.maxHorizontalScrollPosition;
+                var value:int = Math.min(pos, max);
+               tp1.horizontalScrollPosition = value;
+               slider.value = value;
+            }
+
+            private function slider_change(evt:SliderEvent):void {
+                tp1.horizontalScrollPosition = evt.value;
+            }
+				
+				
+				
+				
+				
+				
+				
+				
+				private function myScroll1(){
+					
+					if (homeVideos1.verticalScrollPolicy!="on"){
+						homeVideos1.verticalScrollPolicy ="on"
+					}
+						        			
+        		}
+        		private function myScroll2(){
+        			if (homeVideos1.verticalScrollPolicy!="off"){
+        			homeVideos1.verticalScrollPolicy = "off";
+        			}
+        		}
+        		
+        		private function init()
+        		{
+        			tp1.addEventListener(ListEvent.ITEM_CLICK,showProfile);        	
+        			spacer1.width= hboxMain.width-(imgmain.width+loginForm.width)-270;
+        		 //  peopleList.width=hboxMain.width-200;
+        	        slider.width = 400;
+					
+        		}
+        		
+        		
+        			 		
+	 		
+		    private function alertListenerMyProfile(eventObj:CloseEvent):void {      
+				if (eventObj.detail==Alert.YES) {
+					app.actionToClick = 'viewMyProfile';
+						app.forceLogin();
+ 			      		return;				
+				}		
+				else if(eventObj.detail==Alert.NO) {
+					// do nothing	
+				}
+	        }
+	        
+	          private function alertListenerOtherProfiles(eventObj:CloseEvent):void {      
+				if (eventObj.detail==Alert.YES) {
+					app.actionToClick = 'viewOtherProfiles';
+						app.forceLogin();
+ 			      		return;				
+				}		
+				else if(eventObj.detail==Alert.NO) {
+					// do nothing	
+				}
+	        }
+	        
+	        
+	        private function alertListenerMyNetwork(eventObj:CloseEvent):void {      
+				if (eventObj.detail==Alert.YES) {
+					app.actionToClick = 'viewMyNetwork';
+						app.forceLogin();
+ 			      		return;				
+				}		
+				else if(eventObj.detail==Alert.NO) {
+					// do nothing	
+				}
+	        }
+	        
+	        private function alertListenerNetworks(eventObj:CloseEvent):void {      
+				if (eventObj.detail==Alert.YES) {
+					app.actionToClick = 'viewNetworks';
+						app.forceLogin();
+ 			      		return;				
+				}		
+				else if(eventObj.detail==Alert.NO) {
+					// do nothing	
+				}
+	        }
+	        
+	        private function alertListenerMeetings(eventObj:CloseEvent):void {      
+				if (eventObj.detail==Alert.YES) {
+					app.actionToClick = 'viewMeetings';
+						app.forceLogin();
+ 			      		return;				
+				}		
+				else if(eventObj.detail==Alert.NO) {
+					// do nothing	
+				}
+	        }
+	        
+	        
+        		
+        	private function openMyProfile():void{
+        		 if (! app.isLoggedIn()){
+        			 Alert.show("You need to login to view your profile. Would you like to login?", "Need to Login" ,Alert.YES | Alert.NO, this,alertListenerMyProfile, null, Alert.YES);
+ 			      		return;
+ 			 			}
+ 			 	app.detailedprofileId	=	app.Univ_LoginId;
+				app.id_selectedbyeadmin=    app.Univ_LoginId;					 										 			 			
+ 			 	app.currentState		=	'profilingdim';
+        		return;	
+        		}
+        		
+				private function openMyNetwork():void{
+				 if (! app.isLoggedIn()){
+        			 Alert.show("You need to login to view your network. Would you like to login?", "Need to Login" ,Alert.YES | Alert.NO, this,alertListenerMyNetwork, null, Alert.YES);
+ 			      		return;
+ 			 			}
+ 			 	app.detailedprofileId	=	app.Univ_LoginId;
+				app.id_selectedbyeadmin=    app.Univ_LoginId;					 										 			 			
+ 			 	app.viewNet();		 			 				
+        		
+        		return;	
+        		}
+        		private function openNetworks():void{
+        			var	vdata: Object = new Object();
+        			vdata = app.timesseen_based[0];        			
+        			        		
+        		 if (! app.isLoggedIn()){
+        			 Alert.show("You need to login to view networks. Would you like to login?", "Need to Login" ,Alert.YES | Alert.NO, this,alertListenerNetworks, null, Alert.YES);
+ 			      		return;
+ 			 			}
+ 			 	app.detailedprofileId	=	app.Univ_LoginId;
+				app.id_selectedbyeadmin=    app.Univ_LoginId;					 										 			 			
+ 			 	app.viewVideoNetwork(vdata);	
+        			
+        		
+        		return;	
+        		}
+        		private function openMeetings():void{        			
+        			if (! app.isLoggedIn()){
+        			 Alert.show("You need to login to enter into meeting area. Would you like to login?", "Need to Login" ,Alert.YES | Alert.NO, this,alertListenerMeetings, null, Alert.YES);
+ 			      		return;
+ 			 			}			 					
+						app.currentState='pubconference';		 			 				
+        		        		
+        		return;	
+        		}
+        		
+			
+        		
+        		
+        		private function showProfile(e:ListEvent):void{
+        			
+        			try{  
+        			var data:XML			= 	new XML(tp1.selectedItem);//	new XML( peoplelist[e.columnIndex] );
+					app.detailedprofileId	=	data.@id.toString();
+					app.id_selectedbyeadmin=data.@id.toString();				 								
+		  		
+        			}catch(e:Error){
+					// do nothing
+						}
+        			
+        			if (! app.isLoggedIn()){
+        			 Alert.show("You need to Login to enter into Profiles Area. Would you like to login?", "Need to Login" ,Alert.YES | Alert.NO, this,alertListenerOtherProfiles, null, Alert.YES);
+ 			      		return;
+ 			 			}			 					
+				      
+				      app.currentState		=	'profilingdim'; 			
+        			      
+        			
+		  			return;
+
+        		}
+	
+			]]>
+		</mx:Script>
+	
+
+			
+</mx:Canvas>
+

@@ -1,0 +1,136 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="592" height="168" title="{deleteNewsM}">
+	<mx:Canvas x="10" y="10" width="551" height="115" backgroundColor="white" >
+		<mx:Label x="96" y="10" text="{areYouNDM}" width="385" height="25"  fontSize="13" fontWeight="bold"/>
+		<mx:Button x="96" y="84" label="{yesM}" click="yesclick(event);" width="82"/>
+		<mx:Button x="356" y="84" label="{noM}" click="noclick(event);" width="79"/>
+		<mx:Label x="40" y="43" text="{Application.application.title_tck}" width="483" fontSize="14" fontStyle="italic" textAlign="center"/>
+	</mx:Canvas>
+	<mx:HTTPService id="deletenewsService" url="{app.ServerPath + 'GraphData/news.php'}" useProxy="false" fault="{deleteFault();}" result="suceessdelete_showresponse();"
+				method="POST" showBusyCursor="true" >
+				<mx:request xmlns="">
+					<action>deletenews</action>
+					<id2>{Application.application.id_tck}</id2>	
+				</mx:request>
+		</mx:HTTPService>	
+
+<mx:Script source=".././Asfiles/as_constants.as" />
+
+	<mx:Script>
+	<![CDATA[
+			import mx.core.Application;
+			import mx.controls.Alert;
+			import flash.display.*;
+            import flash.events.*;
+            import flash.net.*;
+            import flash.text.TextField;
+            import flash.text.TextFieldAutoSize;
+            
+            import flash.text.TextFormat;
+            import flash.utils.*;
+			import mx.containers.ControlBar;
+            import mx.containers.Panel;
+            import mx.containers.VBox;
+            import mx.controls.Button;
+            import mx.controls.Label;
+            import mx.controls.Spacer;
+            import mx.controls.TextInput;
+            import mx.managers.PopUpManager;
+            import mx.rpc.events.ResultEvent;
+			import mx.rpc.http.mxml.HTTPService;
+			
+			 [Bindable]public var app:Tentube=Tentube(Application.application);
+			 public var Pnlpopper:Panel = new Panel();
+			 
+			 private function deleteFault():void{
+			trace("loadconstantsFault()");}
+			
+			private function suceessdelete_showresponse():void
+	   
+            {
+            	
+            	var lblpop:Label = new Label();
+            	var lbl2:Label = new Label();
+            	lbl2.text = Application.application.id_tck ;
+            	lblpop.text = sucUpM ;
+            	lblpop.setStyle("color", app.colorreturn());
+            	lbl2.setStyle("color", app.colorreturn());
+            	var btnpop:Button = new Button();
+            	btnpop.label = closeM;
+            	btnpop.addEventListener(MouseEvent.CLICK, closePopdel);
+            	Pnlpopper = Panel(PopUpManager.createPopUp(Application.application.upperBox,Panel,false));
+            	Pnlpopper.x = 500;
+            	Pnlpopper.y = 400;
+            	Pnlpopper.height = 100;
+            	Pnlpopper.width = 200;
+            	Pnlpopper.title = statusM;
+            	Pnlpopper.horizontalScrollPolicy = "off";
+            	//paneldisp.title = label.text;
+            	//label.visible = true;
+            	Pnlpopper.addChild(lblpop);
+            	Pnlpopper.addChild(btnpop);	
+            	//Pnlpopper.addChild(lbl2);
+            	//Application.application.successaddnews();
+            } 
+            
+            private function closePopdel(event:MouseEvent):void {
+              
+              
+               PopUpManager.removePopUp(Pnlpopper);
+               PopUpManager.removePopUp(Application.application.Panup);
+            }
+            public function initnewsdel(str:String):void {
+             
+              Application.application.id_tck = str;
+              
+               
+            }
+            private function yesclick(event:MouseEvent):void 
+        	{		
+        		deletenewsService.send();
+        		PopUpManager.removePopUp(this);
+        		PopUpManager.removePopUp(Application.application.Panup);
+            
+         	} 
+            private function noclick(event:MouseEvent):void 
+        	{		
+        		PopUpManager.removePopUp(this);
+        	
+         	} 
+            ]]>
+	
+	</mx:Script>
+</mx:Panel>

@@ -1,0 +1,193 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" 
+    creationComplete="this.addEventListener(MouseEvent.CLICK,windowClicked);" x="168" y="86"  height="186" width="312" 
+    backgroundAlpha="1.0" layout="absolute"	 borderThicknessRight="0" 
+    borderThicknessLeft="0" borderThicknessBottom="0" 
+    borderThickness="0" borderThicknessTop="0"	title="{evalname}" 
+    showCloseButton="true" visible="true" verticalScrollPolicy="off" horizontalScrollPolicy="off"
+    color="#000000" close="RemoveMe()" 	addedEffect="Fade" >
+	
+
+		
+		
+	<mx:states>
+		<mx:State name="ShowAll">
+			<mx:SetProperty name="width" value="284"/>
+			<mx:SetProperty name="height" value="178"/>
+			
+			
+		</mx:State>
+	</mx:states>
+	
+					
+	<mx:transitions>
+		<mx:Transition id="Expand" fromState='*' toState='ShowAll'>
+			<mx:Resize target="{this}" />
+		</mx:Transition> 
+		
+		<mx:Transition id="Contract" fromState='ShowAll' toState='*'>
+			<mx:Resize target="{this}" duration="250" />
+		</mx:Transition>
+	</mx:transitions> 
+
+<mx:Script>
+	<![CDATA[
+		import mx.validators.ValidationResult;
+		import mx.core.UIComponent;
+		import mx.core.Application;
+		import mx.managers.PopUpManager;
+        import mx.controls.Text;
+        import mx.controls.Alert;
+        import flash.net.navigateToURL;
+        import flash.events.MouseEvent;
+		
+		[Bindable]public var Url:String=new String();
+		[Bindable]public var nodeid:String=new String();
+		//[Bindable]public var videoname:String=new String();		
+		//[Bindable]public var category:String=new String();
+		[Bindable]public var evalname:String=new String();
+		[Bindable]public var evalType:String=new String();
+		[Bindable]public var eovalue:String=new String();
+		
+		//[Bindable]public var timesseen:String=new String();
+		//[Bindable]public var picture:String=new String();
+		//[Bindable]public var submittedby:String=new String();
+		
+		[Bindable]public var authors:String=new String();
+		[Bindable]public var description:String=new String();
+		
+		//[Bindable]public var tags:String=new String();
+		
+		private var lastMouseDownTime: int 	= -999999;    
+		public var insidevbox:Boolean		=	true;
+		public var myRef:UIComponent=new UIComponent();
+		
+ 		[Bindable]public var app:Tentube=Tentube(Application.application);  
+
+
+    	public function RemoveMe():void{    							
+			var myIndex:Number; 
+			myIndex =  app.Vbox_Ids.indexOf( nodeid );
+			
+			var friends:Array;
+   		 	var first:Array;
+   		 	var last:Array;
+   		 	
+			friends 		= 	app.Vbox_Ids; 
+			first			=	friends.splice(0,myIndex);
+	   	 	last			=	friends.splice(1,friends.length-1);
+			friends			=	first.concat(last);
+			app.Vbox_Ids	=	friends;
+	
+			friends			=	[];	
+			first			=	[];
+			last			=	[];
+			friends 		= 	app.Vbox_Refs; 
+			first			=	friends.splice(0,myIndex);
+	   	 	last			=	friends.splice(1,friends.length-1);
+			friends			=	first.concat(last);
+			app.Vbox_Refs	=	friends;
+   		 	
+   		 	if ( insidevbox == true ){
+   		 		app.evalbox.removeChild(myRef);     			
+      		}	
+      		else{
+      			PopUpManager.removePopUp(this);
+      			// nothing
+      		}	
+      			
+        	if 	( app.Vbox_Refs.length == 0 )
+				app.currentState='spring_view';
+   		 										
+        	myRef=null;
+        	Url=null;
+        	nodeid=null;
+        } 
+        
+        
+        
+        
+        /** when the time difference between mouse click is less than 300 ms, it is 
+			considered as a double click
+			and we change the state
+		 **/
+		 
+        public function windowClicked(e:MouseEvent):void{
+   	 		var now: int = getTimer();
+   			if((now - lastMouseDownTime) < 300) {
+   				this.addEventListener(MouseEvent.CLICK,windowClicked);
+   				getLost();
+				return;
+   			}
+   			lastMouseDownTime = now;  		 	
+   		 }
+   		 
+   		 
+   		/**  push out the window into the main page		**/ 	
+   		 
+		private function getLost():void{
+			if ( insidevbox == true ){
+				insidevbox			=	false;
+				app.evalbox.removeChild(myRef);
+				app.addshortProfile(this);
+			}
+			if ( currentState == 'ShowAll' )
+				currentState	=	'';
+			else
+				currentState	=	'ShowAll';
+		}
+		
+         /**  plays the video in a new tab		**/
+         
+        private function newWin():void {
+			var urlRequest:URLRequest = new URLRequest(Url);
+			navigateToURL(urlRequest, '_blank');
+		} 
+			
+        
+        
+	]]>
+</mx:Script>
+
+    <mx:TextArea  editable="false" text="{evalType}" color="#7B7676" 	x="17" y="33" id="pevalType" height="22" fontWeight="bold" width="256"/>
+    <mx:Label x="19" y="10" text="Evaluation Type" width="104"/>
+    <mx:Label x="19" y="60" text="Subcriteria" width="93"/>
+    <mx:Label x="19" y="119" text="EOValue" width="93"/>
+    <mx:TextArea editable="false" text="{evalname}" color="#7B7676" x="19" y="83" height="27" width="254"/>
+    <mx:TextArea editable="false" text="{eovalue}" color="#7B7676" x="120" y="120" height="18" width="114"/>
+
+    
+    
+    
+</mx:TitleWindow>  
+

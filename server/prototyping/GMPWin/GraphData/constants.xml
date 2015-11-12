@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<constants>
+		<tubeShortName>GMPWIN</tubeShortName>
+ 	<tubeLabel>Web2.0 Innovations Network</tubeLabel>
+	<aboutUs>Web2.0 Innovations Network by Albert Angehrn <br/> Pradeep Kumar Mittal <br/> Krishna Mahesh K <br/> Rakesh Lalwani <br/><br/><br/> www.calt.insead.edu</aboutUs>			
+	<videoTypes_PanelLabel>Channels</videoTypes_PanelLabel>			
+	<videoCategory_CDLabel>Web2.0</videoCategory_CDLabel>
+	<videoCategory_CDOppLabel>Experiences</videoCategory_CDOppLabel>
+	<videoCategory_CDExpertsLabel>WIN</videoCategory_CDExpertsLabel>
+	<label_fourth_videoCategory>Us </label_fourth_videoCategory>
+	<demoVideoId>Video1</demoVideoId>
+	<taboowords>TeamWork,Collaboration</taboowords>
+	<gamepage_title>WIN Game</gamepage_title>
+	<gameDescription>
+The WIN Game is a two-player game. Each time you play you are randomly paired with another player whose identity you don't know. You can't communicate with your partner, and the only thing you have in common with them is that you both watch the same video.
+The goal is to guess what your partner is typing.
+You can match as many words as you want. For each match you get 50 points. Each time you type a word or phrase, you must press enter on your keyboard to submit it to the game.
+Some videos have taboo words, which you can't use; nor can you use any plural, singular, or word related to a taboo word.
+If you feel that a video is too boring or doesn't fit into your radar, you can ask to pass by clicking the pass button on the lower left corner.But you lose 20 points for that !! 
+Clicking the button will generate a message on your partner's screen,letting them know that you want to pass. You cannot pass on a video until both you and your partner have hit the pass button.
+	</gameDescription>
+	<nodeWidth>62</nodeWidth>
+	<nodeNameWidth>58</nodeNameWidth>
+	<uploadError>Please try again or send your video to pkmittal82@gmail.com</uploadError>
+	<useFMS>false</useFMS>
+	<ServerName>localhost</ServerName>
+	<VideoPath>prototyping/GMPWin/GraphData/upload/Videos</VideoPath>
+	<key>lab1</key>
+		<privacy>false</privacy>
+	<popupAgent>false</popupAgent>
+	<styling>innotube</styling>
+	<trade>
+		<enabled>false</enabled>
+		<url>http://idem.dnsalias.org/</url>
+	</trade>
+	<logos>
+		
+		<useFirst>true</useFirst>
+		<useSecond>false</useSecond>
+		<useThird>false</useThird>
+		<firstLogo>media/icc.png</firstLogo>
+		<secondLogo>media/cedep.jpg</secondLogo>
+		<thirdLogo>media/ri.jpg</thirdLogo>
+		<firstUrl>http://www.insead.edu</firstUrl>
+        <secondUrl>http://www.cedep.fr</secondUrl>
+		<thirdUrl>http://www.cedep.fr</thirdUrl>
+
+	</logos>
+	
+	<video_conferencePath>rtmp://localhost/GMPWin_videoconference/</video_conferencePath>
+
+<helpLink></helpLink>
+	<helpMail></helpMail>
+
+<camera_bandwidth>0</camera_bandwidth>
+	<camera_quality>95</camera_quality>
+	
+	<camera_fps>15</camera_fps>
+
+	<EnableRegisteration>true</EnableRegisteration>
+<EnableGame>true</EnableGame>
+
+<EnableVideoChat>true</EnableVideoChat>
+<EnableRecording>true</EnableRecording>
+<EnableNews>false</EnableNews>
+<EnableTagCrowd>false</EnableTagCrowd>
+	
+<PrivacyLink></PrivacyLink>
+<defaultPageState>home</defaultPageState>
+
+<vClassRoom>
+<enable>true</enable>
+<url>http://demo.bigbluebutton.org/</url>
+</vClassRoom>
+
+<videoExtension>*.3gp;*.avi;*.flv;*.mov;*.mp4;*.mpg;*.m4v;*.wmv</videoExtension>
+
+
+<homePageLogo>http://localhost/prototyping/GMPWin/media/icc.png</homePageLogo>
+</constants>	

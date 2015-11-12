@@ -1,0 +1,241 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" >
+<!--	<mx:Text text="videorecommendations" textAlign="center" x="80" y="10" width="291"/>-->
+
+	
+	<mx:HTTPService  id="agentrecommendations" url="{app.ServerPath + 'GraphData/Recommendationagent.php'}" result="{recagent_function();}"
+		fault="loadagentFault();" useProxy="false" method="POST" resultFormat="e4x" showBusyCursor="false">
+		<mx:request xmlns="">
+			<guid>{app.Univ_LoginId1}</guid>
+		</mx:request>
+	</mx:HTTPService>
+	
+	<mx:Script source=".././Asfiles/as_constants.as" />
+	
+	<mx:Script>
+        	<![CDATA[
+        		import mx.core.Application;
+        		import mx.managers.PopUpManager;
+        		import com.adobe.flex.extras.controls.springgraph.Item;
+        		import mx.controls.Alert;
+				import com.adobe.flex.extras.controls.springgraph.Item;	
+				import mx.rpc.events.ResultEvent;
+				import mx.rpc.http.mxml.HTTPService;
+        		
+        		[Bindable] public var recVideosList:XMLList = new XMLList();
+        		[Bindable] public var app:Tentube=Tentube(Application.application); 
+        		[Bindable] public var recommendedVideosList:XMLList = new XMLList();
+        		[Bindable] public var recommendedProfilesList:XMLList = new XMLList();
+        		
+        			
+        		[Bindable] public var xmlvids:Object = new Object;
+        		[Bindable] public var xmlpeople:Object = new Object;
+        		
+        		       	
+        	public function refreshRecoAgent(){
+        		 try{
+                   agentrecommendations.send();
+                 } catch(e:Error){ }
+                                 
+                 }
+        	
+        	       	
+			private function loadagentFault():void{
+			//Alert.show('A problem has occured','Error !');
+			}
+			
+        	 
+			   	public function recagent_function():void
+        			{		
+        			
+        				var countNewMembersR = 0;
+	      	         	var countNewVideosR = 0;
+	      	
+        			
+        			xmlpeople	=	agentrecommendations.lastResult;
+					agentrecommendations.clearResult();
+					
+        			//var videosxml:Object	=	r.Result.TopRecommendedVideos; 
+		            var peoplexml2:XML = 	new XML(xmlpeople);
+		            //recommendedProfilesList = peoplexml2.recommendedpeople[0] ;
+		            var recProfList:XML = new XML(peoplexml2.recommendedpeople[0]);
+		           
+		            recommendedProfilesList = new XMLList();
+		         //   trace("pplList: " + recommendedProfilesList);
+	   				
+	   				  var i:int;
+		              i=0;
+			     	for each (var peoplenode:XML in recProfList.descendants("people")) {
+   				        recommendedProfilesList = recommendedProfilesList + peoplenode;
+   		       // 		trace("pplList: " + recommendedProfilesList);
+   				        i=i+1;
+   			      	}
+   			     	 i=0;  
+	   				
+	   				var recvidList:XML = new XML(peoplexml2.TopRecommendedVideos[0]);
+	   				recommendedVideosList = new XMLList();
+	   				
+		             i=0;
+			     	for each (var Vidnode:XML in recvidList.descendants("Video")) {
+   				        recommendedVideosList = recommendedVideosList + Vidnode;
+   		        		
+   				        i=i+1;
+   			      	}
+   			 //    	trace("vidList: " + recommendedVideosList); 
+   			      	
+	   				i=0;
+	   				
+	   				  recoMessage = "Cool!";
+			          countNewMembersR =	recommendedProfilesList.length();
+			          countNewVideosR = recommendedVideosList.length();
+			          
+			          if ((countNewMembersR==0) && (countNewVideosR ==0) ){
+			          	app.recBtn.visible = false;
+			          }else{
+			          	app.recBtn.visible = true;
+			          //  app.recBtn.toolTip = "Recommended(" + countNewVideosR + " Videos" + "," + countNewMembersR + " Users)";
+			            app.recBtn.toolTip =  countNewVideosR + " Videos and "  + countNewMembersR + " Users Recommended.";
+			          
+			          }
+			          
+			          recoMessage = recoMessage + "(" + countNewVideosR + "," + countNewMembersR + ")";
+			          app.recBtn.label = recoMessage;
+			
+	   					   				
+					}
+					 
+        		public function showRecommendedVideos():void
+        	    {	
+        	    	var profileId:String	=	app.Univ_LoginId1;
+					var item:Item			=	app.fullGraph.find( profileId );
+					var userdata:XML		=	new XML(item.data);
+				  //  Alert.show(userdata.@interests.toString(),"Info");
+				    var interestsArray:Array = userdata.@interests.split(",");
+				    var j:int;
+				    for(j=0;j<interestsArray.length;j++)
+				    {
+				      // Alert.show(interestsArray[j].toString(),"Individual Element");
+				        var results:XMLList	=	new XMLList();
+					    var pattern:RegExp 	= 	new RegExp(interestsArray[j],'i');
+					
+					    for each ( var viddata:XML in app.videos_list )
+					    {
+						    var name:String	=	viddata.@name.toString();
+						    var tags:String	=	viddata.@tags.toString();
+						    if  ( (name.search(pattern) != -1) ||  (tags.search(pattern) != -1) ){
+							    results	=	results + viddata;
+						    }
+					     }
+				    
+				         recommendedVideosList += results;
+				     }
+        	    }
+        	    
+        	    
+
+          	    public function showRecommendedProfiles():void
+          	    {
+          	    	var profileId:String	=	app.Univ_LoginId1;
+					var item:Item			=	app.fullGraph.find( profileId );
+					var userdata:XML;
+				    userdata				=	new XML(item.data);
+				    var interestsArray:Array = userdata.@interests.split(",");
+				    
+				   
+				    for each ( var ppldata:XML in app.people_list )
+					{
+						    var name:String	=	ppldata.@name.toString();
+	
+						    var othersProfileId:String	=	(ppldata.@id).toString();
+						    if(othersProfileId==profileId)
+						       continue;
+						       
+						       
+					       var other_item:Item			=	app.fullGraph.find( othersProfileId );
+					       var other_userdata:XML;
+				           other_userdata				=	new XML(other_item.data);
+				           var otherUsersInterestsArray:Array = other_userdata.@interests.split(",");
+                          
+                           var m:int;
+                           var n:int;
+                           var shouldbreak:Boolean=false;
+                           for(m=0;m<interestsArray.length;m++)
+                           {
+                           	 for(n=0;n<otherUsersInterestsArray.length;n++)
+                           	 {
+                           	 	if(interestsArray[m].toString()==otherUsersInterestsArray[n].toString())
+                           	 	{
+                           	 		//add the other user to the recommended profile list
+                           	 		recommendedProfilesList+=ppldata;
+                           	 		 trace("pplList: " + recommendedProfilesList);
+                           	 	//	Alert.show(other_userdata.@name.toString(),interestsArray[m].toString());
+                           	 		shouldbreak=true;
+                           	 		break;
+                           	 	}
+                           	 }
+                           	 if(shouldbreak==true)
+                           	 	   break;
+                           }
+                            
+					}
+
+		  }
+        		
+       	]]>
+        </mx:Script>
+	<mx:TabNavigator x="0" y="0" width="457" height="212">
+		<mx:Canvas label="{videosM}" width="100%" height="100%">
+			<mx:Image id="videoImage" horizontalAlign="center" verticalAlign="center" width="172" height="167" x="0" y="0"/>
+			<mx:DataGrid x="180" y="0" width="275" height="167" visible="true" horizontalScrollPolicy="off" verticalScrollPolicy="auto" variableRowHeight="true" id="helpBoxVideos2" dataProvider="{recommendedVideosList}">
+					<mx:columns>
+						<mx:DataGridColumn headerText="Videos" itemRenderer="component.helpSubComponent"/>
+						<mx:DataGridColumn headerText="Myfavorite" visible="false" width="85" itemRenderer="component.helpFavoriteComponent"/>
+					</mx:columns>
+			</mx:DataGrid>
+		</mx:Canvas>
+		<mx:Canvas label="{profilesM}" width="100%" height="100%">
+			<mx:Image id="profileImage" horizontalAlign="center" verticalAlign="center" width="172" height="167" x="0" y="0"/>
+			<mx:DataGrid x="180" y="0" width="275" height="167" horizontalScrollPolicy="off" verticalScrollPolicy="auto" variableRowHeight="true" id="helpBoxProfiles" dataProvider="{recommendedProfilesList}">
+				<mx:columns>
+					<mx:DataGridColumn headerText="Profiles" itemRenderer="component.helpProfileComponent"/>
+				</mx:columns>
+			</mx:DataGrid>
+		</mx:Canvas>
+	</mx:TabNavigator>
+
+</mx:Canvas>
+
+

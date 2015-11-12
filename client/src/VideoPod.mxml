@@ -1,0 +1,115 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:assets="component.assets.*"
+	
+	creationComplete="init()"
+    width="190" height="160" xmlns:local="*" xmlns:component="component.*" backgroundColor="#000000" alpha=".7">
+	
+<mx:Script source="Asfiles/as_constants.as" />	
+	
+	<mx:Script>
+		<![CDATA[
+			import flash.media.Video;
+			import mx.controls.Alert;
+
+			private var microphone:Microphone;
+			private var camera:Camera;
+			private var video:Video;
+			
+			[Bindable]public var userItem:Object;
+			[Bindable]public var nc:NetConnection;
+			[Bindable]private var ns:NetStream;
+			
+			[Bindable]public var isSender:Boolean;
+			
+			private function init():void
+			{
+				
+				
+				
+				ns = new NetStream( nc );
+				ns.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
+		        video = new Video( 166, 126 );
+	        
+				if( isSender ) {
+					camera = Camera.getCamera();
+					// 2k bytes (or ~16kbps) of bandwidth
+					camera.setQuality( 16384 / 2, 0 );
+					camera.setMode( 166, 126, 15, false );
+					// Set loopback as compressed
+					camera.setLoopback( true );			
+					video.attachCamera( camera );
+					ns.attachCamera( camera );
+					microphone = Microphone.getMicrophone();
+					microphone.gain=50;
+					ns.attachAudio( microphone );
+					ns.publish( userItem.identifier );						
+				} else {
+			        video.attachNetStream( ns );	
+					//Logger.debug( "VIDEOCHATPOD: play(" + userItem.identifier + ")" );
+	        		ns.play( userItem.identifier ); 					
+				}
+				videoconDisplay.video = video;
+			}
+			
+			private function netStatusHandler( event:NetStatusEvent ):void
+			{
+				//RIALogger.debug( "MAIN:connectionSuccess:Success" );				
+				switch( event.info.code ) {
+					case "NetConnection.Connect.Success":
+						// Connection succeeded now create components
+						//connectComponents();
+						// Change to Video view
+						//vsMain.selectedChild = pnlVideo;
+					break;
+					case "NetConnection.Connect.Rejected":
+						Alert.show( limitedUserM, limitedRestUserM );
+					break;					
+				}
+
+			}
+			
+			
+		]]>
+	</mx:Script>
+	
+	<mx:VBox horizontalAlign="center" verticalAlign="middle" color="#000000" left="10" top="3">
+		<mx:Label text="{ userItem.name }" height="18" />
+		<local:VideoContainer id="videoconDisplay" width="166" height="126" />
+	</mx:VBox>
+	
+	
+</mx:Canvas>
+
+

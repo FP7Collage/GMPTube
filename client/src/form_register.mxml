@@ -1,0 +1,630 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:Panel creationComplete="{init()}" horizontalScrollPolicy="off" layout="vertical" 
+   xmlns:toolbox="com.advancedlist.flextoolbox.controls.*"
+   title="{registerM}" xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" 
+	xmlns:ImageOps="Asfiles.image_upload.*" height="{app.height}">
+	<!-- to upload image-->
+	<ImageOps:FileUpload id="registerImage" creationComplete="registerImage.init() ;" />
+	
+	<mx:HTTPService id="registerService" fault="registerFault();" useProxy="false" result="{showresponse(event)}"
+		method="POST" showBusyCursor="true" url="{app.ServerPath + 'GraphData/change.php'}">
+	</mx:HTTPService>
+	
+	<mx:HTTPService id="getGListService" url="{app.ServerPath + 'GraphData/groupmanager.php'}" result="{groupsListResult(event)}">
+		<mx:request xmlns="">
+			<action>getgrouplist</action>
+		</mx:request>
+	</mx:HTTPService>
+		
+	<mx:Array id="validators">
+		<mx:RegExpValidator source="{txt_name}" property="text"
+			required="true" requiredFieldError="{plzGNM}"
+			expression="^[^&quot;&apos;&amp;&lt;&gt;]*$" noMatchError="{nCNContainM}"
+			trigger="{txt_name}" triggerEvent="change"/>
+		<mx:EmailValidator source="{txt_email}" property="text"
+			required="true" requiredFieldError="{plzGYEM}"
+			trigger="{txt_email}" triggerEvent="change"/>
+		<mx:RegExpValidator source="{txt_company}" property="text"
+			required="true" requiredFieldError="{plzENCM}"
+			expression="^[^&quot;&apos;&amp;&lt;&gt;]*$" noMatchError="{cCNContainM}"
+			trigger="{txt_company}" triggerEvent="change"/>
+		<!--<mx:Validator source="{invitedby}" property="selectedLabel"
+			required="true" requiredFieldError="{plzSLPM}"
+			trigger="{submitBtn}" triggerEvent="change"/>-->
+		<mx:RegExpValidator source="{txt_nationality}" property="text" required="false"
+			expression="^[^&quot;&apos;&amp;&lt;&gt;]*$" noMatchError="{natCNContainM}"
+			trigger="{txt_nationality}" triggerEvent="change"/>
+	    <mx:RegExpValidator source="{txt_title}" property="text"
+			required="false" requiredFieldError="{plzGTM}"
+			expression="^[^&quot;&apos;&amp;&lt;&gt;]*$" noMatchError="{tCNContainM}"
+			trigger="{txt_title}" triggerEvent="change"/>		
+	    <mx:RegExpValidator source="{txt_webpage}" property="text" required="false"
+			expression="^[^&quot;&apos;&amp;&lt;&gt;]*$" noMatchError="{wCNContainM}"
+			trigger="{txt_webpage}" triggerEvent="change"/>
+	
+		<mx:RegExpValidator source="{txt_location}" property="text"
+			required="false" requiredFieldError="{plzEGLM}"
+			expression="^[^&quot;&apos;&amp;&lt;&gt;]*$" noMatchError="{lCNContainM}"
+			trigger="{txt_location}" triggerEvent="change"/>
+		<mx:RegExpValidator source="{txt_description}" property="text" required="false"
+			expression="^[^&quot;&apos;&amp;&lt;&gt;]*$" noMatchError="{aCNContainM}"
+			trigger="{txt_description}" triggerEvent="change"/>
+		<mx:RegExpValidator source="{txt_password}" property="text" id="pwdValidator"
+			required="true" requiredFieldError="{plzEPAM}"
+			expression="^[^&quot;&apos;&amp;&lt;&gt;]*$" noMatchError="{paCNContainM}"
+			trigger="{txt_password}" triggerEvent="change" enabled="{pwdItem.visible}"/>
+		<mx:RegExpValidator source="{txt_cpassword}" property="text"
+			required="true" requiredFieldError="{plzCYPM}"
+			expression="^[^&quot;&apos;&amp;&lt;&gt;]*$" noMatchError="{paCNContainM}"
+			trigger="{txt_cpassword}" triggerEvent="change" enabled="{pwdItem.visible}"/>
+		<mx:RegExpValidator source="{txt_interests}" property="text" required="false"
+			expression="^[^&quot;&apos;&amp;&lt;&gt;]*$" noMatchError="{inCNContainM}"
+			trigger="{txt_interests}" triggerEvent="change"/>
+			
+			
+			
+	</mx:Array>
+	
+	<mx:TabNavigator id="regPageTab" width="100%" height="100%" >
+		<mx:HBox width="100%" label="{basicInfoM}" height="100%">
+		
+				
+			<mx:Form width="422" height="100%">
+			    <mx:FormHeading label="{urInfoM}"/>
+			    <mx:FormItem label="{nameM}" required="true" width="100%">
+			        <mx:TextInput id="txt_name" toolTip="{v1060}" width="100%" maxChars="100"/>
+			    </mx:FormItem>
+			     <mx:FormItem label="{emailM}" required="true" width="100%">
+			        <mx:TextInput id="txt_email"  width="100%" maxChars="45"/>  
+			    </mx:FormItem>
+			   
+			     <mx:FormItem label="{companyM}" required="true" width="100%">
+			        <mx:TextInput id="txt_company"  width="100%" maxChars="100"/>  
+			    </mx:FormItem>
+			    <mx:FormItem label="{inviteByM}" width="100%" required="true">
+			 	   <mx:ComboBox id="invitedby" labelField="@name" dataProvider="{peoplelist}" width="100%"/>
+			    	    <mx:Label width="100%" text="{selectIntroUserM}" />
+			    	</mx:FormItem>
+			   
+			    
+			    <mx:FormItem label="{natM}" width="100%">
+			        <mx:TextInput id="txt_nationality"  width="100%" maxChars="100"/>
+			    </mx:FormItem>
+			    <mx:FormItem label="{titleRM}"  width="100%">
+			        <mx:TextInput id="txt_title"  width="100%" maxChars="100"/>
+			    </mx:FormItem>
+			   
+			    <mx:FormItem label="{webpageM}"  width="100%">
+			        <mx:TextInput id="txt_webpage"  width="100%" maxChars="1000"/>  
+			    </mx:FormItem>
+			    <mx:FormItem label="{geoM}"  width="100%">
+			        <mx:TextInput id="txt_location"  width="100%" maxChars="45"/>  
+			    </mx:FormItem>
+			      <mx:FormItem label="{aboutMM}" width="100%" height="85">
+			        <mx:TextArea id="txt_description" height="79" width="100%" />  
+			    </mx:FormItem>
+			      <mx:FormItem>
+			            <mx:Spacer/>
+			      </mx:FormItem>
+			      
+		      	    <mx:FormItem id="pwdItem" label="{passwordM}" width="100%" required="true" visible="{(app.useKey == 'true') ? false : true}">
+			        <mx:TextInput id="txt_password" width="{txt_name.width/2}" visible="{pwdItem.visible}" maxChars="10"/>
+			    </mx:FormItem>
+			    <mx:FormItem label="{conPM + pwdItem.label}" required="{pwdItem.required}" width="100%" visible="{pwdItem.visible}">
+			        <mx:TextInput id="txt_cpassword" width="{txt_password.width}" visible="{pwdItem.visible}" maxChars="10"/>
+			    </mx:FormItem>
+		
+			      
+			      
+			   </mx:Form>
+		
+		
+			
+		
+			
+			<mx:Form width="450" height="100%">			
+			<mx:FormItem label="{interestM}" width="100%" id="fitem_interests">
+				<mx:Label width="100%" text="{tryInterestM}" />
+			    <toolbox:CheckBoxList alternatingItemColors="[0xEEEEEE, 0xDFDFDF]" enabledField="enabled" dataProvider="{app.interestslist}"  width="229" id="existing_interests" height="82"/>
+			    <mx:Label width="100%" text="{orAddInterestM}" />  
+			    <mx:TextArea id="txt_interests" height="100%" width="299" />
+			</mx:FormItem>
+			
+			<mx:FormItem label="{imageM}" width="100%" id="fitem_image">
+			        <mx:Label text="{uploadImM}" width="100%"/>  
+			        <mx:HBox verticalAlign="middle">
+			        	<mx:Image source="{userpic}"/>
+			       	 	<mx:Button id="btnImageUpload" label="{uploadPhotoM}" visible="true" click="registerImage.startUpload();"/>
+			       	 	
+			       	 		
+			       	 				    
+			        </mx:HBox>
+			     </mx:FormItem>
+			     
+			<mx:Spacer>
+				
+			</mx:Spacer>   
+			
+			<mx:Label text="{v1086}" width="100%"/>
+			<mx:HBox  verticalScrollPolicy="off" horizontalScrollPolicy="off"  width="100%">
+				<mx:LinkButton icon="@Embed(source='./media/privacy.jpg')" id="privacyId"  toolTip="{v1085}"  click="{app.openPrivacyLink();}" width="80"/>
+									
+					<mx:FormItem  required="true" width="100%" >
+					
+					<mx:CheckBox styleName="privacyCheckBox" color="blue" id="prterms" textRollOverColor="blue" textSelectedColor="blue"  label="{v1087}"   height="47" width="100%"/>					    
+					  </mx:FormItem>													
+									
+			</mx:HBox>		
+		</mx:Form>
+	
+		</mx:HBox>
+	</mx:TabNavigator>
+	<mx:ControlBar horizontalAlign="right">
+		<mx:Button toolTip="{goToLoginM}" click="clearFields(); goBack();	" label="{bacM}"/>
+		<mx:Button id="submitBtn" label="{submitRM}" click="{submitData(event)}"/>
+	</mx:ControlBar>
+	<!-- user can register here. he can create new profile, upload his image . cool !-->
+	
+	<mx:Script source="Asfiles/as_constants.as" />
+	<mx:Script>
+		<![CDATA[
+			import flash.net.navigateToURL;
+			import mx.events.CloseEvent;
+			import mx.collections.ArrayCollection;
+			import mx.events.ValidationResultEvent;
+			import mx.validators.Validator;
+			//import mx.charts.chartClasses.RenderData;
+			import mx.rpc.events.ResultEvent;
+			import mx.core.Application;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.controls.DataGrid;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import component.competenceComponent_registerpage;
+			import flash.events.Event ;
+			import mx.managers.PopUpManager;
+			
+			[Bindable] public var app:Tentube			=	Tentube(Application.application); 
+			[Bindable] public var userpic:String		=	new String(); 
+			[Bindable] public var peoplelist:Array		=	new Array(); 
+			public var userinterests:String				= 	new String();
+			[Bindable] public var competencesArray:Array=new Array();
+     		[Bindable] public var competenceTypesArray:Array=new Array();
+     		[Bindable] public var competenceCategories:Array=new Array();
+     		[Bindable]public var competenceList:XMLList;
+			public var competenceType:DataGrid;
+			public var competenceColumn:DataGridColumn;
+			public var addCompetenceBtn:Button      =   new Button();
+			public var Innoxml:XML ;
+			[Bindable] public var xmldata1:Object = new Object;
+			[Bindable] public var compString:String="";
+			[Bindable] private var groupsAvailable:Boolean;
+			
+
+ 
+
+			
+			         
+			
+			public function displayprofile(fa:FlexEvent):void{
+			//	competencesVbox_regpage.removeAllChildren();
+				clearFields();					// clear all fields	
+				loadppl_interests_competences();
+			}
+			
+			private function getPyValue(pyval:String, pyGroups:ArrayCollection):String {
+				if(pyval == '#EVERYBODY#' || pyval == '#AUTHORONLY#')
+					return pyval;
+				else if(pyval == '#GROUPS#') {
+					for each(var obj:Object in pyGroups) {
+						if(!obj.isSelected)
+							continue;
+						pyval += obj.gid + ',';
+					}
+					if(pyval == '#GROUPS#')
+						return pyval;
+					else
+						return pyval.substr(0, pyval.length - 1);
+				} else return '#EVERYBODY#';
+			}
+			
+			private function groupsListResult(event:ResultEvent):void {
+				var grouplisttotal:String = event.result.rsp.message;
+				var groupsArray:Array = new Array();
+				
+				if(grouplisttotal==''){
+					Alert.show('Unable to Load data from server !!');
+					groupsAvailable = false;
+					return;
+				} else if(grouplisttotal=='NoGroup'){
+					groupsAvailable = false;
+					return;
+				} else
+					groupsAvailable = true;
+				var allrecords:Array=grouplisttotal.split("#@#");
+				
+				for(var i:Number=0;i<allrecords.length;i++){
+					var str:String=allrecords[i].toString();
+					if(str=='') break;
+					var eachrecord:Array = str.split("%@%");
+
+					var obj:Object=new Object();
+					obj.gid=eachrecord[0].toString();
+					obj.gname=eachrecord[1].toString();
+					obj.isSelected=false;
+					obj.text=groupsAvailable ? 'Select Groups' : 'No Groups';
+					groupsArray.push(obj);
+				}
+			}
+			
+			// FUNCTION TO CLONE AN OBJECT.
+			private function clone(source:Object):* {
+				var myBA:ByteArray = new ByteArray();
+				myBA.writeObject(source);
+				myBA.position = 0;
+				return(myBA.readObject());
+			}
+			
+			/** FUNCTION TO LOAD INTERESTS FROM CONTROL PANEL TABLE 	**/ 
+					   
+			public function loadppl_interests_competences():void{	
+				app.loadinterests.url 	= app.ServerPath + app.graphData + "loadinterests.php";	
+				app.loadinterests.addEventListener(ResultEvent.RESULT,loadint_resp);			
+		     	app.loadinterests.send();	
+		     	
+		     	app.loadpeople.url 	= app.ServerPath + app.graphData + "loadpeople.php";	
+				app.loadpeople.addEventListener(ResultEvent.RESULT,loadppl_resp);			
+		     	app.loadpeople.send();
+		     	
+		/*     	app.loadCompetences.url 	= app.ServerPath + app.graphData + "loadCompetences.php";	
+				app.loadCompetences.addEventListener(ResultEvent.RESULT,loadCompetences_resp);			
+		     	app.loadCompetences.send();
+		 */    	
+		     	
+			}
+			
+			/** event listener for loadinterests http request 
+			 * 	This will load the list of interests which the users had entered.
+			 *  we use interestslist:Array in register page and edit profile page		
+			 * **/
+			 
+			private function loadint_resp(r:ResultEvent):void{
+	   			try{
+	   			//	Alert.show("interests Loaded","Interests");
+	   				if ( r.result.rsp.interests == null )
+	   					return;
+	   				var list:String		=	r.result.rsp.interests;
+		   			app.interestslist 	= 	list.split(',');
+	   			}
+	   			catch(e:Error){
+	   				trace('Unable to load "control panel" table in database','Contact administrator');
+	   			}	
+	   			return;
+	    	}
+	    	
+			private function loadCompetences_resp(r:ResultEvent):void{
+	   			try{
+	   			//	Alert.show("Competences loaded","competences");
+	   				xmldata1	=	app.loadCompetences.lastResult;
+			         app.loadCompetences.clearResult();
+		             Innoxml = 	new XML(xmldata1);
+	   				competencesArray=new Array();
+	   				competenceTypesArray=new Array();
+	   				competenceCategories=new Array();
+	   				 var i:int;
+		             i=0;
+			     for each (var node: XML in Innoxml.descendants("Competence")) {
+   				        competencesArray.push(node);
+   		        	//	Alert.show(competencesArray[i].@name,"future name");
+   				        i=i+1;
+   			      }
+   			      i=0;
+   			     for each(var node1:XML in Innoxml.descendants("CompetenceType"))
+   			     {
+   				        competenceTypesArray.push(node1);
+   				        competenceCategories.push(node1.@name.toString());
+   			         //  	Alert.show(competenceTypesArray[i].@name,"Type name");
+   				       i=i+1;
+   			      }
+   			    //  Alert.show("Competences Done","Devudaaaaa");
+	   				
+	   				
+//	   					displayCompetences();			
+	   			}
+	   			catch(e:Error){
+	   				trace(e.message,'Contact administrator');
+	   			}	
+	   			return;
+	    	}
+	    	
+	    	/** event listener for loadpeople http request 
+			 * 	This will load the list of people in the database
+			 *  we use peoplelist:Array to bind data to combo box
+			 * **/
+			 
+			private function loadppl_resp(r:ResultEvent):void{
+	   			try{
+	   		
+	   		/*		if ( r.result.rsp.ppllist == null )
+	   					return;
+	   			
+	   				var list:String			=	r.result.rsp.ppllist;	   				
+	   				var peopleList:Object	=  new Object;
+	   				 peopleList = r.result.rsp.Person ;
+	   				 
+	   				var nodeList:XMLList	=  new XMLList(peopleList);
+	   				var test: XML = new XML(peopleList);
+	   				     trace(test); 
+	   					 trace(nodeList);  				
+	   			
+	   				
+	   				
+		   		peoplelist 				= 	list.split(',');   	
+		   		peoplelist.unshift(null);
+		   */
+		   
+		   var peoplexml:Object	=	app.loadpeople.lastResult;
+			        app.loadpeople.clearResult();
+		            var Innoxml2:XML = 	new XML(peoplexml);
+	   				var i:int;
+		             i=0;
+			     	for each (var nde: XML in Innoxml2.descendants("Node")) {
+   				        peoplelist.push(nde);
+   		        		trace("partnerList: " + peoplelist);
+   				        i=i+1;
+   			      	}
+   			     	peoplelist	=	peoplelist.sortOn("@name",Array.CASEINSENSITIVE);
+   			     	 
+		   		invitedby.dataProvider	=	peoplelist;
+		   		//	invitedby.dataProvider	=	app.people_list;
+		//   		Alert.show(regPageTab.selectedIndex.toString(),"Tabnavigator");
+	   			}
+	   			catch(e:Error){
+	   				trace(e.message,'Error');
+	   			}	
+	   			return;
+	    	}
+	    	
+	    	
+	    	
+			public function init():void{
+				
+				PopUpManager.removePopUp(app.loginWindow);
+				
+			// since we are not showing privacy so no need to load groups now	
+			//	getGListService.send();
+			//	this.addEventListener(FlexEvent.ADD,displayprofile);
+			
+			
+				displayprofile(new FlexEvent(FlexEvent.ADD));
+				txt_password.setStyle("borderColor", "0x0000FF");
+				txt_cpassword.setStyle("borderColor", "0x0000FF");
+			
+			//	regPageTab.getTabAt(1).visible = app.EnableCompetences;	
+			}
+			
+			/** called when user clicks submit. 1st check the validity of the information entered
+					and then send httprequest to server
+		  	*/
+			private function submitData(event:Event):void{
+				var validateResults:Array = Validator.validateAll(validators);
+				if(validateResults.length > 0) {
+					for each(var res:ValidationResultEvent in validateResults) {
+					// error in other language duration translation.. entering password field	
+						if( ((res.message.indexOf(plzEPAM) >= 0) ||(res.message.indexOf(plzCYPM) >= 0) ) && !pwdItem.visible)						
+							continue;
+						//	if(res.message.indexOf(passwordM) >= 0 && !pwdItem.visible)
+					//	if(!pwdItem.visible)
+					//		continue;
+					
+					
+						Alert.show(res.message, errM);
+						return;
+					}
+				}
+				
+				if (prterms.selected != true){
+					Alert.show(v1086);
+				
+					return;
+				}
+				
+				userinterests = new String();
+        		for each(var sel_item:String in existing_interests.selectedItems){
+        			if(userinterests.toUpperCase().indexOf(sel_item.toUpperCase()) < 0)
+        				userinterests = sel_item + ',' + userinterests;
+        		}
+        		var entered_arr:Array = txt_interests.text.split(',');
+        		for each ( var single:String in entered_arr ){
+        			var patt2:RegExp= new RegExp('\r','ig'); 
+        			single			=	single.replace(patt2,''); 
+        			if ( (single != '') )//&& (userinterests.toUpperCase().indexOf(single.toUpperCase()) < 0))
+        				userinterests = single + ',' + userinterests;
+        		}
+        		userinterests = userinterests.slice(0,userinterests.length-1);
+				
+				if(pwdItem.visible) {
+					if(txt_password.text == '') {
+						Alert.show(passFEM, fieldRM);
+						txt_password.setStyle("borderColor", "0xFF0000");
+						txt_password.setFocus();
+						return;
+					}
+					if(txt_cpassword.text == '') {
+						Alert.show(passFEM, fieldRM);
+						txt_cpassword.setStyle("borderColor", "0xFF0000");
+						txt_cpassword.setFocus();
+						return;
+					}
+					if(txt_password.text != txt_cpassword.text) {
+						Alert.show(passNoMM, passMisM);
+						regPageTab.selectedIndex = 0;
+						txt_password.setStyle("borderColor", "0xFF0000");
+						txt_cpassword.setStyle("borderColor", "0xFF0000");
+						txt_password.setFocus();
+						return;
+					} else {
+						txt_password.setStyle("borderColor", "0x0000FF");
+						txt_cpassword.setStyle("borderColor", "0x0000FF");
+					}
+				}
+				
+			 /*   if(compString=="" && app.EnableCompetences==true)
+			    {
+					Alert.show(plzICM,inputNeededM);
+					regPageTab.selectedIndex = 1;
+					return;
+			    }
+				
+				*/
+				registerService.request.action = 'addpeoplenode';
+				
+				registerService.request.name = txt_name.text;
+				registerService.request.title = txt_title.text;
+				registerService.request.company = txt_company.text;
+				registerService.request.nationality = txt_nationality.text;
+				registerService.request.email = txt_email.text;
+				registerService.request.webpage = txt_webpage.text;
+				registerService.request.location = txt_location.text;
+				registerService.request.picture = userpic;
+				registerService.request.interests = userinterests;
+			//	registerService.request.invitedby = invitedby.selectedLabel;
+				registerService.request.invitedby = invitedby.selectedItem.@id;
+				registerService.request.description = txt_description.text;
+				registerService.request.competences = compString.toString();
+				
+				registerService.request.password = txt_password.text;
+	     		
+				
+	     		registerService.send();
+				return;
+			}
+			
+			/** event listener for createprofile request.   */
+			private function showresponse(r:ResultEvent):void{
+	   			try{
+	   				var responseMessage:String;
+	  				responseMessage = r.result.rsp.message;
+		   			if ( responseMessage == 'Success')
+		   				Alert.show(yRSM1 + " " + txt_email.text + " " + yRSM2 ,yRSMCM, Alert.OK, null, regComplete);	   				
+	   			}
+	   			catch(e:Error){
+	   				var res:String = r.result.toString();
+		   			if(new RegExp(/Duplicate entry '.*' for key 1/g).test(res))
+		   				Alert.show(aUESM, aLRCM);	
+	   				else
+	   					Alert.show(yRNSM1,yRNSMC1);
+	   			}
+	   			//clearFields();
+	   			//app.currentState 	= 'login';
+	   			return;
+	    	}
+	    	
+	    	private function regComplete(evt:CloseEvent):void {
+  			//	var urlRequest:URLRequest = new URLRequest( "javascript:history.go(0)" );
+			//	navigateToURL( urlRequest,"_top" );
+				
+				app.currentState 	= 'login';
+	    	}
+
+			private function registerFault():void{
+					trace("registerFault()");
+				}
+	    	
+	    	private function goBack(){
+	    		
+	    		if (app.defaultPageState == "home"){
+	    			app.currentState='home';
+	    		}else{
+	    		app.verticalScrollPosition=0;
+	    		app.currentState='login';
+	    		}
+	    		
+	    	}
+    		
+    		private function clearFields():void{
+				txt_name.text		=	'';
+				txt_title.text		=	'';
+				txt_company.text	=	'';
+				txt_nationality.text=	'';
+				txt_email.text		=	'';
+				txt_webpage.text	=	'';
+				txt_location.text	=	'';
+				txt_interests.text	=	'';
+				txt_description.text=	'';
+				userpic				=	app.ServerPath + app.graphData + "media/people/default_people.jpg";	
+	   			
+	   			
+	   			return;
+	    	}
+	    	
+	    /*	
+	    	public function displayCompetences():void
+	    	{
+	    		competencesVbox_regpage.removeAllChildren();	
+				var i:int;
+				for(i=0;i<competenceTypesArray.length;i++) {
+               		var tempArr:Array= competenceTypesArray[i].@competences.toString().split(",");
+					competenceList=new XMLList();
+					for each(var str:String in tempArr){
+      					var tempInt:int=uint(str);
+						competenceList=competenceList+new XML(tempInt);
+					}
+                    competenceType=new DataGrid();   
+                    competenceType.width=450;
+                    competenceType.rowHeight=25;
+                    competenceType.rowCount=competenceList.length();
+                    competenceType.height=(competenceType.rowCount+1)*competenceType.rowHeight;
+					competenceType.visible=true;
+					competenceType.horizontalScrollPolicy="off";
+					competenceType.verticalScrollPolicy="off";
+					competenceType.dataProvider=competenceList; 
+					
+					competenceColumn=new DataGridColumn();
+					competenceColumn.headerText=competenceTypesArray[i].@name.toString();
+					competenceColumn.itemRenderer= new ClassFactory(component.competenceComponent_registerpage);
+					var temp:Array=new Array();
+                    temp.push(competenceColumn);
+                  competenceType.columns=temp;
+                 competencesVbox_regpage.addChild(competenceType);
+               
+               }
+        */       
+	    
+		]]>
+	</mx:Script>
+	
+	
+	
+
+</mx:Panel>

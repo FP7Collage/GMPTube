@@ -1,0 +1,148 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:toolbox="com.advancedlist.flextoolbox.controls.*"  
+	 visible="true" x="179" y="157" width="477" height="300" layout="absolute" initialize="init();" 
+	  fontWeight="bold"
+	 showCloseButton="true" close="removeMe();"  horizontalScrollPolicy="off" verticalScrollPolicy="off"	 >
+	
+			<mx:Label x="10" y="10" text="{v1093}" width="437" color="{app.colorreturn2()}" height="28"/>
+		    <toolbox:CheckBoxList textAlign="left"  alternatingItemColors="[0xEEEEEE, 0xDFDFDF]" enabledField="enabled" labelField="@name" dataProvider="{amPeopleList}"  width="85%" rowHeight="20" id="addPeopleCheckBoxList" fontSize="9" backgroundAlpha="0.0" color="#FFFFFF" borderStyle="solid" height="128" y="56" x="35"/>
+			<mx:Button  label="{submitRM}" click="processAlertMembers();" x="58" y="201"/>
+			<mx:Button  label="{cancelM}" click="PopUpManager.removePopUp(this)" x="182" y="201"/>
+
+<mx:HTTPService id="inviteAlertVW" url="{app.ServerPath + 'GraphData/inviteAlertWV.php'}"  fault="processFault();" useProxy="false" method="POST"
+          showBusyCursor="false" >
+     </mx:HTTPService>
+			
+			
+<mx:Script source=".././Asfiles/as_constants.as" />				
+	<mx:Script>
+		<![CDATA[			
+     		
+			import mx.events.ItemClickEvent;    
+            import mx.core.Application;
+			import mx.managers.CursorManager;
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.ItemClickEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.managers.PopUpManager;
+			
+			[Bindable]public var app:Tentube=Tentube(Application.application);			
+			[Bindable]public var amPeopleList:ArrayCollection	=	new ArrayCollection();
+			
+			
+			private function init():void {
+			
+			 for each ( var ppl:XML in app.people_list ){
+           			amPeopleList.addItem(ppl);
+            	}
+            	
+			}
+			
+			private function processAlertMembers():void {
+			    var memberStr = new String();
+                var variables:URLVariables  = 	new URLVariables();		
+            	var queryList:Array = new Array();
+				var queryIdList:Array = new Array();
+				var amPeopleStr : String = new String ();
+				
+				queryList = addPeopleCheckBoxList.selectedItems ;
+				
+				for each ( var ppl:XML in queryList ){
+					queryIdList.push(ppl.@id);
+				}
+				// get the email id of selected items
+				
+				amPeopleStr = queryIdList.toString();		     
+            	          		
+            		memberStr = amPeopleStr;	
+					variables.youremail			=	app.Univ_LoginId1;
+					variables.vid =  data.@id.toString();
+					variables.memberList = memberStr;
+					inviteAlertVW.clearResult();  				    	
+			 		inviteAlertVW.request = variables;  
+			 		inviteAlertVW.addEventListener(ResultEvent.RESULT, processInvitationResult);
+					inviteAlertVW.send();
+            	    	
+            		
+    				
+			}
+			
+	private function processInvitationResult(r:ResultEvent):void{
+				try{
+					var Message:String 	= 	r.result.rsp.message;
+					
+					if ( Message == 'Success' ){
+						Alert.show("Invitation has been sent successfully.");
+						PopUpManager.removePopUp(this);	
+						return;	
+					}
+					else{
+						Alert.show('Invitation could not be sent. Please try again.');
+						return;
+					}
+						
+					
+				}
+				catch(e:Error){
+					// take care ;
+					trace (e.message);
+					PopUpManager.removePopUp(this);	
+					
+				}
+			}
+
+		private function processFault():void{
+						Alert.show("Connection Problem. Please Try Again.");
+									
+				}
+						
+
+        private function removeMe():void {
+                PopUpManager.removePopUp(this);
+            }
+    
+
+            
+		]]>
+
+	</mx:Script>
+			
+			
+			
+</mx:TitleWindow>
+		

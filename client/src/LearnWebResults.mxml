@@ -1,0 +1,251 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+
+<mx:TitleWindow title="Additional Search Results from LearnWeb" xmlns:mx="http://www.adobe.com/2006/mxml" width="900" minHeight="180" maxHeight="450" alpha="0.8"
+	backgroundColor="white"  horizontalScrollPolicy="off" 
+	isPopUp="true" 
+	showCloseButton="true"
+	close="closethis();"
+	creationComplete="populate()"
+	>
+		<mx:Script>
+		<![CDATA[
+			import mx.controls.*;
+			import mx.core.Application;
+			import mx.managers.PopUpManager;
+			import mx.containers.*;
+			//[Bindable] public var xml:XML=WebService(LearnWebXML); 
+			public var weblink:String=new String();
+		public function close(event:MouseEvent):void {
+					results.removeAllChildren();
+				PopUpManager.removePopUp(this);
+				
+			}
+			
+			public function closethis():void {
+					results.removeAllChildren();
+				PopUpManager.removePopUp(this);
+				
+			}
+			public function open(event:MouseEvent):void {
+				this.visible=true;
+			}
+			
+			public function populate():void {
+			
+			try
+			{
+							
+						
+		
+			
+			
+			var i:int =0;
+			
+				for each(var node:XML in Application.application.LearnWebXML.descendants("resource"))
+				{
+					
+					if(node.canonical.dc.type=="Video")
+					{
+					i=1;
+					var result:HBox = new HBox();
+					
+					// for putting the result on top
+			//		result.y = 0;
+					
+					result.percentWidth=100;
+					result.percentHeight=100;
+					//result.toolTip=node.canonical.dc.description;
+				//	<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	//horizontalAlign="center" width="100%" height="100%"  verticalAlign="left"  >
+
+					var title_text:Text=new Text();
+					title_text.text=node.canonical.dc.title;
+					title_text.toolTip=node.canonical.dc.title;
+					title_text.width=360;
+					title_text.height=15;
+					title_text.selectable=false;
+					//title_text.x=0;
+					result.addChild(title_text);
+					var type_text:Text= new Text();
+					type_text.text=node.canonical.dc.type;
+					type_text.width=80;
+					type_text.height=15;
+					type_text.selectable=false;
+					result.addChild(type_text);
+					var date_text:Text= new Text();
+					date_text.text=node.canonical.dc.date;
+					date_text.width=80;
+					date_text.height=15;
+					date_text.selectable=false;
+					result.addChild(date_text);
+					var creator_text:Text= new Text();
+					if(node.canonical.dc.creator=='')
+					creator_text.text="root";
+					else
+					creator_text.text=node.canonical.dc.creator;
+					creator_text.width=80;
+					creator_text.height=15;
+					creator_text.selectable=false;
+					result.addChild(creator_text);
+					var description_text:Text= new Text();
+					description_text.text="View Description";
+					description_text.toolTip=node.canonical.dc.description;
+					description_text.width=100;
+					description_text.height=15;
+					description_text.selectable=false;
+					result.addChild(description_text);
+					
+					var link:Button=new Button();
+					link.label="Open Resource";
+					//link.co
+					link.width=100;
+					link.toolTip=node.canonical.link.@href.toString();
+					//link.fontsize=13;
+					//link.fontWeight="normal";
+					//link.trxtDecoration="underline";
+				//	link.click=navigateToURL(new URLRequest(data.@link.toString()), '_blank');
+					 link.addEventListener(MouseEvent.CLICK,linkHandler);
+					 
+					
+					//weblink=node.canonical.link.@href.toString();
+					result.addChild(link);
+/*
+	<mx:Text id="source_text" text="" width="100%" textAlign="left" height="15" selectable="false" />
+	<mx:Text id="creator_text" text="" width="100%" textAlign="left" height="15" selectable="false"/>	
+	<mx:Text id="type_text" text=""  width="100%"  textAlign="left" height="15" selectable="false"/>		
+	<mx:Text id="date_text" text="" width="100%" textAlign="left" height="15" selectable="false" />
+	<mx:LinkButton id="link" label="see here" fontSize="13" fontWeight="normal" textDecoration="underline"
+			click="{navigateToURL(new URLRequest(data.@link.toString()), '_blank')}"/>
+
+
+</mx:HBox>
+					
+	*/				
+					
+					
+					//var node1:Object=node.canonical.dc.@source;
+					
+					
+					
+				//	result.source_text.text=node.canonical.dc.source;
+					
+					
+				//	result.creator_text.text=node.canonical.dc.creator;
+				
+					
+				//	result.type_text.text=String(node.canonical.dc.type);
+				
+					//result.date_text.text=String(node.canonical.dc.date);
+				
+
+					results.addChild(result);
+				//	var spac:Spacer = new Spacer();
+				//	spac.height = 10;
+					//results.addChild(spac);
+					}
+				}
+			if (i==0)
+			{
+				var noresult_text:Text=new Text();
+					noresult_text.text="no results to display";
+					noresult_text.toolTip="no results to display";
+					noresult_text.width=1000;
+					//noresult_text.textHeight=50;
+					noresult_text.height=150;
+					noresult_text.selectable=false;
+					results.addChild(noresult_text);
+			}
+			
+			}
+			catch(e:Error){
+			 		trace('error'+ e.message);
+			 	}
+			
+			
+			// alignment of results
+			
+		//	results.y = 5;
+			}
+		
+		private function linkHandler(event:MouseEvent):void {
+           weblink=event.currentTarget.toolTip;
+            var url:URLRequest = new URLRequest(weblink);
+            navigateToURL(url);
+        }
+		
+		
+	//	Application.application.LearnWebXML;
+			
+		]]>
+	</mx:Script>
+		
+	
+	
+
+	
+
+
+
+
+
+	<!--
+		<mx:Spacer id="titleSpacer" width="100%" visible="false" height="{closeBtn.height}"/>
+	
+		<mx:Button id="closeBtn" label="X"  toolTip="Close LearnWeb Results"
+			click="close(event)" right="20"/>
+			
+	<mx:Text text="Additional Search Results from LearnWeb"  fontSize="20" top="0" selectable="false"/>
+	-->
+	<mx:VBox top="30" backgroundColor="white" id="results" enabled="true"  height="100%" width="100%" horizontalScrollPolicy="off" verticalScrollPolicy="auto">
+									
+	<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	 width="100%" height="100%"  verticalAlign="left"  >
+
+	
+
+	<mx:Text  text="Title" fontWeight="bold" width="360" textAlign="left" height="18" selectable="false" />
+	<mx:Text  text="Type" fontWeight="bold" width="80" textAlign="left" height="18" selectable="false"/>	
+	<mx:Text  text="date"  fontWeight="bold" width="80"  textAlign="left" height="18" selectable="false"/>		
+	<mx:Text  text="Creator" fontWeight="bold" width="80" textAlign="left" height="18" selectable="false" />
+	<mx:Text  text="Description" fontWeight="bold" width="100" textAlign="left" height="18" selectable="false" />
+	<mx:Text  text="Link" fontWeight="bold" width="100" textAlign="left" height="18" selectable="false" />
+
+</mx:HBox>
+									
+									</mx:VBox>
+	
+	
+	
+	
+</mx:TitleWindow>	
+

@@ -1,0 +1,1386 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow title="{grpManM}" xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="100%" height="514" 
+	xmlns:fs="com.fs.*" added="{gotoGroup()}"
+	creationComplete="initgrp();"  xmlns:ns1="component.*" fontWeight="bold" 
+	textDecoration="normal" verticalScrollPolicy="auto" horizontalScrollPolicy="auto">
+	
+	
+	<!-- the user can view the profiles of all groups in this page. 
+		 admin can create and edit group profile, upload a new picture,
+		 features to be included in this page for next version
+		 	1. Send message to another groups
+		 	2. Invite for a video conference if the other user is online
+		 	3. Show videos uploaded by the groups
+		 	4. change the ui of the page 
+	-->
+	
+
+	
+	
+	<mx:Canvas verticalScrollPolicy="off"  horizontalScrollPolicy="off" width="100%" height="436"  backgroundColor="#FFFFFF">
+		
+		<mx:VBox visible="false" id="content" verticalScrollPolicy="off" height="310" width="478" horizontalCenter="-10" top="100" verticalAlign="top" horizontalAlign="center" verticalGap="10">
+			<mx:TabNavigator  id="tabs" width="471" height="299">
+			
+				<mx:Canvas label="{genDM}" width="100%" height="100%" >
+					<mx:Panel layout="vertical" width="100%" height="100%">
+						<mx:HBox horizontalAlign="center" width="100%" height="100%">
+							<mx:Label text="{nameM}" color="#FFFFFF" width="50" height="20"/>
+							<mx:TextArea editable="false" width="280" height="30" id="grp_name"/>
+						</mx:HBox>
+						<mx:HBox horizontalAlign="center" width="100%" height="100%">
+							<mx:Label text="{authorM}" color="#FFFFFF" width="50" height="20"/>
+							<mx:TextArea editable="false"  x="158" y="80" width="280" height="30" id="grp_author"/>
+						</mx:HBox>
+						<mx:HBox horizontalAlign="center" width="100%" height="100%">
+							<mx:Label text="{urlM}" color="#FFFFFF" width="50" height="20"/>
+							<mx:TextArea editable="false" x="158" y="150" width="280" height="30" id="grp_url"/>
+						</mx:HBox>
+					</mx:Panel>
+				</mx:Canvas>
+				
+				<mx:Canvas label="{descM}" width="100%" height="100%" id="candescription">
+					<mx:Panel layout="horizontal" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+						<mx:TextArea  verticalScrollPolicy="on" editable="false" id="grp_description" width="70%" height="70%"/>
+					</mx:Panel>
+				</mx:Canvas>
+				
+				<mx:Canvas label="{membersM}" width="100%" height="100%" id="canmembers">
+					<mx:Panel id="addmembersys" visible="false" layout="horizontal" width="100%" height="100%" title="Add/Remove Members">
+						<mx:List selectable="true" id="listofallmembers" dataProvider="{totallist}" width="100%" height="100%" borderStyle="none" horizontalScrollPolicy="on">
+							<mx:itemRenderer>
+								<mx:Component>
+									<mx:Label text="{data.namesLabel}" width="100%" height="20"/>
+								</mx:Component>
+							</mx:itemRenderer>
+						</mx:List>
+						<mx:VBox height="100%" horizontalAlign="center" verticalAlign="middle" >
+							<mx:Button id="addelement_btn" label="{addM}" width="50" click="Add_Member()"/>
+							<mx:Button id="removeelement_btn" label="{dropM}" width="50" click="Drop_Member()"/>
+						</mx:VBox>
+						<mx:List selectable="true" id="listofselectedmembers"  dataProvider="{selectedgrplist}" width="100%" height="100%" borderStyle="none" horizontalScrollPolicy="on">
+							<mx:itemRenderer>
+								<mx:Component>
+									<mx:Label text="{data.namesLabel}" width="100%" height="20"/>
+								</mx:Component>
+							</mx:itemRenderer>
+						</mx:List>
+					</mx:Panel>
+					
+					<mx:Panel id="grp_memberlist" width="100%" height="100%" layout="absolute" horizontalAlign="center" verticalAlign="middle">
+						<mx:List editable="false" visible="true"   dataProvider="{grpmemberNames}" x="50" y="10" width="80%" height="80%" verticalScrollPolicy="on" horizontalScrollPolicy="on"/>
+					</mx:Panel>
+					
+				</mx:Canvas>
+				
+				<mx:Canvas label="{interestM}" width="100%" height="100%" id="caninterests">
+					<mx:Panel layout="horizontal" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+						<mx:List   dataProvider="{listofinterests}" verticalScrollPolicy="on" editable="false" id="grp_interests" width="70%" height="90%">
+							<mx:itemRenderer>
+								<mx:Component>
+									<mx:Label text="{data.int}" width="100%" height="20"/>
+								</mx:Component>
+							</mx:itemRenderer>
+						</mx:List>
+					</mx:Panel>
+				</mx:Canvas>
+				
+				<mx:Canvas label="{comM}" width="100%" height="100%" id="cancompetence" enabled="{app.EnableCompetences}" visible="{app.EnableCompetences}">
+					<mx:Panel width="100%" height="100%">
+					   <mx:List id="comlist" dataProvider="{grpcompetence}" visible="true" horizontalScrollPolicy="on" verticalScrollPolicy="on" width="100%" height="100%">
+							<mx:itemRenderer>
+								<mx:Component>
+									<mx:HBox>
+										<mx:Label text="{data.id}" visible="false" width="30" height="20"/>
+										<mx:Label text="{data.name}" width="200" height="20"/>
+										<mx:HSlider id="hsl" enabled="false"  value="{data.val}" minimum="0" maximum="100" snapInterval="10" toolTip="{hsl.value}" width="150" height="15" showDataTip="true" allowTrackClick="true"/>
+									</mx:HBox>
+								</mx:Component>
+							</mx:itemRenderer>
+						</mx:List>
+					</mx:Panel>
+				</mx:Canvas>
+				
+			</mx:TabNavigator>
+		</mx:VBox>
+		
+		
+		
+		<mx:Image visible="false"  id="imggrppic" source="{app.ServerPath+'GraphData/media/groupphotos/default_people.jpg'}" top="150" left="30" width="175" height="175"/>
+		
+		<mx:Button visible="false" id="btnedit" label="{editGM}" right="30" top="170"  enabled="true" width="150" height="20" click="editgroupbtnclicked();" />
+		<mx:Button visible="false" id="btnsave" label="{saveM}" right="30" top="200"  enabled="true" width="150" height="20" click="savegroupbtnclicked();"/>
+		<mx:Button visible="true"  id="btncreate" label="{crtGM}" right="30" top="140"  enabled="true" width="150" height="20" click="creategroupbtnclicked();"/>
+		<mx:Button visible="false" id="btndelete" label="{delGM}" right="30" top="230"  enabled="true" width="150" height="20" click="deletegroupbtnclicked();"/>
+		<mx:Button visible="false" id="btnback" label="{listGM}" right="30" top="290"  enabled="true" width="150" height="20" click="{backgroupbtnclicked();}"/>
+		<mx:Button visible="{joinshow}" id="btnjoin" label="{jGM}" right="30" top="198" enabled="true" width="150" height="20" click="{joinGroup()}"/>
+		<mx:Button visible="{unjoinshow}" id="btnunjoin" label="{unjGM}" right="30" top="250" enabled="true" width="150" height="20" click="{unjoinGroup()}"/>
+		<mx:Button visible="false" id="btnpic" label="{upPhGM}" left="40" top="350"  enabled="true" width="150" height="20" click="picuploadbtnclicked();"/>
+		
+		
+
+		<mx:TileList id="tilegrpprofiles" doubleClickEnabled="true" visible="true" height="394" columnCount="4" dataProvider="{testarray}" horizontalScrollPolicy="on" verticalScrollPolicy="on" left="36" right="222" top="10"   doubleClick="loadparticularprofile();">
+		<mx:itemRenderer>
+			<mx:Component>
+				<mx:VBox horizontalScrollPolicy="off" verticalScrollPolicy="off" width="100" height="100" horizontalAlign="center" verticalAlign="middle">
+					<mx:Image source="{data.picture}" width="50" height="50"/>
+					<mx:Label text="{data.name}" height="20" width="100"/>
+					<mx:Label text="{data.id}" visible="false"/>
+				</mx:VBox>
+			</mx:Component>
+		</mx:itemRenderer>		
+		</mx:TileList>
+		
+		
+		
+		
+  </mx:Canvas>
+  
+  	
+  	
+    <mx:Script source="Asfiles/as_constants.as" />
+    <mx:Script source="Asfiles/as_variables.as" />
+	
+       <!--  dataProvider="{peoplelist}"   -->
+	<mx:Script>
+		<![CDATA[
+			import mx.rpc.events.ResultEvent;
+			import component.groupadminlogin;
+			import mx.controls.Label;
+			import mx.automation.delegates.controls.LabelAutomationImpl;
+			import component.groupprofile;
+			import mx.rpc.events.FaultEvent;
+			import mx.collections.ArrayCollection;
+			import flash.display.DisplayObject;
+			import flash.events.*;
+			import flash.net.FileFilter;
+			import flash.net.FileReference;
+			import flash.net.URLRequest;
+			import flash.net.URLRequestMethod;
+			import flash.net.URLVariables;
+			
+			import mx.controls.Alert;
+			import mx.controls.DataGrid;
+			import mx.controls.ProgressBar;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import mx.core.Application;
+			
+			import mx.managers.*;
+			
+			
+
+			[Bindable]public var app:Tentube	=Tentube(Application.application);
+			
+			public var imageTypes:FileFilter 	= new FileFilter('Images (*.jpg, *.jpeg, *.gif,*.png)', '*.jpg; *.jpeg; *.gif; *.png');
+			public var imagefilter:Array 		= new Array(imageTypes); 
+   			public var groupupload_url:String;
+        	public var grpfileref:FileReference=new FileReference();
+        	
+        	[Bindable] public var randomgroupphotoname:String=new String();
+        	[Bindable] public var createdFLAG:Boolean=false;
+        	[Bindable] public var editedFLAG:Boolean=false;
+        	[Bindable] public var selectedgrpliststring:String=new String();
+        	[Bindable] public var grouplisttotal:String=new String();
+        	[Bindable] public var selectedid:String=new String();
+        	
+        	[Bindable] public var testarray:ArrayCollection=new ArrayCollection();
+        	        	
+        	[Bindable] public var grpcompetence:ArrayCollection=new ArrayCollection();
+        	
+        	[Bindable] public var totallist:ArrayCollection=new ArrayCollection();
+        	
+        	[Bindable] public var listofinterests:ArrayCollection=new ArrayCollection();
+        	
+			[Bindable] public var grpdata:XML;
+			[Bindable] public var grpmember:ArrayCollection=new ArrayCollection();
+			
+			[Bindable] public var grpmemberNames:ArrayCollection=new ArrayCollection();
+			
+			
+			[Bindable] public var selectedgrplist:ArrayCollection = new ArrayCollection();
+			[Bindable] public var edit_groupidlist:ArrayCollection=new ArrayCollection();
+			[Bindable] public var edit_alreadymembers:ArrayCollection=new ArrayCollection();
+			[Bindable] public var view_members:ArrayCollection=new ArrayCollection();
+			[Bindable] public var view_groupidlist:ArrayCollection=new ArrayCollection();
+			[Bindable] public var grouppic:String		=new String();
+			[Bindable] public var editpic:String=new String();
+			[Bindable] public var viewpic:String=new String();
+			
+			[Bindable] public var currphotoimage:String = app.ServerPath+'GraphData/media/groupphotos/default_people.jpg';
+			[Bindable] public var uploadedfilename:String=new String();
+			
+			[Bindable] public var presentstate:String=new String();
+			
+			[Bindable] public var currentGid:String = '';
+			
+			[Bindable] public var joinshow:Boolean=false;
+			[Bindable] public var unjoinshow:Boolean=false;
+			
+			public var createbtn:String=new String();
+			public var editbtn:String=new String();
+
+			
+/*			
+All group fucntions start from here...
+
+*/
+			
+			public function creategroupbtnclicked():void{
+				
+				if(app.adminstatus==false){
+						var loginWin:groupadminlogin=groupadminlogin(PopUpManager.createPopUp(this,groupadminlogin,true));	
+						PopUpManager.centerPopUp(loginWin);	
+					}
+					
+				if(app.adminstatus==false){
+					return;
+				}
+				
+				content.visible=true;
+				imggrppic.visible=false;
+					
+				btncreate.visible=false;
+				btnedit.visible  =false;
+				btnsave.visible  =true;
+				btnpic.visible   =false;
+				btndelete.visible=false;
+				btnback.visible  =true;
+				
+				grp_name.text="";
+				grp_url.text="";
+				grp_author.text="";
+				grp_description.text="";
+				
+				grp_name.editable=true;
+				grp_url.editable=true;
+				grp_author.editable=true;
+				grp_description.editable=true;
+				
+				tilegrpprofiles.visible=false;
+				
+				caninterests.enabled=false;
+				cancompetence.enabled=false;
+				
+				
+				addmembersys.visible=true;
+				grp_memberlist.visible=false;
+				
+				imggrppic.source=app.ServerPath+'GraphData/media/groupphotos/default_people.jpg';
+				
+				grp_author.text=app.Univ_LoginId1;
+				grp_url.text="http://";
+				
+				
+				if(selectedgrplist.length>0){
+					selectedgrplist.removeAll();
+				}
+				if(grpmember.length>0){
+					grpmember.removeAll();
+				}
+				if(grpmemberNames.length>0){
+					grpmemberNames.removeAll();
+				}
+				
+				
+						
+				var http_grp:HTTPService 	= 	new HTTPService();
+				http_grp.url				= 	app.ServerPath + 'GraphData/randomString.php';
+				http_grp.useProxy			=	false;
+				http_grp.resultFormat		=	'object';
+				http_grp.addEventListener(ResultEvent.RESULT,randomgrpString);
+				http_grp.send();
+				
+				createdFLAG=true;
+				editedFLAG=false;
+				
+				tabs.selectedIndex=0;
+				
+			}
+			
+			public function editgroupbtnclicked():void{
+				if(app.adminstatus==false){
+						var loginWin:groupadminlogin=groupadminlogin(PopUpManager.createPopUp(this,groupadminlogin,true));	
+						PopUpManager.centerPopUp(loginWin);	
+					}
+				
+				if(app.adminstatus==false){
+					return;
+				}
+				
+				btncreate.visible=false;
+				btnedit.visible  =false;
+				btnsave.visible  =true;
+				btnpic.visible   =true;
+				btndelete.visible=false;
+				btnback.visible  =true;
+				
+				grp_name.editable=true;
+				grp_url.editable=true;
+				grp_author.editable=true;
+				grp_description.editable=true;
+				
+				caninterests.enabled=false;
+				cancompetence.enabled=false;
+				
+				addmembersys.visible=true;
+				grp_memberlist.visible=false;
+				
+				/*
+				if(selectedgrplist.length>0){
+					selectedgrplist.removeAll();
+				}
+				
+				for(var i:Number=0;i<grpmember.length;i++){
+					selectedgrplist.addItem(grpmember.getItemAt(i).toString());
+				}
+				*/
+				
+				// this line has to changed so that we assign the object
+				selectedgrplist=grpmember;
+				
+				var http_grp:HTTPService 	= 	new HTTPService();
+				http_grp.url				= 	app.ServerPath + 'GraphData/randomString.php';
+				http_grp.useProxy			=	false;
+				http_grp.resultFormat		=	'object';
+				http_grp.addEventListener(ResultEvent.RESULT,randomgrpString);
+				http_grp.send();
+				
+				createdFLAG=false;
+				editedFLAG=true;
+				
+				tabs.selectedIndex=0;
+				
+			}
+			
+			public function savegroupbtnclicked():void{
+				
+				var num:Number=grp_content_check();
+				
+				if (num==0){
+					return;
+				}
+			
+			//	selectedgrpliststring=selectedgrplist.getItemAt(0).toString();
+				selectedgrpliststring=selectedgrplist.getItemAt(0).names.toString();
+				
+				for(var i:Number=1;i<selectedgrplist.length;i++){
+			//		selectedgrpliststring=selectedgrpliststring+';'+selectedgrplist.getItemAt(i).toString();
+			selectedgrpliststring=selectedgrpliststring+';'+selectedgrplist.getItemAt(i).names.toString();
+				}
+				
+				if(createdFLAG==true){
+					creategroupHTTP.send();
+					btnsave.visible=false;
+					
+					grp_name.editable=false;
+					grp_url.editable=false;
+					grp_author.editable=false;
+					grp_description.editable=false;
+					
+					addmembersys.visible=false;
+					grp_memberlist.visible=true;
+						
+				}
+				else if(editedFLAG==true){
+					editgroupHTTP.send();
+					btnsave.visible=true;
+					
+					grp_name.editable=true;
+					grp_url.editable=true;
+					grp_author.editable=true;
+					grp_description.editable=true;
+					
+					addmembersys.visible=true;
+					grp_memberlist.visible=false;
+				}
+				
+				btncreate.visible=false;
+				btnedit.visible  =false;	
+				btnpic.visible   =true;
+				btndelete.visible=false;
+				btnback.visible  =true;
+				
+				caninterests.enabled=false;
+				cancompetence.enabled=false;
+					
+				
+			}
+			
+			public function picuploadbtnclicked():void{
+				
+				if(createdFLAG==false && editedFLAG==false){
+					return;
+				}
+				
+				if(editedFLAG==true){
+					var http_grp:HTTPService 	= 	new HTTPService();
+					http_grp.url				= 	app.ServerPath + 'GraphData/randomString.php';
+					http_grp.useProxy			=	false;
+					http_grp.resultFormat		=	'object';
+					http_grp.addEventListener(ResultEvent.RESULT,randomgrpString);
+					http_grp.send();
+				}
+				
+				if(createdFLAG==true){
+					grpfileref.addEventListener(Event.SELECT, uploadgrppic_selectHandler);
+            		grpfileref.addEventListener(Event.COMPLETE, uploadgrppic_completeHandler);
+					grpfileref.browse(imagefilter);
+				}
+				else if(editedFLAG==true){
+					grpfileref.addEventListener(Event.SELECT, uploadgrppic_selectHandler);
+            		grpfileref.addEventListener(Event.COMPLETE, uploadgrppicedit_completeHandler);
+					grpfileref.browse(imagefilter);
+				}
+			}
+			
+			public function backgroupbtnclicked():void{
+				
+				btncreate.visible=true;
+				btnedit.visible  =false;
+				btnsave.visible  =false;
+				btnpic.visible  =false;
+				btndelete.visible=false;
+				btnback.visible  =false;
+				
+				content.visible=false;
+				imggrppic.visible=false;
+				
+				grp_name.editable=false;
+				grp_url.editable=false;
+				grp_author.editable=false;
+				grp_description.editable=false;
+				
+				grp_name.text="";
+				grp_url.text="";
+				grp_author.text="";
+				grp_description.text="";
+				
+				
+				tilegrpprofiles.visible=true;
+					
+				createdFLAG=false;
+				editedFLAG=false;
+				
+				imggrppic.source=app.ServerPath+'GraphData/media/groupphotos/default_people.jpg';
+				
+				var bool:Boolean=testarray.refresh();
+				
+				selectedid='';
+				
+				testarray.refresh();
+				
+				joinshow=false;
+				unjoinshow=false;
+			}
+			
+			public function deletegroupbtnclicked():void{
+				
+				if(app.adminstatus==false){
+						var loginWin:groupadminlogin=groupadminlogin(PopUpManager.createPopUp(this,groupadminlogin,true));	
+						PopUpManager.centerPopUp(loginWin);	
+					}
+					
+				if(app.adminstatus==false){
+					return;
+				}
+				
+				deletegroupHTTP.send();
+			}
+			
+			private function joinGroup():void {
+				joinGService.send();
+			}
+			private function joinResult():void {
+				var responseMessage:String;
+				responseMessage = joinGService.lastResult.rsp.message;
+				
+				if(responseMessage =='Success'){
+					Alert.show(succJoinM, joinM);
+					joinshow=false;
+					unjoinshow=true;
+					getgroupdataHTTP.send();
+				}
+				else if(responseMessage =='Already'){
+					Alert.show(youArMM, joinM);
+				}
+				else
+					Alert.show('Failed due to an unknown error', 'Sorry');
+			}
+			
+			private function unjoinGroup():void {
+				unjoinGService.send();
+			}
+			private function unjoinResult():void {
+				var responseMessage:String;
+				responseMessage = unjoinGService.lastResult.rsp.message;
+				
+				if(responseMessage == 'Success'){
+					Alert.show(succUnJoinM, unjoinM);
+					joinshow=true;
+					unjoinshow=false;
+					getgroupdataHTTP.send();
+				}
+				else if(responseMessage == 'Not a member'){
+					Alert.show(youArNMGM, unjoinM);
+				}
+				else
+					Alert.show('Failed due to an unknown error', 'Sorry');
+			}
+			
+			public function saveprofileFault():void{
+				
+			}
+					
+			public function initgrp():void{
+				
+				totallist.removeAll();
+				
+				for(var i:Number=0;i<app.people_list.length;i++){
+					var obj:Object=new Object();
+					obj.names=app.people_list[i].@id.toString();
+					// adding the namesLabel
+				    obj.namesLabel=app.people_list[i].@name.toString();
+					totallist.addItem(obj);
+				}
+				
+				getlistofgroupsHTTP.send();
+				adminstatus=false;
+				competenceHTTP.send();
+				
+			}
+			
+			
+			public function Add_Member():void{
+				if(listofallmembers.selectedItems.length==0){
+					return;
+				}
+				var num:Number=listofallmembers.selectedIndex;
+				
+				for(var i:Number=0;i<selectedgrplist.length;i++){
+				//if(totallist.getItemAt(num).names.toString()==selectedgrplist.getItemAt(i).toString()){
+				if(totallist.getItemAt(num).namesLabel.toString()==selectedgrplist.getItemAt(i).namesLabel.toString()){
+				    	Alert.show(theMemberAlreadyGM);
+						return;
+					}
+				}
+				
+				// Referencing names and id for the list
+			//	selectedgrplist.addItem(totallist.getItemAt(num).names.toString());
+				selectedgrplist.addItem(totallist.getItemAt(num));
+				
+				
+				
+
+			}
+			
+			public function Drop_Member():void{
+				if(selectedgrplist.length==0){
+					return;
+				}
+				if(listofselectedmembers.selectedItems.length==0){
+					return;
+				}
+				selectedgrplist.removeItemAt(listofselectedmembers.selectedIndex);
+			}
+			
+			
+			public function loadparticularprofile():void{
+				if(tilegrpprofiles.selectedItems.length==0){
+					return;
+				}
+				
+				listofinterests.removeAll();
+				
+				tabs.selectedIndex=0;
+				
+				var obj:Object=new Object;
+				obj=testarray.getItemAt(tilegrpprofiles.selectedIndex);
+				selectedid=obj.id.toString();
+				
+				getgroupdataHTTP.send();
+				
+				content.visible=true;
+				imggrppic.visible=true;
+					
+				btncreate.visible=false;
+				btnedit.visible  =true;
+				btnsave.visible  =false;
+				btnpic.visible   =false;
+				btndelete.visible=true;
+				btnback.visible  =true;
+				
+				addmembersys.visible=false;
+				grp_memberlist.visible=true;
+				
+				tilegrpprofiles.visible=false;
+				
+				caninterests.enabled=true;
+				
+				cancompetence.enabled=app.EnableCompetences;
+				
+						
+				for(var i:Number=0;i<grpcompetence.length;i++){
+					grpcompetence.enableAutoUpdate();
+					grpcompetence.getItemAt(i).val=0;
+					//grpcompetence.itemUpdated(collectionOfThoseClasses.getItemAt(i));
+				}
+				
+				
+			}
+			
+			
+			public function randomgrpString(r:ResultEvent):void{
+				try{
+			   		randomgroupphotoname	=	r.result.rsp.name;
+			 	}
+			 	catch(e:Error){
+			 		trace('An unexpected error had occured. Please contact the administrator','Error !');
+			 	}
+		 	}
+		 	
+		 	
+			
+			public function uploadgrppic_selectHandler(event:Event):void {
+            try{
+            	var filesize:Number = event.target.size;
+            	if ( (filesize/1024) > 100 ){		//  max size is 2 mb
+            		Alert.show(theMaxUploadGM,tooBigM);
+            		return;
+            	}
+	            var params:URLVariables = new URLVariables();
+	            uploadedfilename = grpfileref.name;
+	            var request:URLRequest  = new URLRequest();
+		        request.url				= Application.application.ServerPath+'GraphData/uploadgroupphotos.php';
+        		request.method 			= URLRequestMethod.POST;
+        		grpfileref.upload(request);
+    		}
+    		catch (error:Error){
+        		trace("Unable to upload Group Photo.");
+        		Alert.show(uploadErrorMessage,errM);
+   				}    
+        	}
+        
+       
+			public function uploadgrppic_completeHandler(event:Event):void {
+				renamephotocreateHTTP.send();
+			}
+			
+			public function uploadgrppicedit_completeHandler(event:Event):void {
+				renamephotoeditHTTP.send();
+			}
+			
+			
+			
+			public function getResponse_create():void{
+				var responseMessage:String;
+				responseMessage = creategroupHTTP.lastResult.rsp.message;
+				
+				if(responseMessage==''){
+					Alert.show('Unable to connect to server !!');
+					return;
+				}
+				
+					switch ( responseMessage ){
+	   				case 'Success':
+		   				Alert.show(gcUDPGM);
+		   				/*
+		   				var obj:Object=new Object();
+						obj.id=randomgroupphotoname;
+						obj.name=grp_name.text;
+						obj.picture=app.ServerPath+'GraphData/media/groupphotos/default_people.jpg';
+						testarray.addItem(obj);
+						btnpic.visible=true;
+						imggrppic.visible=true;
+						*/
+						btnpic.visible=true;
+						imggrppic.visible=true;
+						testarray.removeAll();
+		   				getlistofgroupsHTTP.send();
+		   				testarray.refresh();
+		   				grpmember=selectedgrplist;
+	   					break;
+	   				case 'Exists':
+	   					Alert.show(gneTM);
+	   					break;
+	   				default:
+	   					Alert.show(errM, responseMessage);
+	   					break;
+	    			}
+	    			return;
+			}
+			
+			public function getResponse_edit():void{
+				var responseMessage:String;
+				responseMessage = editgroupHTTP.lastResult.rsp.message;
+				
+				if(responseMessage==''){
+					Alert.show('Unable to connect to server !!');
+					return;
+				}
+				
+					switch ( responseMessage ){
+	   				case 'Success':
+		   				Alert.show(gEditedM);
+		   				
+		   				/*
+		   				var num:Number=new Number();
+		   				var pic:String=new String();
+		   				var obj:Object=new Object();
+		   				
+						for(var i:Number=0;i<testarray.length;i++){
+							obj=testarray.getItemAt(i);
+							
+							if(obj.id.toString()==selectedid){
+								num=i;
+								pic=testarray.getItemAt(i).picture;
+							}
+						}
+						testarray.removeItemAt(num);
+					
+						var obj:Object=new Object();
+						obj.id=selectedid;
+						obj.name=grp_name.text;
+						obj.picture=pic;
+						testarray.addItem(obj);
+						
+						grpmember=selectedgrplist;
+						*/
+						
+						grpmember=selectedgrplist;
+						testarray.removeAll();
+		   				getlistofgroupsHTTP.send();
+						testarray.refresh();
+						grpmember=selectedgrplist;
+						
+	   					break;
+	   				case 'Exists':
+	   					Alert.show(gneTM);
+	   					break;
+	   				default:
+	   					Alert.show(errM, responseMessage);
+	   					break;
+	    			}
+	    			return;
+			}
+			
+			public function getResponse_delete():void{
+				var responseMessage:String;
+				responseMessage = deletegroupHTTP.lastResult.rsp.message;
+				
+				if(responseMessage==''){
+					Alert.show('Unable to Load data from server !!');
+					return;
+				}
+				
+					switch ( responseMessage ){
+	   				case 'Success':
+		   				Alert.show(gDeletedM);
+		   				
+		   				/*
+		   				var num:Number=new Number();
+		   				var obj:Object=new Object();
+		   				
+						for(var i:Number=0;i<testarray.length;i++){
+							obj=testarray.getItemAt(i);	
+							if(obj.id.toString()==selectedid){
+								num=i;
+							}
+						}
+						
+						testarray.removeItemAt(num);
+		   				selectedid=''
+		   				testarray.refresh();
+		   				backgroupbtnclicked();
+		   				*/
+		   				
+		   				testarray.removeAll();
+		   				backgroupbtnclicked();
+		   				getlistofgroupsHTTP.send();
+		   				testarray.refresh();
+		   				grpmember.removeAll();
+		   				grpmemberNames.removeAll();
+		   				selectedgrplist.removeAll();
+		   				
+	   					break;
+	   				default:
+	   					Alert.show(errM, responseMessage);
+	   					break;
+	    			}
+	    			return;
+			}
+			
+			public function getResponse_rename_edit():void{
+				var responseMessage:String;
+				responseMessage = renamephotoeditHTTP.lastResult.rsp.message;
+				
+				if(responseMessage==''){
+					Alert.show('Unable to Load data from server !!');
+					return;
+				}
+				
+				var arr:Array=new Array();
+				arr=responseMessage.split("%@%");
+				if(arr[0].toString()=="Success"){
+					Alert.show(newGPUSM);
+					imggrppic.source=arr[1].toString();
+					
+					/*
+					var num:Number=new Number();
+					var obj:Object=new Object();
+					
+					for(var i:Number=0;i<testarray.length;i++){
+						obj=testarray.getItemAt(i);
+						if(obj.id.toString()==selectedid){
+							num=i;
+						}
+					}
+					
+					testarray.removeItemAt(num);
+					
+					var obj:Object=new Object();
+					obj.id=selectedid;
+					obj.name=grp_name.text;
+					obj.picture=arr[1].toString();
+					testarray.addItem(obj);
+					*/
+					
+					testarray.removeAll();
+		   			getlistofgroupsHTTP.send();
+		   			testarray.refresh();
+		   			
+				}
+				else{
+					Alert.show(errUGPM);
+				}
+				
+			}
+			
+			public function getResponse_rename_create():void{
+				var responseMessage:String;
+				responseMessage = renamephotocreateHTTP.lastResult.rsp.message;
+				
+				if(responseMessage==''){
+					Alert.show('Unable to Load data from server !!');
+					return;
+				}
+				
+				var arr:Array=new Array();
+				arr=responseMessage.split("%@%");
+				if(arr[0].toString()=="Success"){
+					Alert.show(gPhotoSM);
+					imggrppic.source=arr[1].toString();
+					
+					/*
+					
+					var num:Number=new Number();
+					for(var i:Number=0;i<testarray.length;i++){
+						if(testarray.getItemAt(i).id==randomgroupphotoname){
+							num=i;
+						}
+					}
+					
+					testarray.removeItemAt(num);
+					
+					var obj:Object=new Object();
+					obj.id=randomgroupphotoname;
+					obj.name=grp_name.text;
+					obj.picture=arr[1].toString();
+					testarray.addItem(obj);
+					
+					btnpic.visible=false;
+				*/
+					testarray.removeAll();
+		   			getlistofgroupsHTTP.send();
+		   			testarray.refresh();
+					
+				}
+				else{
+					Alert.show(errUGPM);
+				}
+				
+			}
+			
+			public function getResponse_grplist():void{
+				
+				grouplisttotal = getlistofgroupsHTTP.lastResult.rsp.message;
+				
+				if(grouplisttotal==''){
+					Alert.show('Unable to Load data from server !!');
+					return;
+				}
+				if(grouplisttotal=='NoGroup'){
+					Alert.show(noGESCM);
+					return;
+				}
+				
+				var allrecords:Array=grouplisttotal.split("#@#");
+				
+				var eachrecord:Array=new Array();
+				var str:String=new String();
+				
+				for(var i:Number=0;i<allrecords.length;i++){
+					
+					
+					str=allrecords[i].toString();
+					if(str==''){
+						return;
+					}
+					eachrecord=str.split("%@%");
+
+					
+					var obj:Object=new Object();
+					obj.id=eachrecord[0].toString();
+					obj.name=eachrecord[1].toString();
+					obj.picture=eachrecord[2].toString();
+					
+					testarray.addItem(obj);
+					
+				}
+				
+				gotoGroup();
+
+			}
+			
+			private function gotoGroup():void {
+				if(app.gotoGroupId == '')
+					return;
+				var ind:Number = 0;
+				while(ind < testarray.length) {
+					var objec:Object = testarray.getItemAt(ind);
+					if(objec.id == app.gotoGroupId) {
+						app.gotoGroupId = "";
+						break;
+					}
+					ind++;
+				}
+				if(tilegrpprofiles != null) {
+				tilegrpprofiles.selectedIndex = ind;
+				tilegrpprofiles.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+				}
+			}
+			
+			public function getResponse_competencetypes():void{
+				var responseMessage:String;
+				responseMessage = competenceHTTP.lastResult.rsp.message;
+				
+				if(responseMessage==''){
+					Alert.show('Unable to Load data from server !!');
+					return;
+				}
+				
+				var allrecords:Array=responseMessage.split("#@#");
+				
+				var eachrecord:Array=new Array();
+				var str:String=new String();
+				
+				for(var i:Number=0;i<allrecords.length;i++){
+					
+					
+					str=allrecords[i].toString();
+					if(str==''){
+						return;
+					}
+					eachrecord=str.split("%@%");
+
+					var obj:Object=new Object();
+					obj.id=eachrecord[0].toString();
+					obj.name=eachrecord[1].toString();
+					obj.val=0;
+					grpcompetence.addItem(obj);
+					
+				}
+				
+			}
+			
+			public function getResponse_grpdata():void{
+				var responseMessage:String;
+				responseMessage = getgroupdataHTTP.lastResult.rsp.message;
+				
+				if(responseMessage==''){
+					Alert.show('Unable to Load data from server !!');
+					return;
+				}
+				
+				var eachfield:Array=new Array();
+				eachfield=responseMessage.split("%@%");
+				
+				currentGid = eachfield[0].toString();
+				grp_name.text=eachfield[1].toString();
+				grp_author.text=eachfield[5].toString();
+				grp_url.text=eachfield[3].toString();
+				grp_description.text=eachfield[4].toString();
+				imggrppic.source=eachfield[2].toString();
+				
+				var temp:String=eachfield[6].toString();
+				var temparr:Array=new Array();
+				temparr=temp.split(";");
+				
+				grpmember.removeAll();
+				grpmemberNames.removeAll();
+				
+				
+				var ctpid:Number=0;
+				
+				for(var i:Number=0;i<temparr.length;i++){
+					//grpmember.addItem(temparr[i].toString());
+					// adding the names in the group					
+					var userName: String = "";
+					userName = app.getUserName(temparr[i].toString());
+					grpmemberNames.addItem(userName);	
+					
+					var obj1 = new Object();
+					obj1.names=temparr[i].toString();					
+				    obj1.namesLabel=userName;
+					grpmember.addItem(obj1);
+										
+					if(temparr[i].toString()==app.Univ_LoginId1){
+						ctpid=1;
+					}
+				}
+				
+				if(ctpid==1){
+					joinshow=false;
+					unjoinshow=true;
+				}
+				else{
+					joinshow=true;
+					unjoinshow=false;
+				}
+				
+				var tmpid:String=new String();
+				var tmpstrint:String=new String();
+				var tmparrint:Array=new Array();
+				var ct:Number=0;
+				var grpint:ArrayCollection=new ArrayCollection();
+				
+				for(var j:Number=0;j<app.people_list.length;j++){
+					tmpid=app.people_list[j].@id.toString();
+					for(var k:Number=0;k<temparr.length;k++){
+						if(tmpid==temparr[k].toString()){
+							ct=ct+1;
+						}
+					}
+					if(ct>0){
+						tmpstrint=app.people_list[j].@interests.toString();
+						tmparrint=tmpstrint.split(",");
+						var count:Number=0;
+						
+						for(var m:Number=0;m<tmparrint.length;m++){
+							for(var n:Number=0;n<grpint.length;n++){
+								if(tmparrint[m].toString()==grpint.getItemAt(n).toString()){
+									count=count+1;
+								}
+							}
+							if(count==0){
+								grpint.addItem(tmparrint[m].toString());
+							}
+							count=0;
+						}
+						ct=0;
+					}
+						
+				}
+				
+				
+				
+				
+				if(grpint.length>0){
+					var odd:Object=new Object;
+					odd.int=grpint.getItemAt(0).toString();
+					listofinterests.addItem(app.getTagname3(odd));
+				}
+				for(var x:Number=1;x<grpint.length;x++){
+					var even:Object=new Object;
+					even.int=grpint.getItemAt(x).toString();
+					listofinterests.addItem(app.getTagname3(even));
+				}
+				
+				for(var dd:Number=0;dd<grpint.length;dd++){
+					if(grpint.getItemAt(dd).toString()=='Not Visible'){
+						listofinterests.removeItemAt(dd);
+						grpint.removeItemAt(dd);
+					}
+				}
+				
+				ct=0;
+				
+				for(var a:Number=0;a<app.people_list.length;a++){
+					tmpid=app.people_list[a].@id.toString();
+					for(var b:Number=0;b<temparr.length;b++){
+						if(tmpid==temparr[b].toString()){
+							ct=ct+1;
+						}
+					}
+					if(ct>0){
+						tmpstrint=app.people_list[a].@competences.toString();
+						tmparrint=tmpstrint.split(",");
+						
+						var anoarr:Array=new Array();
+						var tid:String=new String();
+						var tval:String=new String();
+						
+						for(var c:Number=0;c<tmparrint.length;c++){
+							
+							anoarr=tmparrint[c].toString().split("?");
+							
+							if(anoarr.length>1){
+								tid=anoarr[0].toString();
+								tval=anoarr[1].toString();
+							}
+							else{
+								tid=anoarr[0].toString();
+								tval='0';
+							}
+							var obj:Object=new Object;
+							
+							for(var d:Number=0;d<grpcompetence.length;d++){
+								obj=grpcompetence.getItemAt(d);
+								if(tid==obj.id.toString() && tval>obj.val.toString()){
+									grpcompetence.enableAutoUpdate();
+									grpcompetence.getItemAt(d).val=tval;
+									//grpcompetence.itemUpdated(collectionOfThoseClasses.getItemAt(d));
+								}
+								
+								
+							}
+							
+						}
+						ct=0;
+					}	
+				}
+			
+					var tempo:Array=new Array();
+					var tobj:Object=new Object();
+					
+					for(var t:Number=0;t<grpcompetence.length;t++){
+						
+						tobj=grpcompetence.getItemAt(t);
+						var tt:Object=new Object();
+						tt.id=tobj.id.toString();
+						tempo.push(tt);
+					}
+					
+					tempo=tempo.sortOn("id",Array.NUMERIC);
+					
+					var tempAC:ArrayCollection=new ArrayCollection();
+					
+					for(var y:Number=0;y<tempo.length;y++){
+						for(var z:Number=0;z<grpcompetence.length;z++){
+							tobj=grpcompetence.getItemAt(z);
+							if(tempo[y].id.toString()==tobj.id.toString()){
+								tempAC.addItem(tobj);
+							}
+						}
+					}
+					grpcompetence.removeAll();
+					grpcompetence=tempAC;
+						
+			}
+			
+			public function grp_content_check():Number{
+	
+				var retmatch:Array=new Array();
+				var findmatch:RegExp = /^[a-zA-Z_][a-zA-Z0-9_\s]*/g;
+
+				if (grp_name.text==''){
+					Alert.show(plzEGNPM);
+					return 0;
+				}
+				retmatch=grp_name.text.match(findmatch);
+				
+				if(retmatch.length==0){
+					Alert.show(plzEVGNM);
+					return 0;
+				}
+				
+				var obj:Object=new Object();
+				var i:Number=new Number();
+				
+				if(createdFLAG==true){
+					for(i=0;i<testarray.length;i++){
+						obj=testarray.getItemAt(i);
+						if(obj.name.toString()==grp_name.text){
+							Alert.show(gnaEM);
+							return 0;
+						}
+					}
+				}
+				
+				if(editedFLAG==true){
+					for(i=0;i<testarray.length;i++){
+						obj=testarray.getItemAt(i);
+						if(obj.name.toString()==grp_name.text && obj.id.toString()!=selectedid){
+							Alert.show(gnaEM);
+							return 0;
+						}
+					}
+				}
+				
+				
+				findmatch=/^[a-zA-Z][a-zA-Zs]*/g;
+				
+				if (grp_author.text==''){
+					Alert.show(plzEAuGM);
+					return 0;
+				}
+				retmatch=grp_author.text.match(findmatch);
+				
+				if(retmatch.length==0){
+					Alert.show(plzEVAuGM);
+					return 0;
+				}
+				
+				
+				if (grp_description.text==''){
+					Alert.show(plzDGM);
+					return 0;
+				}
+				
+				if(selectedgrplist.length==0){
+					Alert.show(cannotEGEM);
+					return 0;
+				}
+			
+				return 1;
+	
+			}
+			
+			public function groupregisterFault(event:FaultEvent):void{
+					trace("registerFault()" + event.message);					
+			}
+
+		]]>
+	</mx:Script>
+	
+	
+	
+	
+	
+	<mx:HTTPService id="creategroupHTTP" fault="groupregisterFault(event);" useProxy="false" result="getResponse_create();"
+		method="POST" showBusyCursor="true" url="{app.ServerPath + 'GraphData/groupmanager.php'}">
+		<mx:request xmlns="">
+			<action>{'creategroup'}</action>
+			<name>{grp_name.text}</name>
+			<author>{grp_author.text}</author>
+			<url>{grp_url.text}</url>
+			<description>{grp_description.text}</description>
+			<members>{selectedgrpliststring}</members>
+			<picture>{currphotoimage}</picture>
+			<id>{randomgroupphotoname}</id>
+		</mx:request>
+	</mx:HTTPService>
+	
+	<mx:HTTPService id="editgroupHTTP" fault="groupregisterFault(event);" useProxy="false" result="getResponse_edit();"
+		method="POST" showBusyCursor="true" url="{app.ServerPath + 'GraphData/groupmanager.php'}">
+		<mx:request xmlns="">
+			<action>{'editgroup'}</action>
+			<name>{grp_name.text}</name>
+			<author>{grp_author.text}</author>
+			<url>{grp_url.text}</url>
+			<description>{grp_description.text}</description>
+			<members>{selectedgrpliststring}</members>
+			<id>{selectedid}</id>
+		</mx:request>
+	</mx:HTTPService>
+	
+	<mx:HTTPService id="deletegroupHTTP" fault="groupregisterFault(event);" useProxy="false" result="getResponse_delete();"
+		method="POST" showBusyCursor="true" url="{app.ServerPath + 'GraphData/groupmanager.php'}">
+		<mx:request xmlns="">
+			<action>{'deletegroup'}</action>
+			<id>{selectedid}</id>
+		</mx:request>
+	</mx:HTTPService>
+	
+	
+	
+	<mx:HTTPService id="renamephotocreateHTTP" fault="groupregisterFault(event);" useProxy="false" result="getResponse_rename_create();"
+		method="POST" showBusyCursor="true" url="{app.ServerPath + 'GraphData/groupmanager.php'}">
+		<mx:request xmlns="">
+			<action>{'renamephotocreate'}</action>
+			<finalname>{randomgroupphotoname}</finalname>
+			<existingname>{uploadedfilename}</existingname>
+			<serverpath>{app.ServerPath}</serverpath>
+			</mx:request>
+	</mx:HTTPService>
+	
+	<mx:HTTPService id="renamephotoeditHTTP" fault="groupregisterFault(event);" useProxy="false" result="getResponse_rename_edit();"
+		method="POST" showBusyCursor="true" url="{app.ServerPath + 'GraphData/groupmanager.php'}">
+		<mx:request xmlns="">
+			<action>{'renamephotoedit'}</action>
+			<id>{selectedid}</id>
+			<finalname>{randomgroupphotoname}</finalname>
+			<existingname>{uploadedfilename}</existingname>
+			<serverpath>{app.ServerPath}</serverpath>
+			</mx:request>
+	</mx:HTTPService>
+	
+	
+	<mx:HTTPService id="getlistofgroupsHTTP" fault="groupregisterFault(event);" useProxy="false" result="getResponse_grplist();"
+		method="POST" showBusyCursor="true" url="{app.ServerPath + 'GraphData/groupmanager.php'}">
+		<mx:request xmlns="">
+			<action>{'getgrouplist'}</action>
+		</mx:request>
+	</mx:HTTPService>
+	
+	<mx:HTTPService id="getgroupdataHTTP" fault="groupregisterFault(event);" useProxy="false" result="getResponse_grpdata();"
+		method="POST" showBusyCursor="true" url="{app.ServerPath + 'GraphData/groupmanager.php'}">
+		<mx:request xmlns="">
+			<action>{'getgroupdata'}</action>
+			<id>{selectedid}</id>
+		</mx:request>
+	</mx:HTTPService>
+	
+	<mx:HTTPService id="competenceHTTP" fault="groupregisterFault(event);" useProxy="false" result="getResponse_competencetypes();"
+		method="POST" showBusyCursor="true" url="{app.ServerPath + 'GraphData/groupmanager.php'}">
+		<mx:request xmlns="">
+			<action>{'competence'}</action>
+		</mx:request>
+	</mx:HTTPService>
+	
+	<mx:HTTPService id="joinGService" url="{app.ServerPath + 'GraphData/groupmanager.php'}" result="{joinResult()}" method="POST">
+		<mx:request xmlns="">
+			<action>joingroup</action>
+			<pid>{app.Univ_LoginId1}</pid>
+			<id>{selectedid}</id>
+		</mx:request>
+	</mx:HTTPService>
+	
+	<mx:HTTPService id="unjoinGService" url="{app.ServerPath + 'GraphData/groupmanager.php'}" result="{unjoinResult()}" method="POST">
+		<mx:request xmlns="">
+			<action>unjoingroup</action>
+			<pid>{app.Univ_LoginId1}</pid>
+			<id>{selectedid}</id>
+		</mx:request>
+	</mx:HTTPService>
+	 
+</mx:TitleWindow>

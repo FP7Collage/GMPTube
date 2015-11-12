@@ -1,0 +1,269 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+ <!-- <mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml"  title="{Application.application.tubeLabel}" layout="vertical" minWidth="300" width="380" creationComplete="init();">-->
+
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" horizontalAlign="right" height="100" minWidth="300" creationComplete="init();">	
+	<mx:HTTPService id="check" url="{app.ServerPath + 'GraphData/authenticate.php'}" result="showresponse();" fault="{trace('Check Fault')}" useProxy="false" method="POST" showBusyCursor="true">
+		<mx:request xmlns="">
+			<username>{txtUsername.text}</username>
+			<password>{txtPassword.text}</password>
+			<useKey>{app.useKey}</useKey>
+		</mx:request>
+	</mx:HTTPService>
+	
+	<!--<mx:HTTPService id="connectfms" url="http://labs.calt.insead.edu/prototyping/TenTube/Testing/GraphData/connectfms.php" result="connectresponse();" useProxy="false" method="POST" showBusyCursor="true">
+	</mx:HTTPService>
+	-->
+	<mx:Script source="Asfiles/as_constants.as" />   
+	<mx:Script source="Asfiles/as_variables.as" />
+	
+	
+	<mx:Script>
+	   	<![CDATA[
+	   		import mx.managers.PopUpManager;
+	   		import mx.core.Application;
+			import mx.controls.Alert;
+			 
+			 // init() function has been added in creation complete so that things gets loaded for pop up login window too
+			
+			[Bindable]
+			public var app:Tentube=Tentube(Application.application);
+			
+			private var remso:SharedObject;
+			
+			
+			public function init():void {
+				
+				registerLink.visible = app.EnableRegisteration;
+				
+				/*
+				if(Application.application.parameters.tubeName == "GMPTube"){
+					registerLink.visible = false;
+					//registerLink.tabEnabled = false;
+				}else if(Application.application.parameters.tubeName == "GMPTubeN5P3"){
+					registerLink.visible = false;
+					//registerLink.tabEnabled = false;
+				}else{
+					registerLink.visible = app.EnableRegisteration;
+				//	registerLink.visible = true;
+					//registerLink.tabEnabled = true;
+				}
+					*/			
+				
+				remso = SharedObject.getLocal(app.tubeShortName);
+				if(remso.data.txtUsername != undefined && remso.data.txtPassword != undefined) {
+					passRemember.selected = true;
+					txtUsername.text = remso.data.txtUsername;
+					txtPassword.text = remso.data.txtPassword;
+					btnLogin.setFocus();
+				} else {
+					txtUsername.setFocus();
+				}
+			}
+       	
+			private function authenticate(event:Event):void {  
+				btnLogin.enabled = registerLink.enabled = false;
+	     		check.send();
+				return;
+			}
+			
+	/*			private function authenticate(event:Event):void {
+				connectfms.send();							 	
+				  return;
+			}
+			
+		
+						
+			private function connectresponse():void {
+				var responseMessage:String;
+	  			responseMessage = connectfms.lastResult.toString();
+	  			if (responseMessage == "Success"){
+	  			btnLogin.enabled = registerLink.enabled = false;
+	     		check.send();
+
+	  			}else{
+	  			Alert.show("Can not connect to FMS Server");
+	  				return;
+	  			}
+	  					
+			}
+
+		*/	
+			
+			private function showresponse():void{
+	    		var responseMessage:String;
+	  			responseMessage = check.lastResult.rsp.message;
+	   			switch ( responseMessage ){
+	   				case 'Success':
+	   					txtUsername.text = check.lastResult.rsp.userid;
+	   					if(passRemember.selected) {
+	   						remso.data.txtUsername = txtUsername.text;
+	   						remso.data.txtPassword = txtPassword.text;
+	   						remso.flush();
+	   					} else {
+	   						remso.clear();
+	   					}
+	   					/*
+		   				var t_info:Object 	= new Object();
+	      				t_info.action		= "updatelog";
+	      				t_info.actiontype 	= 'Login';
+	      				t_info.takenby 		=  txtUsername.text ;
+	      				t_info.takenon 		= app.tubeShortName;
+	      				app.send_log_msg( t_info );
+	      				*/
+	      				
+	      	//  For showing the first and second pop up		
+	   					if(app.enableFirstPopUp){
+	   						if(check.lastResult.rsp.pop1=="1"){
+	   							app.showFirstPopUp = false ;
+	   						}else if(check.lastResult.rsp.pop1=="0"){
+	   						     app.showFirstPopUp = true ;	// if 0 means first pop up already shown, show second pop up
+	   					         app.popUpMessage = app.secondPopUpMessage;
+	   						}else{
+	   							 app.showFirstPopUp = true;      // first pop up is not yet shown
+	   							 app.popUpMessage = app.firstPopUpMessage;
+	   								
+	   						}
+	   						 
+	   					}
+	   						
+	   					
+	   				
+	      				
+	      				
+	   					app.Univ_LoginId = txtUsername.text;
+	   					app.Univ_LoginId1 = txtUsername.text;
+	   					//app.display_user_name = 
+	   					app.passwd=txtPassword.text;
+	   					app.id_selectedbyeadmin=txtUsername.text;
+	   					app.onAppCreationComplete();
+	   					
+	   					 app.currentState  = 'new_ui';
+	   							
+	   					    // caling the welcome agent and reco agent to calculate things
+	   				    		app.welcAgent.refreshDetails();	   						
+	   				//	 setTimeout(app.welcAgent.refreshDetails,20000);	   						
+	   					 setTimeout(app.helpBoxId.refreshRecoAgent,20000);
+  							
+  				
+  						
+  						// remove the extra pop up opened by special login window
+  						
+  					    PopUpManager.removePopUp(app.loginWindow);
+	   					break;
+	   				case 'CheckKey': 
+	   					remso.clear();
+	   					Alert.show(plzChKeyM, loginErrM);
+	   					break;
+	   					
+	   				case 'CheckPass': 
+	   					remso.clear();
+	   					Alert.show(	plzChPassM, loginErrM);
+	   					break;
+	   					
+	   				case 'UserDoesNotExist': 
+	   					remso.clear();
+	   					Alert.show(userDoesNTEM, loginErrM);
+	   					break;
+	   				
+	   				
+	   					
+	   				default:
+	   					remso.clear();
+	   					Alert.show(responseMessage, loginErrM);
+	   					break;
+	   			}
+	   			btnLogin.enabled			=	true;
+	   			
+	   			if(app.EnableRegisteration == true){
+				  registerLink.enabled		=	true;
+	   			}
+	   			return;
+	    	}
+	    	
+   			private function openForgotPass():void{
+ 				 				
+ 				var it:Item = app.fullGraph.find(app.Univ_LoginId1);
+ 				var urlStr:String = app.ServerPath+"GraphData/forgotpass.php";
+				var webPageURL:URLRequest = new URLRequest( urlStr );
+	  		    navigateToURL(webPageURL, '_blank');
+
+ 			}
+
+     
+		]]>
+	</mx:Script>
+	
+	<!--<mx:Form id="loginForm" width="100%" height="100%" defaultButton="{btnLogin}">
+		<mx:FormItem label="{emailIdM}" fontWeight="bold" color="{app.colorreturn2()}" width="100%">
+			<mx:TextInput id="txtUsername" text="" width="100%" tabEnabled="true" tabIndex="1"/>
+		</mx:FormItem>
+		<mx:FormItem label="{(app.useKey == 'true') ? keyM : passwdM }" color="{app.colorreturn2()}" fontWeight="bold" width="100%">
+			<mx:TextInput id="txtPassword" text="" width="100%" tabEnabled="true" tabIndex="2" enter="{btnLogin.dispatchEvent(new MouseEvent(MouseEvent.CLICK))}" displayAsPassword="true" maxChars="10"/>
+		</mx:FormItem>
+		<mx:FormItem horizontalAlign="right">
+			<mx:CheckBox label="{remLoginM}" color="{app.colorreturn2()}" id="passRemember" tabIndex="3"/>
+		</mx:FormItem>
+	</mx:Form>-->
+	
+	
+	<mx:HBox height="50" verticalAlign="middle" horizontalAlign="center" horizontalGap="10" borderColor="Green" borderThickness="2">
+	    <mx:Label  text="{emailIdM}"  top="5" fontWeight="bold" color="{app.colorreturn2()}">
+	    	
+	    </mx:Label>
+		<mx:TextInput id="txtUsername" text="" width="100%"  tabEnabled="true" tabIndex="1"/>
+		<mx:Label  top="5" text="{(app.useKey == 'true') ? keyM : passwdM }" fontWeight="bold" color="{app.colorreturn2()}">
+	    	
+	    </mx:Label>
+	    
+	    <mx:TextInput id="txtPassword" text="" width="100%" tabEnabled="true" tabIndex="2" enter="{btnLogin.dispatchEvent(new MouseEvent(MouseEvent.CLICK))}" displayAsPassword="true" maxChars="10"/>
+	    <mx:Button label="{loginM}" id="btnLogin" styleName="null"  height="25" width="50" click="authenticate(event)" tabEnabled="true" tabIndex="4"/>
+	    <mx:CheckBox label="{remLoginM}" selected="true" color="{app.colorreturn2()}" visible="false" width="0" id="passRemember" tabIndex="3"/>
+	</mx:HBox> 
+	
+	<mx:HBox horizontalAlign="right" verticalAlign="middle">
+		<mx:LinkButton id="registerLink"  label="{needRegM}" click="{app.currentState = 'registerpage'}" tabIndex="5" tabEnabled="true"/>
+		<mx:LinkButton id="forgotPassLink"  label="{v1083}" click="{openForgotPass();}" />
+	</mx:HBox>
+	
+	<!--<mx:ControlBar height="41">
+	    
+	    <mx:LinkButton id="registerLink"  label="{needRegM}" click="{app.currentState = 'registerpage'}" tabIndex="5" tabEnabled="true"/>
+		<mx:LinkButton id="forgotPassLink"  label="{v1083}" click="{openForgotPass();}" />
+			    	   
+		
+		
+		<mx:Button label="{loginM}" id="btnLogin" click="authenticate(event)" tabEnabled="true" tabIndex="4"/>
+        
+	</mx:ControlBar>-->
+	
+</mx:VBox>

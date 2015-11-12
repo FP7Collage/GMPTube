@@ -1,0 +1,12 @@
+.project
+.flexProperties
+.actionScriptProperties
+*.db
+*.php
+*.exe
+*/GraphData/*
+GraphData
+html-template
+*/html-template/*
+*/bin-release/*
+bin-release

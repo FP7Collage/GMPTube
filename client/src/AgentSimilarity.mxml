@@ -1,0 +1,120 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas creationComplete="init()" xmlns:mx="http://www.adobe.com/2006/mxml" width="484" height="290" >
+ 	<mx:Label  color="#000000" text="{userNameM}" fontWeight="bold" width="123" x="10" y="43"/>
+	<mx:ComboBox id="People_List" labelField="@name"  dataProvider="{app.people_list}" width="181.5" x="141" y="41">
+		</mx:ComboBox>
+	<mx:Button y="41" right="10" click="IamTheAgent()" label="{findM}" toolTip="{findSimM}"/>
+ 	<mx:Text id="genText" selectable="false" color="#000000" text="{selectNFM}"  y="9" width="280" height="24" x="2" fontWeight="bold"> 	
+		</mx:Text>
+		 
+	<mx:VBox height="209" right="10" left="10" bottom="10" id="myVbox" verticalScrollPolicy="auto" horizontalScrollPolicy="auto">
+	</mx:VBox>
+	
+	<!-- This window is in the horizontal accordion along with search video	window
+		 theorotically, this should have an intelligent match making function, which can compute
+		 the similarity between users and display them. 
+		 
+		 * 	Now, the function IamTheAgent() finds the similarity between the name selected in 
+		 	People_List:combobox and all the other users 
+		 *  Probably, the function uses some video , has seen relation to find a similarity
+		 	value, whatever it is, its not effective. Please change the function
+	-->
+	
+	<mx:Script source="Asfiles/as_constants.as" />
+	
+	<mx:Script>
+		<![CDATA[
+			import component.SimilarityBox;
+			import com.adobe.flex.extras.controls.springgraph.Item;
+			import mx.core.Application;
+			import mx.core.IFlexDisplayObject;
+			import mx.managers.PopUpManager;
+			
+			[Bindable]
+			public var people_list:Array=new Array();	
+						
+			[Bindable] 	          		
+   			public var app:Tentube=Tentube(Application.application); 
+   			
+   			private function init():void{
+   				people_list	=	app.people_list;
+   			}
+   			
+			public function IamTheAgent():void{
+				myVbox.removeAllChildren();
+				var people_ids:Array=new Array();
+				var user_centre:String ; 
+				for each ( var item:Item in app.fullGraph.nodes )
+					if ( item.data.@nodetype.toString() == 'People' ){
+						people_ids.push( [item.id, item.data.@name.toString()] );
+						if ( item.data.@name.toString() == People_List.selectedLabel )
+							user_centre = item.id;
+					}
+					
+				var vids_centre:Array=new Array();
+				var similarity_values:Array = new Array();				
+				vids_centre = app.Neighbours[user_centre];
+				
+				var vids_otheruser:Array=new Array();
+				 for each( var any_user_arr:Array in people_ids ){
+					var any_user:String=any_user_arr[0];
+					if ( any_user != user_centre ){
+						vids_otheruser = app.Neighbours[any_user];
+						var match:Number = 0;
+						for each(var video_id:String in vids_centre)
+							if ( vids_otheruser.indexOf(video_id) != (-1) )
+								match+=1;		//video match!!
+						
+						var actual_num_videos:Number = vids_centre.length + vids_otheruser.length - match;
+						var sim:Number = match/actual_num_videos;
+						similarity_values[any_user] = sim;	
+						
+						var new_sim_box:SimilarityBox = new SimilarityBox();
+						myVbox.addChild( new_sim_box );
+						
+						new_sim_box.frnds_name.text = any_user_arr[1] ;
+						new_sim_box.sim_rule.width = 150*sim ;
+						sim = sim*100;
+						new_sim_box.sim_value.text = sim.toPrecision(3);
+					}	
+				}
+			
+			}
+			
+			
+	
+	
+		]]>
+	</mx:Script>
+
+</mx:Canvas>

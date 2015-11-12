@@ -1,0 +1,223 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	horizontalAlign="center" width="100%" height="100%"  verticalAlign="left"  toolTip="{data.@description.toString()} ">
+	<mx:Text text="{data.@name.toString()}" width="100%" textAlign="left" height="50" selectable="false" color="#007B26" 
+		fontWeight="bold"/>
+	<mx:Text width="100%" color="#B6B1B1" visible="true" text="{submitByM}" textAlign="left" height="15" 
+		selectable="false" fontStyle="italic"/>	
+	<mx:Text text="{getUserName(data.@submittedby.toString())}" toolTip="{tooltip_authors}"  width="100%"  textAlign="left" height="20" selectable="false" color="#B6B1B1"/>		
+	<mx:Text text="{data.@submitttime.toString()}" width="100%" textAlign="left" height="15" selectable="false" color="#B6B1B1"/>
+	<mx:Text text="{viewTimes }" toolTip="{viewTimesTip}" width="100%" textAlign="left" height="15" selectable="false" color="#B6B1B1"/>
+	<mx:HBox width="100%">
+			<mx:LinkButton  click="{app.viewVideoNetwork(data)}" toolTip="{clickVNM}" left="0" width="16" height="18" id="lblnetwork" visible="true" icon="@Embed(source='../media/network2.jpg')"/>
+		
+		<mx:LinkButton  click="{app.openCopyLink(data)}" toolTip="{v1077}" left="0" width="16" height="18"  id="lblcopy" visible="true" icon="@Embed(source='../media/copyurl.jpg')"/>
+		
+		<!--
+		<mx:LinkButton  click="{app.openGDLink(data)}" toolTip="{v1097}" left="0" width="16" height="18" id="gddocLB"  visible="true" icon="@Embed(source='../media/gddoc2.png')"/>
+		
+		<mx:LinkButton  click="{app.openPPTLink(data)}" toolTip="{v1098}" left="0" width="16" height="18"  
+		 toggle="false"  id="gdppt" visible="true" icon="@Embed(source='../media/gdppt.png')"/>
+		
+		-->
+		
+		<mx:Image  click="{app.openGDLink(data)}" toolTip="{v1097}" left="0" width="16" height="18" id="gddocLB"  visible="true" source="{getGDIcon(data)}"/>
+		
+		<mx:Image  click="{app.openPPTLink(data)}" toolTip="{v1098}" left="0" width="16" height="18"  
+		   id="gdppt" visible="true" source="{getPPTIcon(data)}"/>
+		
+		
+		 <mx:Image  source="{readPicUrl}"  toolTip="{readPicToolTip}" visible="{isReadVisible}" id="isReadPic" horizontalAlign="left" width="16" height="16" />
+		 
+	 	
+	</mx:HBox>
+	
+	<!-- basic information about the video
+		* 	title 
+		*	submitted by who ?
+	-->
+
+
+<mx:Script source=".././Asfiles/as_constants.as" />
+  <mx:Script>
+  	<![CDATA[
+  		import mx.binding.utils.BindingUtils;
+  		import mx.core.Application;
+  		
+  		[Bindable] private var tooltip_authors:String;
+  		[Bindable] private var readPicUrl:String;
+  		[Bindable] private var readPicToolTip:String;
+  		[Bindable] private var isReadVisible:Boolean;
+  		[Bindable] public var app:Tentube=Tentube(Application.application);
+  			[Bindable] private var viewTimes:String;
+  			[Bindable] private var viewTimesTip:String;
+  		
+  		private function getGDIcon (vdata :Object): String{
+  			 	   if(data.@gdurlattached.toString()!=""){
+  			 	   	  	return "media/gddocb.png";
+     				}else{
+     					return "media/gddoc2.png";
+     				
+     				}
+     				
+    
+  		}
+  		
+  	   private function getPPTIcon (vdata :Object): String{
+  			 	    if(data.@gdurlattached.toString()!=""){
+  			 	   	  	return "media/gdpptb.png";
+     				}else{
+     					return "media/gdppt.png";
+     				
+     				}    
+  		}
+  		
+  		
+  		
+  		private function getReadPic(vdata : Object): void{
+  				var vidId:String;
+  				var userId:String;
+  				
+  				if(vdata == null){
+  					isReadPic.visible = false;
+  					return ;
+  				}
+  				
+  				if (vdata.@timesseen.toString() != "0"){
+  					viewTimes = "(" + vdata.@timesseen.toString() + " views)";
+  					viewTimesTip  = "This video has been seen " + vdata.@timesseen.toString() + " times"; 
+  				}else{
+  					viewTimes = "";
+  					viewTimesTip = "";
+  				}
+  				
+  				vidId = vdata.@id.toString();
+  				userId = Application.application.Univ_LoginId;
+  				
+  				  				
+  			for each ( var edge:XML in Application.application.edgeList_Xml ){
+  				if ( (edge.@name.toString().toLowerCase() == "has seen") && (edge.@fromID.toString().toLowerCase() == userId.toLowerCase()) && (edge.@toID.toString().toLowerCase() == vidId.toLowerCase()) ){
+  					readPicUrl = "media/read.gif";
+  					readPicToolTip = youHSVM;
+  					isReadVisible = true;
+  					return ; 
+  					
+  				}
+  			}
+  			
+  		//	isReadPic.visible = false;
+  		isReadVisible = false;
+  			 readPicUrl = "media/notread.gif";
+  			 readPicToolTip = youHNSVM; 
+  			return  ;
+  			  			
+  			
+  		}
+  		
+  			
+  	
+  	
+  		
+  		
+  		private function getUserName(userId :String):String{
+  
+  			var userName: String;  			
+  			userName = "";
+  			
+  			// times viewed
+  			
+  			  			
+  			
+  			/*
+  			for each ( var ppl:XML in Application.application.people_list ){
+  				if ( ppl.@id.toString().toLowerCase() == userId.toLowerCase() ){
+  					userName =  ppl.@name.toString();
+  					break;  // added to make the code more efficient
+  				}
+  			}
+  			*/
+  			
+  			
+  			// for setting the has seen or not seen pic paths and tool tips
+  			getReadPic(data);
+  			
+  			// for setting up co authors...
+  			 			
+  			//video_authors		
+					var displayAuthorlist = new String();
+					var loopAuthorName:String;
+					var tempAuthorList:String;	
+					var matchFound :int;
+					var coAuthorFound: int;				
+					var mainAuthor : String;
+					coAuthorFound =0;
+					tempAuthorList = data.@authors.toString().toLowerCase();					
+					for each ( var ppl:XML in Application.application.people_list ){
+							loopAuthorName= ppl.@id.toString().toLowerCase();						
+							if (loopAuthorName == userId.toLowerCase() ){
+  								mainAuthor =  ppl.@name.toString();  								
+  								  continue;
+  								}  
+											
+		 				matchFound = tempAuthorList.indexOf(loopAuthorName,0);
+  						if(matchFound >=0){
+  							coAuthorFound = 1;
+  							if (displayAuthorlist == ""){
+		 				 		 displayAuthorlist = ppl.@name.toString();
+		 		     		}else{
+		 			  			 displayAuthorlist = ppl.@name.toString() + "," + displayAuthorlist;
+		 			  		}
+		 		 		}// end of match found
+  					} // end of for
+  						
+  			if(coAuthorFound == 1){
+  				tooltip_authors = mainAuthor + "," + displayAuthorlist;  
+  				return (mainAuthor) + " ..."; 
+  			}else{
+  				tooltip_authors = mainAuthor; 
+  			 return mainAuthor;	
+  			}
+  			  			 
+  			//return userName ;
+  		}
+  		
+  		
+  		
+  	]]>
+  </mx:Script>
+  		
+	
+</mx:VBox>

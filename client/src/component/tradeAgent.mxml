@@ -1,0 +1,84 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" alpha="1"
+	horizontalScrollPolicy="off" xmlns:component="component.*" horizontalAlign="center" verticalAlign="middle" backgroundAlpha="1" backgroundColor="#708090">
+
+	
+		
+			<mx:HBox width="100%" backgroundAlpha="1">
+				<mx:Spacer id="titleSpacer1" width="100%" visible="false" height="{closeBtn.height}"/>
+				<mx:Label id="trdlbl" text="IDEM Trade" fontSize="12" fontStyle="normal" fontWeight="bold" width="100"/>
+				<mx:Spacer id="titleSpacer2" width="100%" visible="false" height="{closeBtn.height}"/>
+				<mx:Button id="closeBtn" label="X" width="{closeBtn.height}" toolTip="{hideTradeM}"
+					click="close(event)"/>
+			</mx:HBox>
+			
+			<mx:VBox width="100%" height="100%" verticalAlign="bottom" horizontalAlign="center" backgroundColor="#838B8B" borderThickness="5">
+				<component:IFrame  visible="false" id="iFrametrade" source="{app.tradeUrl + '?username=' + app.Univ_LoginId1}" width="95%" height="95%" left="10" right="10"/>				
+			</mx:VBox>
+			
+		
+<mx:Script source=".././Asfiles/as_constants.as" />	
+	
+	<mx:Script>
+		<![CDATA[
+		
+			//{app.tradeUrl + '?username=' + app.Univ_LoginId1}
+			
+			import mx.events.CloseEvent;
+			import mx.core.Application;
+			import mx.managers.PopUpManager;
+	    	import mx.controls.Alert;
+        	import flash.events.MouseEvent; 
+        	
+			[Bindable] public var app:Tentube	=Tentube(Application.application);
+			
+			public function close(event:MouseEvent):void {
+				app.tradeWindow.visible = false;
+				app.tradeWindow.height = 0;
+				iFrametrade.visible=false;
+			}
+			
+			public function open(event:MouseEvent):void {
+				app.tradeWindow.height = 400;
+				app.tradeWindow.visible = true;
+				iFrametrade.visible=true;
+			}
+		
+		]]>
+	</mx:Script>
+	
+</mx:VBox>
+

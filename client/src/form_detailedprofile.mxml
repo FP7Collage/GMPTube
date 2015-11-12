@@ -1,0 +1,1725 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow   remove="RemoveMe()" horizontalScrollPolicy="off" verticalScrollPolicy="off" creationPolicy="all" creationComplete="init()" title="{profilesM}" xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="100%" height="100%" minHeight="485" backgroundColor="#FFFFFF" 
+	xmlns:toolbox="com.advancedlist.flextoolbox.controls.*"
+	backgroundAlpha="1.0" xmlns:ns1="*" xmlns:ImageOps="Asfiles.image_upload.*" >
+	
+	<!-- the user can view the profiles of all other users in this page. 
+		 can also edit his own profile, upload a new picture,
+		 features to be included in this page for next version
+		 	1. Send message to another user
+		 	2. Invite for a video conference if the other user is online
+		 	3. Show videos uploaded by the user
+		 	4. change the ui of the page 
+	-->
+	
+	<mx:Array id="prOpts">
+		<mx:Object label="{v1042}" value="#EVERYBODY#"/>
+		<mx:Object label="{v1043}" value="#AUTHORONLY#"/>
+		<mx:Object label="{v1044}" value="#GROUPS#"/>
+	</mx:Array>
+	
+	<mx:HTTPService id="getGListService" url="{app.ServerPath + 'GraphData/groupmanager.php'}" result="{groupsListResult(event)}">
+		<mx:request xmlns="">
+			<action>getgrouplist</action>
+		</mx:request>
+	</mx:HTTPService>
+	
+	<mx:HTTPService id="PplPrivacyService" url="{app.ServerPath + 'GraphData/privacyValues.php'}" result="{initPrivacyVals(event)}">
+		<mx:request xmlns="">
+			<reqPrivacy>people</reqPrivacy>
+			<loginId>{app.Univ_LoginId1}</loginId>
+		</mx:request>
+	</mx:HTTPService>
+	
+	<mx:HTTPService id="memberGroupService" url="{app.ServerPath + 'GraphData/groupmanager.php'}" result="memberResult(event)">
+		<mx:request xmlns="">
+			<action>getmemberof</action>
+		</mx:request>
+	</mx:HTTPService>
+	
+	<ImageOps:FileUpload id="editImage" creationComplete="editImage.init();" />
+		
+	<mx:Canvas width="100%" height="100%"  backgroundColor="#FFFFFF"   x="8">
+		<mx:VBox width="100%" height="100%" paddingBottom="0" horizontalGap="0" >
+		<mx:Spacer width="5%"/>
+		<mx:Spacer  width="5%"/>
+			
+		<mx:HBox width="100%"  verticalScrollPolicy="off" horizontalScrollPolicy="off" height="310" maxHeight="330"  >
+		
+		<mx:Canvas horizontalScrollPolicy="off" top="10" bottom="120" left="10" minWidth="200">
+			<mx:Text id="lblProfilename" selectable="false" text="{txtProfilename.text}"  width="100%" fontWeight="bold" fontSize="20" y="0" textAlign="center"/>
+			<mx:Image source="{userdata.@picture.toString()}" id="imgPicture" width="107" height="62" x="13" y="75"/>
+			<mx:TextArea visible="false" id="txtProfilename" x="0" y="0" text="{userdata.@name.toString()}" height="40" width="100%" fontSize="14"/>
+<!-- PE			<mx:VBox width="100%" visible="{editMode &amp;&amp; app.privacyEnabled}" x="0" y="43">
+				<mx:HBox width="100%">
+					<mx:Label text="{visibilityM}" visible="{txtProfilename.visible}"/>
+					<mx:ComboBox id="namePyOption" dataProvider="{clone(prOpts) as Array}" width="100%"></mx:ComboBox>
+				</mx:HBox>
+				<mx:ComboBox id="namePyGroups"  dropdownWidth="260" labelField="text"  enabled="{(groupsAvailable) ? ((namePyOption.selectedIndex == 2) ? true : false) : false}" width="100%">
+					<mx:itemRenderer>
+						<mx:Component>
+							<mx:HBox click="data.isSelected=!data.isSelected" horizontalScrollPolicy="off">
+								<mx:CheckBox label="" selected="{data.isSelected}"/>
+								<mx:Label text="{data.gname}"/>
+							</mx:HBox>
+						</mx:Component>
+					</mx:itemRenderer>
+				</mx:ComboBox>
+			</mx:VBox>
+			<mx:VBox width="100%" visible="{editMode &amp;&amp; app.privacyEnabled}" x="0" y="198">
+				<mx:HBox width="100%">
+					<mx:Label text="{visibilityM}" visible="{txtProfilename.visible}"/>
+					<mx:ComboBox id="picturePyOption" dataProvider="{clone(prOpts) as Array}" width="100%"></mx:ComboBox>
+				</mx:HBox>
+				<mx:ComboBox id="picturePyGroups" dropdownWidth="260" labelField="text"  enabled="{(groupsAvailable) ? ((picturePyOption.selectedIndex == 2) ? true : false) : false}" width="100%">
+					<mx:itemRenderer>
+						<mx:Component>
+							<mx:HBox click="data.isSelected=!data.isSelected" horizontalScrollPolicy="off">
+								<mx:CheckBox label="" selected="{data.isSelected}"/>
+								<mx:Label text="{data.gname}"/>
+							</mx:HBox>
+						</mx:Component>
+					</mx:itemRenderer>
+				</mx:ComboBox>
+			</mx:VBox>
+
+PE -->			
+
+			<mx:Button visible="{(app.adminenter|| app.adminstatus || app.id_selectedbyeadmin==app.Univ_LoginId1) }" id="btnEditprofile" y="200" label="{edPM}"  click="editprofile();tileProfiles.visible=false;"  x="10" width="98"/>
+			<!--<mx:Button visible="true" id="btneditImage1" y="170" label="Select"   width="47" textAlign="left" left="10"/>-->
+			
+									
+			<mx:Button  visible="true" id="btnSaveprofile" y="280" label="{saveM}"  click="{saveprofile();tileProfiles.visible=true;}" width="120" x="0" icon="@Embed(source='media/file-save.png')"/>	
+			<mx:Button visible="true" id="btnCancelprofile" y="281" label="{cancelM}"  click="cancelsave();tileProfiles.visible=true;" width="100" x="128" icon="@Embed(source='media/button-cancel.png')"/>
+			<mx:LinkButton visible="{(app.adminenter|| app.adminstatus || app.id_selectedbyeadmin==app.Univ_LoginId1) }" x="140" y="101" icon="@Embed(source='media/picupload.png')" click="{editImage.startUpload();}" toolTip="{cngPicTM}"  width="20" height="22" color="#818080"  textAlign="center" fontWeight="bold" fontSize="11" id="btneditImage"/>
+			<mx:LinkButton visible="{(app.adminenter|| app.adminstatus || app.id_selectedbyeadmin==app.Univ_LoginId1) }" x="170" y="101" icon="@Embed(source='media/rp.jpg')" click="{app.openPictureDisp();}" toolTip="{makePicM}"  width="20" height="22" color="#818080"  textAlign="center" fontWeight="bold" fontSize="11" id="photoChgBtn"/>
+		<!--	<mx:Button visible="{(app.id_selectedbyeadmin==app.Univ_LoginId1)&amp;&amp; (btnSaveprofile.visible ? false : true) }" id="photoChgBtn" label="{makePicM}"   click="{app.openPictureDisp();}" y="220" x="10"/>-->			
+			<mx:Button x="12" label="{viewNetM}" visible="{btnSaveprofile.visible ? false : true}" y="226"  id="viewNetw" click="app.viewNet();"/>
+			<mx:Button visible="false" x="0" y="288" label="{comAnalM}" id="btnXpertum" click=" xpertumInputPanel.visible=true;"  fontSize="9"/>
+			<mx:FormItem label="{aliasM}"   x="12" y="149">
+			</mx:FormItem>
+			<mx:TextInput  id="aliasCtrl" text="{userdata.@alias.toString()}" editable="{editMode}" width="199" y="170" x="10"/>
+			
+			
+		</mx:Canvas>
+		<mx:Spacer width="5%"/>		
+		<mx:VBox verticalScrollPolicy="off"  height="304">
+			<mx:TabNavigator id="detProfComponents" width="100%"   height="300">
+				<mx:Form label="{personalM}" width="100%" height="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+					<mx:FormItem label="{descM}" width="441" height="97">
+						<mx:TextArea  selectable="true" editable="false" text="{userdata.@profile.toString()}"  width="347" id="txtDescription"  color="blue" height="90" />
+						
+		<!-- PE				<mx:HBox width="100%" visible="{editMode &amp;&amp; app.privacyEnabled}">
+							<mx:Label text="{visibilityM}"/>
+							<mx:ComboBox id="profilePyOption" dataProvider="{clone(prOpts) as Array}" width="140"></mx:ComboBox>
+							<mx:ComboBox id="profilePyGroups" dropdownWidth="260" labelField="text" enabled="{(groupsAvailable) ? ((profilePyOption.selectedIndex == 2) ? true : false) : false}" width="150">
+								<mx:itemRenderer>
+									<mx:Component>
+										<mx:HBox click="data.isSelected=!data.isSelected" horizontalScrollPolicy="off">
+											<mx:CheckBox label="" selected="{data.isSelected}"/>
+											<mx:Label text="{data.gname}"/>
+										</mx:HBox>
+									</mx:Component>
+								</mx:itemRenderer>
+							</mx:ComboBox>
+						</mx:HBox>
+						
+		PE	-->			
+						
+					</mx:FormItem>
+					<mx:FormItem label="{interestM}" width="100%">
+						<mx:TextArea editable="false" text="{app.getTagname(userdata)}" width="347" id="txtInterests"  color="blue" height="58"/>
+						<toolbox:CheckBoxList alternatingItemColors="[0xEEEEEE, 0xDFDFDF]" enabledField="enabled" dataProvider="{intslist}"  width="100%" visible="{editMode}"
+							id="existing_interests" rowHeight="20" fontSize="10" backgroundAlpha="0.0" color="#000000" borderStyle="solid" height="{editMode ? 70 : 0}"/>
+	<!-- PE 					<mx:HBox width="100%" visible="{editMode &amp;&amp; app.privacyEnabled}">
+							<mx:Label text="{visibilityM}"/>
+							<mx:ComboBox id="interestsPyOption" dataProvider="{clone(prOpts) as Array}" width="140"></mx:ComboBox>
+							<mx:ComboBox id="interestsPyGroups" dropdownWidth="260" labelField="text"  enabled="{(groupsAvailable) ? ((interestsPyOption.selectedIndex == 2) ? true : false) : false}" width="150">
+								<mx:itemRenderer>
+									<mx:Component>
+										<mx:HBox click="data.isSelected=!data.isSelected" horizontalScrollPolicy="off">
+											<mx:CheckBox label="" selected="{data.isSelected}"/>
+											<mx:Label text="{data.gname}"/>
+										</mx:HBox>
+									</mx:Component>
+								</mx:itemRenderer>
+							</mx:ComboBox>
+						</mx:HBox>
+			PE -->			
+					</mx:FormItem>
+					<mx:FormItem label="{memberOfM}" width="100%" visible="{!editMode}" height="{editMode ? 0 : 73}">
+						<mx:List id="memberGroupsList" height="{editMode ? 0 : 73}" width="347" dataProvider="{grpList}">
+							<mx:itemRenderer>
+								<mx:Component>
+									<mx:Label text="{data.gname}"/>
+								</mx:Component>
+							</mx:itemRenderer>
+							<mx:click>
+								<![CDATA[
+								if(memberGroupsList.selectedItem != null) {
+									app.gotoGroupId = memberGroupsList.selectedItem.gid;
+									var evt:ItemClickEvent = new ItemClickEvent(ItemClickEvent.ITEM_CLICK, false, false, app.Groups_ItemLabel);
+									app.togglebuttonbar1.selectedIndex = 5;
+									app.togglebuttonbar1.dispatchEvent(evt);
+								}
+								]]>
+							</mx:click>
+						</mx:List>
+					</mx:FormItem>
+				</mx:Form>
+				<mx:Form label="{workplaceM}" width="100%" height="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+					<mx:FormItem label="{titleM}" width="354" height="27">
+						<mx:TextInput editable="false" text="{userdata.@title.toString()}"  width="262"  color="blue" id="txtTitle" height="24"/>
+					<!-- PE					<mx:HBox width="100%" visible="{editMode &amp;&amp; app.privacyEnabled}">
+							<mx:Label text="{visibilityM}"/>
+							<mx:ComboBox id="titlePyOption" dataProvider="{clone(prOpts) as Array}" width="140"></mx:ComboBox>
+							<mx:ComboBox id="titlePyGroups" dropdownWidth="260" labelField="text"  enabled="{(groupsAvailable) ? ((titlePyOption.selectedIndex == 2) ? true : false) : false}" width="150">
+								<mx:itemRenderer>
+									<mx:Component>
+										<mx:HBox click="data.isSelected=!data.isSelected" horizontalScrollPolicy="off">
+											<mx:CheckBox label="" selected="{data.isSelected}"/>
+											<mx:Label text="{data.gname}"/>
+										</mx:HBox>										
+									</mx:Component>
+								</mx:itemRenderer>
+							</mx:ComboBox>
+						</mx:HBox>
+					PE -->					
+					</mx:FormItem>
+					<mx:FormItem label="{companyM}" width="354">
+						<mx:TextInput editable="false" text="{userdata.@company.toString()}" width="262"  color="blue" id="txtCompany"/>
+	<!-- PE					<mx:HBox width="100%" visible="{editMode &amp;&amp; app.privacyEnabled}">
+							<mx:Label text="{visibilityM}"/>
+							<mx:ComboBox id="companyPyOption" dataProvider="{clone(prOpts) as Array}" width="140"></mx:ComboBox>
+							<mx:ComboBox id="companyPyGroups" dropdownWidth="260" labelField="text"  enabled="{(groupsAvailable) ? ((companyPyOption.selectedIndex == 2) ? true : false) : false}" width="150">
+								<mx:itemRenderer>
+									<mx:Component>
+										<mx:HBox click="data.isSelected=!data.isSelected" horizontalScrollPolicy="off">
+											<mx:CheckBox label="" selected="{data.isSelected}"/>
+											<mx:Label text="{data.gname}"/>
+										</mx:HBox>
+									</mx:Component>
+								</mx:itemRenderer>
+							</mx:ComboBox>
+						</mx:HBox>
+		PE -->				
+					</mx:FormItem>
+					<mx:FormItem label="{natM}"  width="354">
+						<mx:TextInput editable="false" text="{userdata.@nationality.toString()}" width="262"  color="blue" id="txtNationality"/>
+					<!-- PE					<mx:HBox width="100%" visible="{editMode &amp;&amp; app.privacyEnabled}">
+							<mx:Label text="{visibilityM}"/>
+							<mx:ComboBox id="nationalityPyOption" dataProvider="{clone(prOpts) as Array}" width="140"></mx:ComboBox>
+							<mx:ComboBox id="nationalityPyGroups" dropdownWidth="260" labelField="text"  enabled="{(groupsAvailable) ? ((nationalityPyOption.selectedIndex == 2) ? true : false) : false}" width="150">
+								<mx:itemRenderer>
+									<mx:Component>
+										<mx:HBox click="data.isSelected=!data.isSelected" horizontalScrollPolicy="off">
+											<mx:CheckBox label="" selected="{data.isSelected}"/>
+											<mx:Label text="{data.gname}"/>
+										</mx:HBox>
+									</mx:Component>
+								</mx:itemRenderer>
+							</mx:ComboBox>
+						</mx:HBox>
+					PE		-->				
+					</mx:FormItem>
+					<mx:FormItem label="{emailM}" width="354">
+						<mx:TextInput editable="false" text="{userdata.@emailid.toString()}"  color="blue" id="txtEmail" width="262"/>
+					<!-- PE					<mx:HBox width="100%" visible="{editMode &amp;&amp; app.privacyEnabled}">
+							<mx:Label text="{visibilityM}"/>
+							<mx:ComboBox id="emailPyOption" dataProvider="{clone(prOpts) as Array}" width="140"></mx:ComboBox>
+							<mx:ComboBox id="emailPyGroups" dropdownWidth="260" labelField="text"  enabled="{(groupsAvailable) ? ((emailPyOption.selectedIndex == 2) ? true : false) : false}" width="150">
+								<mx:itemRenderer>
+									<mx:Component>
+										<mx:HBox click="data.isSelected=!data.isSelected" horizontalScrollPolicy="off">
+											<mx:CheckBox label="" selected="{data.isSelected}"/>
+											<mx:Label text="{data.gname}"/>
+										</mx:HBox>
+									</mx:Component>
+								</mx:itemRenderer>
+							</mx:ComboBox>
+						</mx:HBox>
+					PE	-->				
+					</mx:FormItem>
+					<mx:FormItem label="{locM}" width="354">
+						<mx:TextInput editable="false" text="{userdata.@location.toString()}"  color="blue" id="txtLocation"  width="262"/>
+	<!-- PE					<mx:HBox width="100%" visible="{editMode &amp;&amp; app.privacyEnabled}">
+							<mx:Label text="{visibilityM}"/>
+							<mx:ComboBox id="locationPyOption" dataProvider="{clone(prOpts) as Array}" width="140"></mx:ComboBox>
+							<mx:ComboBox id="locationPyGroups" dropdownWidth="260" labelField="text"  enabled="{(groupsAvailable) ? ((locationPyOption.selectedIndex == 2) ? true : false) : false}" width="150">
+								<mx:itemRenderer>
+									<mx:Component>
+										<mx:HBox click="data.isSelected=!data.isSelected" horizontalScrollPolicy="off">
+											<mx:CheckBox label="" selected="{data.isSelected}"/>
+											<mx:Label text="{data.gname}"/>
+										</mx:HBox>
+									</mx:Component>
+								</mx:itemRenderer>
+							</mx:ComboBox>
+						</mx:HBox>
+		PE -->				
+					</mx:FormItem>
+					<mx:FormItem label="{webpageM}" width="354">
+						<mx:TextArea editable="false" click="openLink(userdata.@url.toString())"  text="{userdata.@url.toString()}"  color="blue" id="txtWebpage"  width="262" height="20"/>
+					<!-- Pe					<mx:HBox width="100%" visible="{editMode &amp;&amp; app.privacyEnabled}">
+							<mx:Label text="{visibilityM}"/>
+							<mx:ComboBox id="urlPyOption" dataProvider="{clone(prOpts) as Array}" width="140"></mx:ComboBox>
+							<mx:ComboBox id="urlPyGroups" dropdownWidth="260" labelField="text"  enabled="{(groupsAvailable) ? ((urlPyOption.selectedIndex == 2) ? true : false) : false}" width="150">
+								<mx:itemRenderer>
+									<mx:Component>
+										<mx:HBox click="data.isSelected=!data.isSelected" horizontalScrollPolicy="off">
+											<mx:CheckBox label="" selected="{data.isSelected}"/>
+											<mx:Label text="{data.gname}"/>
+										</mx:HBox>
+									</mx:Component>
+								</mx:itemRenderer>
+							</mx:ComboBox>
+						</mx:HBox>
+					PE -->					
+					</mx:FormItem>
+					
+				<!-- Ulead Extra Start -->
+				
+								
+				<mx:FormItem id="exppa1" label="{v1084}" width="354">
+						<mx:TextArea editable="false" click="openLink(userdata.@exppf1.toString())"  text="{userdata.@exppf1.toString()}"  color="blue" id="exppf1"  width="262" height="20"/>
+					</mx:FormItem>
+			
+				
+<!-- Ulead Extra End -->				
+
+					
+				</mx:Form>
+				
+				
+				
+				
+				
+				<!--
+				<mx:Form label="Contact me" width="100%" height="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+					
+					<mx:FormItem label="Email" width="100%">
+						<mx:TextInput editable="false" text="{userdata.@emailid.toString()}" id="txtEmail" x="158" y="10" width="100%"/>
+						<mx:HBox width="100%" visible="{editMode &amp;&amp; app.privacyEnabled}">
+							<mx:Label text="Visibility:"/>
+							<mx:ComboBox id="emailPyOption" dataProvider="{clone(prOpts) as Array}" width="140"></mx:ComboBox>
+							<mx:ComboBox id="emailPyGroups" labelField="text"  enabled="{(groupsAvailable) ? ((emailPyOption.selectedIndex == 2) ? true : false) : false}" width="150">
+								<mx:itemRenderer>
+									<mx:Component>
+										<mx:HBox click="data.isSelected=!data.isSelected" horizontalScrollPolicy="off">
+											<mx:CheckBox label="" selected="{data.isSelected}"/>
+											<mx:Label text="{data.gname}"/>
+										</mx:HBox>
+									</mx:Component>
+								</mx:itemRenderer>
+							</mx:ComboBox>
+						</mx:HBox>
+					</mx:FormItem>
+					<mx:Spacer width="0" height="30"/>
+					<mx:FormItem label="Webpage" width="100%">
+						<mx:TextArea editable="false" text="{userdata.@url.toString()}" id="txtWebpage" x="158" y="66" width="100%" height="25"/>
+						<mx:HBox width="100%" visible="{editMode &amp;&amp; app.privacyEnabled}">
+							<mx:Label text="Visibility:"/>
+							<mx:ComboBox id="urlPyOption" dataProvider="{clone(prOpts) as Array}" width="140"></mx:ComboBox>
+							<mx:ComboBox id="urlPyGroups" labelField="text"  enabled="{(groupsAvailable) ? ((urlPyOption.selectedIndex == 2) ? true : false) : false}" width="150">
+								<mx:itemRenderer>
+									<mx:Component>
+										<mx:HBox click="data.isSelected=!data.isSelected" horizontalScrollPolicy="off">
+											<mx:CheckBox label="" selected="{data.isSelected}"/>
+											<mx:Label text="{data.gname}"/>
+										</mx:HBox>
+									</mx:Component>
+								</mx:itemRenderer>
+							</mx:ComboBox>
+						</mx:HBox>
+					</mx:FormItem>
+					<mx:Spacer width="0" height="30"/>
+					<mx:FormItem label="Location" width="100%">
+						<mx:TextInput editable="false" text="{userdata.@location.toString()}" id="txtLocation" x="158" y="142" width="100%"/>
+						<mx:HBox width="100%" visible="{editMode &amp;&amp; app.privacyEnabled}">
+							<mx:Label text="Visibility:"/>
+							<mx:ComboBox id="locationPyOption" dataProvider="{clone(prOpts) as Array}" width="140"></mx:ComboBox>
+							<mx:ComboBox id="locationPyGroups" labelField="text"  enabled="{(groupsAvailable) ? ((locationPyOption.selectedIndex == 2) ? true : false) : false}" width="150">
+								<mx:itemRenderer>
+									<mx:Component>
+										<mx:HBox click="data.isSelected=!data.isSelected" horizontalScrollPolicy="off">
+											<mx:CheckBox label="" selected="{data.isSelected}"/>
+											<mx:Label text="{data.gname}"/>
+										</mx:HBox>
+									</mx:Component>
+								</mx:itemRenderer>
+							</mx:ComboBox>
+						</mx:HBox>
+					</mx:FormItem>
+					
+				</mx:Form>
+				-->
+				<mx:Panel label="{commentsM}" id="scrapsspanel" width="100%" height="100%" layout="absolute"
+									title="" horizontalScrollPolicy="off" verticalScrollPolicy="auto" headerHeight="15">
+								<ns1:form_userscraps top="0" bottom="0" right="0" left="0" id="scraps_window"></ns1:form_userscraps>
+							</mx:Panel>
+				<mx:Canvas label="{userActM}" width="100%" height="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+					<mx:Label x="33.5" y="12" text="{joinDaM}"/>
+					<mx:Text text="{userdata.@jointime.toString()}" id="txtJointime" x="164.5" y="10" width="271"/>
+					<mx:Text text="{userdata.@lastvisit.toString()}" id="txtLastvisit" x="165.5" y="33" width="271"/>
+					<mx:Label x="33.5" y="35" text="{lastVisitM}"/>
+					<mx:Text  text="{userdata.@timesvisited.toString()}" id="txtTimesvisited" x="165.5" y="63" width="44" height="19"/>
+					<mx:Label x="33.5" y="63" text="{timesLogInM}" width="99.5"/>
+					<mx:Label x="33.5" y="120" text="{subVideoM}" width="115"/>
+					<mx:Label x="33.5" y="201" text="{watchVideoM}" width="115"/>
+					<mx:TextArea x="166" y="88" editable="false" text="{hasSubmittedVideoStr}" horizontalScrollPolicy="auto" width="269.5" height="75"/>
+					<mx:TextArea x="166" y="171" editable="false" text="{hasSeenVideoStr}" horizontalScrollPolicy="auto" width="269.5" height="87"/>
+					
+					<mx:DataGrid x="166" y="285" width="271" height="167" visible="false" horizontalScrollPolicy="off" verticalScrollPolicy="auto" variableRowHeight="true" id="helpBoxVideos2" dataProvider="{favvidlist}">
+						<mx:columns>
+							<mx:DataGridColumn headerText="Videos" itemRenderer="component.helpSubComponent"/>
+							<mx:DataGridColumn headerText="favorite" width="80" visible="false" itemRenderer="component.helpFavComponent"/>
+
+						</mx:columns>
+					</mx:DataGrid>
+					<mx:Label x="33.5" y="285" text="{myFavVideoM}" visible="false" width="115"/>
+			
+				</mx:Canvas>
+				<mx:VBox label="{comM}" width="100%" height="100%" horizontalScrollPolicy="off" enabled="{app.EnableCompetences}" visible="{app.EnableCompetences}">
+	<!-- PE				<mx:HBox width="100%" visible="{editMode &amp;&amp; app.privacyEnabled}">
+						<mx:Label text="{visibilityM}"/>
+						<mx:ComboBox id="competencesPyOption" dataProvider="{clone(prOpts) as Array}" width="140"></mx:ComboBox>
+						<mx:ComboBox id="competencesPyGroups" dropdownWidth="260" labelField="text"  enabled="{(groupsAvailable) ? ((competencesPyOption.selectedIndex == 2) ? true : false) : false}" width="150">
+								<mx:itemRenderer>
+									<mx:Component>
+										<mx:HBox click="data.isSelected=!data.isSelected" horizontalScrollPolicy="off">
+											<mx:CheckBox label="" selected="{data.isSelected}"/>
+											<mx:Label text="{data.gname}"/>
+										</mx:HBox>
+									</mx:Component>
+								</mx:itemRenderer>
+							</mx:ComboBox>
+					</mx:HBox>
+	PE -->				
+					<mx:VBox id="competencesVbox" height="251" width="100%" horizontalScrollPolicy="off">
+					</mx:VBox>
+				</mx:VBox>
+				<!-- 
+				the scraps panel
+				-->
+				<!-- 
+				<mx:Panel label="Scraps" id="scrapsspanel" width="100%" height="100%" layout="absolute"
+									title="" horizontalScrollPolicy="off" verticalScrollPolicy="auto" headerHeight="15">
+								<ns1:form_userscraps top="0" bottom="0" right="0" left="0" id="scraps_window"></ns1:form_userscraps>
+							</mx:Panel>
+				-->
+				
+				
+				
+			</mx:TabNavigator>
+		</mx:VBox>
+		<mx:VBox horizontalAlign="center"  width="181" height="265">
+		
+		<!--  Hide GAME Score  
+			<mx:Text text="{gameScoreM}" id="txtgscorelalebl" width="173" height="53" fontWeight="bold" fontSize="25" color="#711010"/>
+			<mx:Text text="{userdata.@grandscore.toString()}" id="txtGrandscore" width="134" height="43" fontWeight="bold" fontSize="25" color="#711010"/>
+	    -->
+			<!--			<mx:List height="218" id="onlineUsersList" enabled="true" itemRenderer="component.chatListRenderer"></mx:List>-->
+	
+	
+			<mx:VBox width="100%" height="130" verticalAlign="middle" horizontalAlign="center" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+			<mx:Button id="chPwdBtn"  label="{cngPassM}"  visible="{(app.adminenter|| app.adminstatus || app.id_selectedbyeadmin==app.Univ_LoginId1 || app.detailedprofileId == app.Univ_LoginId) &amp;&amp; (app.useKey=='false')}" click="{chPwdPanel.visible=true}"/> 
+		
+		<!--		<mx:Button id="chPwdBtn"  label="{cngPassM}"  visible="{(app.adminenter|| app.adminstatus || app.id_selectedbyeadmin==app.Univ_LoginId1 || app.detailedprofileId == app.Univ_LoginId)}" click="{chPwdPanel.visible=true}"/>  -->
+		
+		
+				<mx:Button id="settingsBtn"  label="{edtSettM}"  visible="{(app.adminenter|| app.adminstatus || app.id_selectedbyeadmin==app.Univ_LoginId1 || app.detailedprofileId == app.Univ_LoginId) }" click="{settingsService.request.action='getsettings';settingsService.send();settingsPanel.visible=true}"/>
+				<mx:Button id="jcBtn"  label="{v1081}" toolTip="{v1082}"  visible="{(app.adminenter|| app.adminstatus || app.id_selectedbyeadmin==app.Univ_LoginId1 || app.detailedprofileId == app.Univ_LoginId) }" click="{openJCLink()}"/>
+		<!--		<mx:Button id="importLinkedInBtn"  label="Import from LinkedIn" toolTip="Import Profile Data from LinkedIn"  visible="{(app.adminenter|| app.adminstatus || app.id_selectedbyeadmin==app.Univ_LoginId1 || app.detailedprofileId == app.Univ_LoginId) }" click="{openLinkedIn()}"/>
+			-->
+				<!--<mx:Button visible="false" click="app.maximizeChat();" width="153" height="40" icon="@Embed('/media/chatlabel.png')" labelPlacement="left"/>
+				<mx:Spacer height="100%"/>-->
+			
+				<!--<mx:Spacer height="100%"/>
+				<mx:Button  visible="false" click="openVidConference();" width="153" height="30" label="{pubConfM}"/>-->
+			</mx:VBox>
+		</mx:VBox>
+	<!--	<mx:Spacer width="5%"/>-->
+		</mx:HBox>
+		
+		<mx:VBox width="100%"  verticalScrollPolicy="off" paddingTop="0" horizontalGap="0" verticalAlign="top" horizontalAlign="center"  >
+		<mx:HorizontalList  columnCount="8"  maxRows="1" itemRenderer="component.profilebox" id="tileProfiles" rowCount="1" horizontalScrollPolicy="off" verticalScrollPolicy="off" height="93" left="100" right="100" >		
+		</mx:HorizontalList>
+	
+	<mx:ControlBar>
+        <mx:Button    label="Previous" click="prev();" />
+         
+            <mx:HSlider id="slider"
+                    minimum="0"
+                    maximum="{tileProfiles.maxHorizontalScrollPosition}"
+                    value="{tileProfiles.horizontalScrollPosition}"
+                    liveDragging="true"
+                    snapInterval="1"
+                    tickInterval="8"                    
+                    tickColor="red"
+                    tickLength="0.5"
+                    tickThickness="3"                    
+                    showDataTip="false"     
+                    width="400"                                
+                   	change="slider_change(event);" />
+           <mx:Button    label="Next" click="next();" />         
+           
+        </mx:ControlBar>
+ 	
+		
+		</mx:VBox>
+		   
+		</mx:VBox>
+		
+		<mx:Panel width="408" height="203" layout="absolute" title="Add New Competence" id="newCompPanel" x="170" y="249" alpha="1.0" visible="false">
+			<mx:Label x="25" y="0" text="{comNameM}" width="121" color="#F3F8F9"/>
+			<mx:TextInput x="163" y="-1" id="competenceName" height="19" width="175"/>
+			<mx:Label x="25" y="26" text="{categoryM}" color="#F3F9FA"/>
+			<mx:ComboBox x="163" y="26" id="competenceCategory" dataProvider="{app.competenceCategories}" width="175"></mx:ComboBox>
+			<mx:Label x="25" y="52" text="{toCrCaM}" width="287" color="#FDFFFF" height="17"/>
+			<mx:TextInput x="163" y="77" height="18" id="newCategory" width="175"/>
+			<mx:Label x="25" y="102" text="{strengthM}" color="#FFFFFF"/>
+			<mx:HSlider x="163" y="103" snapInterval="10" minimum="0" maximum="100" height="8" id="newCompStrength" enabled="true" width="175"/>
+			<mx:Button x="58" y="139" label="{submitRM}" id="compSubmitBtn" click="submitNewCompetence()"/>
+			<mx:Button x="237" y="139" label="{cancelM}" click="cancelNewCompetence()"/>
+		</mx:Panel>
+		<mx:Panel mouseDown="xpertumInputPanel.startDrag();" mouseUp="xpertumInputPanel.stopDrag();" visible="false" x="179" y="157" width="481" height="200" layout="absolute" id="xpertumInputPanel">
+			<mx:RadioButtonGroup id="radiogroup1"/>
+			<mx:RadioButton x="41" y="30" label="{selAllPplM}" groupName="radiogroup1" color="{app.colorreturn()}" width="339"/>
+			<mx:RadioButton x="41" y="56" label="{addAllPplM}" groupName="radiogroup1" color="{app.colorreturn()}" width="284"/>
+			<mx:RadioButton x="41" y="82" label="{letMePplM}" groupName="radiogroup1" color="{app.colorreturn()}" width="239"/>
+			<mx:Label x="10" y="0" text="{plzSePplM}" width="440" color="#F3160B"/>
+			<mx:Button x="85" y="136" label="{proceedM}" click="processData();"/>
+			<mx:Button x="235" y="136" label="{cancelM}" click="xpertumInputPanel.visible=false;"/>
+		</mx:Panel>
+		
+		<mx:Panel  visible="false" x="204" y="182" width="422" height="244" layout="absolute" id="xpertumAddPeoplePanel">
+			<mx:Label x="0" y="0" text="{plzPplM}" width="391" color="#CE0606" height="16"/>
+		    <toolbox:CheckBoxList textAlign="center"  alternatingItemColors="[0xEEEEEE, 0xDFDFDF]" enabledField="enabled" labelField="@name" dataProvider="{xpertumPeopleList}"  width="100%" rowHeight="20" id="addPeopleCheckBoxList" fontSize="9" backgroundAlpha="0.0" color="#FFFFFF" borderStyle="solid" height="137" y="24"/>
+		    <mx:Button x="75" y="169" label="{submitRM}" click="xpertumAddPeoplePanel.visible=false;formQueryString();"/>
+		    <mx:Button x="246" y="169" label="{cancelM}" click="xpertumAddPeoplePanel.visible=false;"/>
+		</mx:Panel>
+		
+		<mx:TitleWindow id="chPwdPanel" mouseDown="chPwdPanel.startDrag();" mouseUp="chPwdPanel.stopDrag();" title="Change Password" visible="false" x="200" y="150" layout="vertical" color="{app.colorreturn2()}" showCloseButton="true" close="{chPwdCancelBtn.dispatchEvent(new MouseEvent(MouseEvent.CLICK))}">
+			<mx:Form width="100%" height="100%">
+				<mx:FormItem label="{newPassM}" width="100%">
+					<mx:TextInput id="newPwd" width="100%" maxChars="10" displayAsPassword="true"/>
+				</mx:FormItem>
+				<mx:FormItem label="{confNewM}" width="100%">
+					<mx:TextInput id="conPwd" width="100%" maxChars="10" displayAsPassword="true"/>
+				</mx:FormItem>
+			</mx:Form>
+			<mx:ControlBar horizontalAlign="center" width="100%">
+				<mx:Button id="chPwdCancelBtn" label="{cancelM}" click="{chPwdPanel.visible=false;newPwd.text=conPwd.text=''}"/>
+				<mx:Button label="{cngPassM}">
+					<mx:click>
+						<![CDATA[
+							if(newPwd.text == conPwd.text) {
+								chPwdService.send();
+							} else {
+								Alert.show(passDoNotM , errM);
+							}
+						]]>
+					</mx:click>
+				</mx:Button>
+			</mx:ControlBar>
+		</mx:TitleWindow>
+		
+		<mx:TitleWindow id="settingsPanel" mouseDown="settingsPanel.startDrag();" mouseUp="settingsPanel.stopDrag();" title="{cngSettingsM}" visible="false" x="200" y="150" layout="vertical" color="{app.colorreturn2()}" showCloseButton="true" close="{settingsCancelBtn.dispatchEvent(new MouseEvent(MouseEvent.CLICK))}">
+			<mx:Form width="100%" height="100%">
+				<mx:FormItem label="" width="100%">
+					<mx:Text id="repfreqtext" text="{repFreM}" width="100%" />
+				</mx:FormItem>
+				<mx:FormItem label="" width="100%">
+					<!--<mx:ComboBox dataProvider="[Daily,Weekly,Biweekly,Monthly,Never]" rowCount="5" id="showrepfreq"  width="150"></mx:ComboBox>-->
+					<mx:ComboBox labelField="@name" dataProvider="{RFList}" rowCount="5" id="showrepfreq"  width="150"></mx:ComboBox> 	
+				</mx:FormItem>
+			</mx:Form>
+			<mx:ControlBar horizontalAlign="center" width="100%">
+				<mx:Button id="settingsCancelBtn" label="{cancelM}" click="{settingsPanel.visible=false;}"/>
+				<mx:Button label="{cngSettingsM}">
+					<mx:click>
+						<![CDATA[
+							//	settingsService.request.freq=showrepfreq.selectedLabel;
+								settingsService.request.freq=showrepfreq.selectedItem.@id.toString();
+								settingsService.request.action='setsettings'
+								settingsService.send();
+							
+						]]>
+					</mx:click>
+				</mx:Button>
+			</mx:ControlBar>
+		</mx:TitleWindow>
+
+
+  </mx:Canvas>
+	
+		<mx:Script source="Asfiles/as_constants.as" />
+	
+       <!--  dataProvider="{peoplelist}"   -->
+	<mx:Script>
+		<![CDATA[
+			
+			//import component.vidconference;
+			import mx.managers.PopUpManager;
+
+
+			import mx.collections.ArrayCollection;
+			import component.competenceComponent;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import mx.controls.DataGrid;
+			import mx.events.ItemClickEvent;
+			import ui.elements.spinner.Tick;
+			import mx.rpc.events.ResultEvent;
+			import mx.events.FlexEvent;
+			import mx.events.ItemClickEvent;
+			import mx.events.ListEvent;
+			import mx.events.CloseEvent;
+			import com.adobe.flex.extras.controls.springgraph.Item;			
+			import mx.core.Application;
+			import mx.controls.Alert;
+			import mx.managers.CursorManager;
+			import mx.events.MenuEvent;
+			import com.adobe.flex.extras.controls.springgraph.Graph;
+			import flash.display.DisplayObject;
+			import flash.events.*;
+			import mx.events.SliderEvent;
+			
+									
+			[Bindable]public var app:Tentube		=	Tentube(Application.application);
+			[Bindable]public var editMode:Boolean = false;
+			
+			[Bindable]public var groupsAvailable:Boolean;
+			
+			/**  contains the id of profile currently being shown	**/
+			[Bindable]public var profileId:String	=	new String(); 	
+			[Bindable]public var userdata:XML;
+			[Bindable]private var memberGroups: ArrayCollection = new ArrayCollection();
+			
+			[Bindable]public var hasSubmittedVideoStr:String  = new String();
+			[Bindable]public var hasSeenVideoStr:String  = new String();
+												
+			 		
+			/**  list of interests in the controlpanel table in database	**/
+			[Bindable]public var intslist:Array 	= 	new Array();
+			[Bindable]public var tagslist:Array 	= 	new Array();
+			[Bindable]private var grpList:ArrayCollection = new ArrayCollection();
+			
+			/**  list of people **/
+			[Bindable]public var peoplelist:Array = 	new Array();
+			[Bindable]public var competenceList:XMLList;
+			public var userinterests:String 		= 	new String();
+			public 	var competenceType:DataGrid;
+			public var competenceColumn:DataGridColumn;
+			public var addCompetenceBtn:Button      =   new Button();
+			[Bindable]public var xpertumPeopleList:ArrayCollection	=	new ArrayCollection();
+			public var queryParam:String="";
+			
+			[Bindable] public var favvidlist:XMLList = new XMLList();
+			
+			
+			[Bindable] public var RFList:Array=new Array(
+			new XML('<res id="Daily" name="'+ v1065 + '"></res>'),
+			new XML('<res id="Weekly" name="'+ v1066 + '"></res>'),
+			new XML('<res id="Biweekly" name="'+ v1067 + '"></res>'),
+			new XML('<res id="Monthly" name="'+ v1068 + '"></res>'),
+			new XML('<res id="Never" name="'+ v1069 + '"></res>')
+			);
+			
+			//Daily,Weekly,Biweekly,Monthly,Never
+			
+			
+			
+			
+			
+
+            private function prev():void {
+            
+                var pos:int = tileProfiles.horizontalScrollPosition-8;
+                var min:int = 0;
+                var value:int = Math.max(min, pos);
+                tileProfiles.horizontalScrollPosition = value;
+                slider.value = value;
+            }
+
+            private function next():void {
+                var pos:int = 	tileProfiles.horizontalScrollPosition+8;
+                var max:int = 	tileProfiles.maxHorizontalScrollPosition;
+                var value:int = Math.min(pos, max);
+               	tileProfiles.horizontalScrollPosition = value;
+               slider.value = value;
+            }
+
+            private function slider_change(evt:SliderEvent):void {
+                	tileProfiles.horizontalScrollPosition = evt.value;
+            }
+				
+				
+
+			
+			
+			
+			
+			
+			private function openLink(url:String):void{				
+				var retUrl:String;
+				if(editMode){
+					return;
+				}
+						if(url.length!=0){
+   							if(url.substr(0,4)!="http"){
+								retUrl = "http://"+url;
+								}else{
+        							retUrl = url;
+      							}
+							navigateToURL(new URLRequest(retUrl), '_blank');
+						}	
+				}
+				
+				
+		private function openJCLink():void {         	
+  
+	            var urlStr:String =  Application.application.parameters.servername + Application.application.parameters.tubepath+ "GraphData/inviteJC.php?youremail="+app.Univ_LoginId1
+				var webPageURL:URLRequest = new URLRequest( urlStr );
+	  		    navigateToURL(webPageURL, '_blank');
+          	            	
+	            }      
+	       
+		private function openLinkedIn():void {         	
+  
+	            var urlStr:String =  Application.application.parameters.servername + Application.application.parameters.tubepath+ "GraphData/linkedinimportprofile.php?profileid="+app.Univ_LoginId1
+				var webPageURL:URLRequest = new URLRequest( urlStr );
+	  		    navigateToURL(webPageURL, '_blank');
+          	            	
+	            }      
+		
+
+			
+		//	public var IsXpectrumEnabled:Boolean = false;
+			 
+			
+			// FUNCTION TO CLONE AN OBJECT.
+			private function clone(source:Object):* {
+				var myBA:ByteArray = new ByteArray();
+				myBA.writeObject(source);
+				myBA.position = 0;
+				return(myBA.readObject());
+			}
+			
+			private function groupsListResult(event:ResultEvent):void {
+				var grouplisttotal:String = event.result.rsp.message;
+				var groupsArray:Array = new Array();
+				
+				if(grouplisttotal==''){
+					Alert.show('Unable to Load data from server !!');
+					groupsAvailable = false;
+					return;
+				} else if(grouplisttotal=='NoGroup'){
+					groupsAvailable = false;
+					return;
+				} else
+					groupsAvailable = true;
+				var allrecords:Array=grouplisttotal.split("#@#");
+				
+				for(var i:Number=0;i<allrecords.length;i++){
+					var str:String=allrecords[i].toString();
+					if(str=='') break;
+					var eachrecord:Array = str.split("%@%");
+
+					var obj:Object=new Object();
+					obj.gid=eachrecord[0].toString();
+					obj.gname=eachrecord[1].toString();
+					obj.isSelected=false;
+					obj.text=groupsAvailable ? 'Select Groups' : 'No Groups';
+					groupsArray.push(obj);
+				}
+/* PE				namePyGroups.dataProvider = new ArrayCollection(clone(groupsArray) as Array);
+				titlePyGroups.dataProvider = new ArrayCollection(clone(groupsArray) as Array);
+				companyPyGroups.dataProvider = new ArrayCollection(clone(groupsArray) as Array);
+				nationalityPyGroups.dataProvider = new ArrayCollection(clone(groupsArray) as Array);
+				emailPyGroups.dataProvider = new ArrayCollection(clone(groupsArray) as Array);
+				urlPyGroups.dataProvider = new ArrayCollection(clone(groupsArray) as Array);
+				locationPyGroups.dataProvider = new ArrayCollection(clone(groupsArray) as Array);
+				picturePyGroups.dataProvider = new ArrayCollection(clone(groupsArray) as Array);
+				interestsPyGroups.dataProvider = new ArrayCollection(clone(groupsArray) as Array);
+				profilePyGroups.dataProvider = new ArrayCollection(clone(groupsArray) as Array);
+				//invitedbyPyGroups.dataProvider = new ArrayCollection(clone(groupsArray) as Array);
+				competencesPyGroups.dataProvider = new ArrayCollection(clone(groupsArray) as Array);
+				PplPrivacyService.send();
+				
+	*/			
+			}
+			
+			private function initPrivacyVals(event:ResultEvent): void {
+				if(event.result.rsp.status == 'False') {
+					Alert.show('Error with privacy values. Please contact admin.', 'Error', Alert.OK);
+					return;
+				}
+/*				profilePyOption.selectedIndex = decodePrivacyVals(event.result.rsp.profile_py, profilePyGroups);
+				titlePyOption.selectedIndex = decodePrivacyVals(event.result.rsp.title_py, titlePyGroups);
+				companyPyOption.selectedIndex = decodePrivacyVals(event.result.rsp.company_py, companyPyGroups);
+				nationalityPyOption.selectedIndex = decodePrivacyVals(event.result.rsp.nationality_py, nationalityPyGroups);
+				emailPyOption.selectedIndex = decodePrivacyVals(event.result.rsp.emailid_py, emailPyGroups);
+				urlPyOption.selectedIndex = decodePrivacyVals(event.result.rsp.url_py, urlPyGroups);
+				locationPyOption.selectedIndex = decodePrivacyVals(event.result.rsp.location_py, locationPyGroups);
+				interestsPyOption.selectedIndex = decodePrivacyVals(event.result.rsp.interests_py, interestsPyGroups);
+				competencesPyOption.selectedIndex = decodePrivacyVals(event.result.rsp.competences_py, companyPyGroups);
+*/				
+			}
+			
+			private function decodePrivacyVals(val:String, pyGroups:ComboBox): Number {
+				if(val == '#EVERYBODY#')
+					return 0;
+				if(val == '#AUTHORONLY#')
+					return 1;
+				if(val.indexOf('#GROUPS#') >= 0) {
+					var i:Number = 0;
+					while(i < (pyGroups.dataProvider as ArrayCollection).length) {
+						if(val.indexOf(pyGroups.dataProvider[i].gid) >= 0)
+							pyGroups.dataProvider[i].isSelected = true;
+						i+=1;
+					}
+					return 2;
+				}
+				return -1;
+			}
+			
+			/** each time, the profile window gains visibility, ths function is called.
+				we get the value in detailedprofileId:String ( declared in main as file ) 
+				and show the profile  
+				if the profile id == login user's id, we set the visibility of edit
+				profile button to true.
+			**/
+			
+			public function openVidConference():void{
+				var vidpop:vidconference=vidconference(PopUpManager.createPopUp(this,vidconference,true));	
+				PopUpManager.centerPopUp(vidpop);	
+			}
+			
+			public function processData():void
+			{
+			
+				for each ( var ppl:XML in app.people_list ){
+           		//	xpertumPeopleList.addItem(ppl.@id.toString());
+           			xpertumPeopleList.addItem(ppl);
+            	}
+            	
+            
+				switch (radiogroup1.selectedValue)
+				{
+					case selAllPplM:
+					xpertumInputPanel.visible=false;
+					 queryParam="ALL";
+			         sendParamtoPhp();
+					break;
+					case addAllPplM:
+					   getNeighbours();
+					 xpertumInputPanel.visible=false;
+			   		break;
+					case letMePplM:
+					  xpertumInputPanel.visible=false;
+			          xpertumAddPeoplePanel.visible=true;
+					break;
+					case null:
+					Alert.show(plzSelAnyOneM,messgM);
+					break;
+					
+				}
+			}
+public function getNeighbours():void
+{
+			var BaseIDs:Array=new Array();
+					var queryarray:Array=new Array();
+						queryarray.push('People@Knows');
+					    BaseIDs.push(app.Univ_LoginId1);
+						var querydegree:String=new String(queryarray.pop());
+						var criteria:Array=querydegree.split(/@/);
+						var ExistingNodesID:Array=new Array();
+			            var NewNodesID:Array=new Array();
+			            var Node_Id_Uid:Array=new Array();
+	   			        var NodesArray:Array=new Array();
+	   			   
+		for each(var curnodeID:String in BaseIDs){
+				var myNeighbours:Object;
+				myNeighbours=app.fullGraph.neighbors(curnodeID);
+				var NewNodesID_len:Number=NewNodesID.length;
+			
+				
+				for each (var myObj:Object in myNeighbours ) 
+				{
+					var num_edges:Number=myObj.num_edges;
+					var count:int=1;
+					var index:Number;
+					var index_existing:Number;
+					while(count<=num_edges){
+						if ( myObj.link[count].SourceID == 	curnodeID)
+						{
+							     var item:Item=app.fullGraph.find(myObj.link[count].DestID);
+ 						         if(item.data.@nodetype=="People")
+ 						         {
+								
+								   index=NewNodesID.indexOf(myObj.link[count].DestID);
+								   index_existing=ExistingNodesID.indexOf(myObj.link[count].DestID);
+								   if( (index==-1) && (index_existing == -1 ) )
+								   {
+									NewNodesID.push(myObj.link[count].DestID);
+								   }
+								
+							     }	
+						}
+						else {	//curNodeId is the destination of this link
+							
+							     var item1:Item=app.fullGraph.find(myObj.link[count].SourceID);
+ 						         if(item1.data.@nodetype=="People")
+ 						         {
+								//to add node
+								   index=NewNodesID.indexOf(myObj.link[count].SourceID);
+								   index_existing=ExistingNodesID.indexOf(myObj.link[count].SourceID);
+								   if( (index==-1) && (index_existing == -1 ) )
+								   {
+									 NewNodesID.push(myObj.link[count].SourceID);
+								   }
+								
+							    }
+						   }
+							count=count+1;
+					}	
+				}
+			}	
+						
+			     		 NewNodesID.push(app.Univ_LoginId1);
+			            queryParam=NewNodesID.toString();
+			            sendParamtoPhp();
+			
+				
+	}//end of getNeighbours function
+			public function formQueryString():void
+			{
+			//	queryParam=addPeopleCheckBoxList.selectedItems.toString();
+				
+				// get the email id of selected items		
+				var queryList:Array = new Array();
+				var queryIdList:Array = new Array();
+				queryList = addPeopleCheckBoxList.selectedItems ;
+				//var num:Number =  queryList.length ;
+				//queryList.push(queryParam);
+				//var partList:XMLList
+				
+				for each ( var ppl:XML in queryList ){
+					//var pin:XML  = XML("<N1>" + ppl + "/N1>");
+           			//var strin:String = new String(pin.N1.Node.@id);
+           			trace(ppl.@id);
+					queryIdList.push(ppl.@id);
+				}
+				// get the email id of selected items
+				
+				queryParam = queryIdList.toString();
+						
+		       sendParamtoPhp();
+			}
+			public function viewXpertumGraph(filename:String):void
+		    {
+			
+			        var urlStr:String ;
+			        var xpertumDataUrl:String;
+			       //   urlStr =app.ServerPath + graphData + "xpertum/flashAS3/xpertum.html"+"?"+app.ServerPath+graphData + "generateXpertumInput.php"+"?"+"value="+ queryParam;
+	            //    urlStr=Application.application.parameters.servername+"/prototyping/Xpertum/xpertum.html"+"?file="+app.ServerPath+app.graphData+filename;
+	            
+	            xpertumDataUrl = app.ServerPath+app.graphData+filename;            
+	        //    urlStr ="http://laboranova.lsi.upc.edu:1000/idearium/xpertum/mini0209/xpertum_mini.html?object="+ xpertumDataUrl;
+	        
+	            urlStr ="http://laboranova.lsi.upc.edu/xpertum/index.html?file="+ xpertumDataUrl;
+
+ 		  //  http://laboranova.lsi.upc.edu/xpertum/index.html?file=http://laboranova.lsi.upc.edu/xpertum/laboranova_scenario.xml
+			      var webPageURL:URLRequest = new URLRequest( urlStr );
+         	      navigateToURL(webPageURL, '_blank');
+  
+		   }
+		   public function sendParamtoPhp():void
+		   {
+		   	  CursorManager.setBusyCursor();
+              var variables:URLVariables 	= new URLVariables();
+              variables.value	= 	queryParam;
+              generateXMLFile.request=variables;
+              generateXMLFile.addEventListener(ResultEvent.RESULT,getXMLFileName);
+              generateXMLFile.send();
+		   	
+		   }
+		   public function getXMLFileName(r:ResultEvent):void
+		   {
+		   	CursorManager.removeBusyCursor();
+		   	try{
+		   		
+		   		  var fileName:String		=	r.result.toString();
+	   			viewXpertumGraph(fileName);
+	   			}
+	   			catch(e:Error){
+	   				trace('Unable to Get the filename of XML file generated!!!','Contact administrator');
+	   			}	
+	   			return;
+		   }
+		   private function cancelNewCompetence():void
+		   {
+		   	competenceName.text="";
+		   	newCategory.text="";
+		   	newCompStrength.value=0;
+		   	newCompPanel.visible=false;
+		   }
+			
+			public function displayprofile(fa:FlexEvent):void{
+				detProfComponents.selectedIndex = 1;
+				
+					btneditImage.visible=(app.adminenter|| app.adminstatus || app.id_selectedbyeadmin==app.Univ_LoginId1);
+				btnEditprofile.visible=(app.adminenter|| app.adminstatus || app.id_selectedbyeadmin==app.Univ_LoginId1);
+			   var tubeNameValue:String =Application.application.parameters.tubeName 
+				
+		
+				btnXpertum.visible = app.XpertumEnabled;					 
+		
+				peoplelist				=	app.people_list;
+				//tileProfiles.dataProvider	=	peoplelist;	
+				var profileId:String	=	app.detailedprofileId;
+				var item:Item			=	app.fullGraph.find( profileId );
+				userdata				=	new XML(item.data);
+				
+				if(app.adminOn==false)
+					setEditable(false);
+				app.adminOn = false;
+				
+		/*		if(app.alreadyEdited==true)
+					editprofile();
+				else {  
+			  	
+			*/  	
+					if ( profileId == app.Univ_LoginId  )
+					{
+						btnEditprofile.visible	=	true;
+						photoChgBtn.visible = true;	
+						btneditImage.visible = true;			
+						btnXpertum.visible = app.XpertumEnabled;
+					} else {
+						btnEditprofile.visible	=	false;
+						photoChgBtn.visible = false;
+						btneditImage.visible = false;
+						btnXpertum.visible=false;
+					}
+					if (app.adminenter|| app.adminstatus){
+						btnEditprofile.visible	=	true;
+						}
+					
+		//		}
+			  
+				waitingforupdate.addEventListener(TimerEvent.TIMER,readId);
+			//	Alert.show(userdata.@competences.toString(),"Competences and strengths string");	
+				//new code added on as 18th april
+				
+				competencesVbox.removeAllChildren();
+				var i:int;
+				for(i=0;i<app.competenceTypesArray.length;i++) {
+					var tempArr:Array= app.competenceTypesArray[i].@competences.toString().split(",");
+					competenceList=new XMLList();
+					for each(var str:String in tempArr){
+						var tempInt:int=uint(str);
+						competenceList=competenceList+new XML(tempInt);
+               //	  		Alert.show(competenceList.toString(),"CompetenceList");
+					}
+               		
+					competenceType=new DataGrid();
+					competenceType.width=450;
+					competenceType.rowHeight=25;
+					competenceType.rowCount=competenceList.length();
+					competenceType.height=(competenceType.rowCount+1)*competenceType.rowHeight;
+					competenceType.visible=true;
+					competenceType.horizontalScrollPolicy="off";
+					competenceType.verticalScrollPolicy="off";
+					//competenceType.labelField=app.competenceTypesArray[i].@name.toString();
+					competenceType.dataProvider=competenceList; 
+                     
+					competenceColumn=new DataGridColumn();
+					competenceColumn.headerText=app.competenceTypesArray[i].@name.toString();
+					competenceColumn.itemRenderer= new ClassFactory(component.competenceComponent);
+					var temp:Array=new Array();
+					temp.push(competenceColumn);
+					competenceType.columns=temp;
+					competencesVbox.addChild(competenceType);
+				}
+				addCompetenceBtn.label= newCLM;
+				//addCompetenceBtn.label= "New";
+				if(app.alreadyEdited==false)
+					addCompetenceBtn.visible=false;
+				else
+					addCompetenceBtn.visible=true;
+				addCompetenceBtn.addEventListener(MouseEvent.CLICK,addCompetence);
+				competencesVbox.addChild(addCompetenceBtn);
+				
+				memberGroupService.request.profileId = userdata.@id.toString();
+				memberGroupService.send();
+				
+				// calling the function to set the activity logs
+				
+				setActivitylogs();
+				// to refersh the scaps of the user
+				app.refreshscraps();
+			}
+		
+   private function getVideoNameById(videoId:String):String{
+		
+		var videoName: String;
+		var tempVideoId : String;
+		for each ( var videodata:XML in app.videos_list ){
+			tempVideoId = videodata.@id.toString();
+			if (tempVideoId == videoId ){
+			   videoName = videodata.@name.toString();
+			   return videoName;
+			}
+			
+		}
+		return "";
+	}				
+	
+	private function setActivitylogs():void{
+				
+		var videoId:String;
+		var videoName : String;
+		var edgeName: String;
+		var edgeFromId : String;
+		var currentProfileId : String;
+		
+		  currentProfileId = app.detailedprofileId;
+		  hasSeenVideoStr = new String();
+		  hasSubmittedVideoStr = new String();
+		
+				
+			for each (var edge: XML in app.edgeList_Xml) {
+		      edgeName = edge.@name.toString();
+		      edgeFromId = edge.@fromID.toString();	
+		      	
+				if ((edgeName == "Has seen")&&( edgeFromId == currentProfileId )){
+					videoId = edge.@toID.toString();
+					videoName = getVideoNameById(videoId);
+					if(videoName == ""){
+						continue;
+					}
+					if(hasSeenVideoStr == ""){
+					 	hasSeenVideoStr = videoName;	
+					}else{
+						hasSeenVideoStr = hasSeenVideoStr + ",\n" + videoName;	
+					}
+										
+				}if ((edgeName == "Has submitted")&&( edgeFromId == currentProfileId)){
+					videoId = edge.@toID.toString();
+					videoName = getVideoNameById(videoId);
+					if(videoName == ""){
+						continue;
+					}
+					if(hasSubmittedVideoStr == ""){
+					 	hasSubmittedVideoStr = videoName;	
+					}else{
+						hasSubmittedVideoStr = hasSubmittedVideoStr + ",\n" + videoName;	
+					}
+				}
+   			
+   			}
+						
+			 
+			return;	
+	
+			}
+			
+			
+			private function memberResult(event:ResultEvent):void {
+				
+				
+				
+				if(event.result.rsp.groups == null) {
+					grpList = null;
+					if(memberGroupService.lastResult.rsp.profile!=null)
+				{
+				txtDescription.text=memberGroupService.lastResult.rsp.profile.toString();
+				}
+					return;
+				}
+				grpList = memberGroupService.lastResult.rsp.groups.group as ArrayCollection;
+				// set the description
+				if(memberGroupService.lastResult.rsp.profile!=null)
+				{
+				txtDescription.text=memberGroupService.lastResult.rsp.profile.toString();
+				}
+				if(grpList == null) {
+					var gp:Object = new Object();
+					gp.gid = event.result.rsp.groups.group.gid;
+					gp.gname = event.result.rsp.groups.group.gname;
+					grpList = new ArrayCollection();
+					grpList.addItem(gp);
+				}
+			}
+               
+			public function addCompetence(ev:Event):void
+			{
+				newCompPanel.visible=true;
+			}
+		    private function submitNewCompetence():void
+			{	
+			   var variables:URLVariables 	= new URLVariables();
+			    variables.id			=   app.Univ_LoginId1;
+				variables.name          =   competenceName.text;
+				if(newCategory.text =="")
+		      		variables.category      =   competenceCategory.selectedLabel.toString();
+		      	else
+		      	   variables.category   =  newCategory.text;	
+		      	
+		      	  variables.strength    = 	newCompStrength.value;
+				updateCompetences.request = 	variables;									 
+				updateCompetences.send();
+							
+			}
+			
+			
+			
+
+			
+			
+			/**  handled only once: 1st time when this page is loaded, after that each time the page
+				 gains visibility we only call the displayprofile() function
+			**/
+			
+			public function init():void{
+				detProfComponents.getTabAt(4).visible = app.EnableCompetences;
+				this.addEventListener(FlexEvent.ADD,displayprofile);
+				tileProfiles.addEventListener(ListEvent.ITEM_CLICK,tileClick);
+				displayprofile(new FlexEvent(FlexEvent.ADD));
+				
+				
+				//  to display the ulead extra filed
+				
+				if(app.tubeShortName=="ULeadNetwork"){
+					exppa1.visible = true;
+					exppf1.visible = true;
+				}else{
+					exppa1.visible = false;
+					exppf1.visible = false;
+				}
+				
+				detProfComponents.selectedIndex = 1;
+			
+				// added for member list when it is empty while directly tring from view profile
+				tileProfiles.dataProvider= app.people_list;
+				
+				getGListService.send();
+				this.favoritedataprovider();
+				
+							
+			}
+			
+			/**  user clicks on one of the tile images, we display the profile of that user **/
+			private function tileClick(e:ListEvent):void{
+				try{
+					var data:XML			= 	new XML(tileProfiles.selectedItem);//	new XML( peoplelist[e.columnIndex] );
+					app.detailedprofileId	=	data.@id.toString();
+					app.id_selectedbyeadmin=data.@id.toString();
+					var t_info:Object = new Object();
+	      				t_info.action		= "updatelog";	
+	      				t_info.actiontype 	= 'ProfileView';
+	      				t_info.takenby 		=  app.Univ_LoginId1 ;  
+	      				t_info.takenon 		= app.detailedprofileId;
+	      				app.send_log_msg( t_info );	     							
+
+					displayprofile(new FlexEvent(FlexEvent.ADD));
+				}
+				catch(e:Error){
+					// do nothing
+				}
+			}
+			
+			
+			/** switches ON/OFF the editable feature for text controls	
+				triggered whenevr the user clicks on one of the people images
+			*/
+	
+			public function setEditable(value:Boolean):void{
+				txtInterests.editable	=	value;
+				txtDescription.editable	=	value;
+				txtCompany.editable		=	value;
+				txtTitle.editable		=	value;
+				txtNationality.editable	=	value;
+				txtEmail.editable		=	value;
+				txtWebpage.editable		=	value;
+				txtLocation.editable	=	value;
+				
+				// ulead start
+				exppf1.editable		=	value;				
+				// ulead end
+				
+				//existing_interests.visible = value;
+				
+				btnSaveprofile.visible		=	value;
+		//		btneditImage.visible		=	value;
+				btnCancelprofile.visible	=   value;				
+				
+				//btnEditprofile.visible		=	value;
+				
+				addCompetenceBtn.visible    =   value;
+				btnXpertum.visible          = value;
+				editMode = value;
+				
+				if ( value == true ){		
+					loaduserinterests();
+					lblProfilename.visible 	= 	false;
+					txtProfilename.visible	=	true;
+				}
+				else{
+					lblProfilename.visible 	= 	true;
+					txtProfilename.visible	=	false;
+				}
+				return;
+			}
+			
+			
+
+			/**  make the text input and text area components as editable	*/
+			
+			public function editprofile():void{
+				
+					if (! app.isLoggedIn()){
+ 			      			app.forceLogin();
+ 			      			return;
+ 						}
+			
+		
+		//		txtDescription.styleSheet = null;  // so that it becomes normal text area
+		
+				
+				app.alreadyEdited=true;
+				setEditable(true);
+				app.isEditState=true;
+				//existing_interests.visible 	= true;
+				btnSaveprofile.visible		= true;
+				btneditImage.visible		= true;
+				btnCancelprofile.visible	= true;				
+				btnEditprofile.visible		= false;
+				btnXpertum.visible          = false;
+				editMode                    = true;
+			}
+			
+			/**  used in edit profile mode  
+				function used to check if an interest, entered by user already exists 
+				 in the set of interests added . */
+				 
+			private function interestAlreadyExists(inte:String,existing:Array):Boolean{
+				inte = inte.toUpperCase();
+				for each ( var t_str:String in existing ){
+					if ( inte == t_str.toUpperCase() )
+						return true;
+				}
+				return false;		
+			}
+			
+			
+			/**  when user clicks Save after editing the profile, this function is called
+				1. check if the inputs are valid ( all necessary fields are filled )
+				2. form the list of interests
+				3. strip white spaces('') and '\r' from the interests which are manually entered
+					by user, 
+				4. and then send request to change the profile					
+			**/
+			
+			private function inputsValid():Boolean{
+				if (  (txtProfilename.text == '') || (txtTitle.text == '') || (txtCompany.text == '') || (txtEmail.text == '') ){
+					Alert.show('Some important information missing','Alert !');
+					return false;  
+				}
+					
+				userinterests = new String();		
+        		var temp_str:String 	= 	txtInterests.text
+        		var uniq_arr:Array		=	new Array();
+        		
+        		
+        		// extracting interests from list box
+        		for each(var sel_item:String in existing_interests.selectedItems){
+        			if ( interestAlreadyExists( sel_item ,uniq_arr) == false  )
+        				uniq_arr.push( sel_item );
+        		}
+        			
+        		// extracting interests from input text 
+        		// strip off any white spaces, in the interests entered by user.        				
+        		var entered_arr:Array 	= 	new Array();
+        		entered_arr				=	temp_str.split(',');
+        		for each ( var single:String in entered_arr ){
+        	//		var patt:RegExp = new RegExp(' ','ig');
+        			var patt2:RegExp= new RegExp('\r','ig');  
+        	//		single			=	single.replace(patt,''); 
+        			single			=	single.replace(patt2,''); 
+        			if ( (single != '') && ( interestAlreadyExists(single,uniq_arr)==false ) )
+        				uniq_arr.push( single );	
+        		}
+        			
+        		
+        		for each ( var indiv:String in uniq_arr )
+        			userinterests = indiv + ',' + userinterests;
+        		
+        		userinterests = userinterests.slice(0,userinterests.length-1);	
+				return true;
+			}
+			
+			/**  get back to normal mode from editable mode	**/
+			private function cancelsave():void{
+				app.alreadyEdited=false;
+				setEditable(false);
+				app.isEditState=false;
+				//existing_interests.visible 	= false;
+				btnSaveprofile.visible		= false;
+	//			btneditImage.visible		= false;
+				btnCancelprofile.visible	= false;							
+				btnEditprofile.visible		= true;
+				//btnXpertum.visible          = true;
+				btnXpertum.visible = app.XpertumEnabled;
+				editMode                    = false; 
+				if ( app.detailedprofileId == app.Univ_LoginId  ){
+					photoChgBtn.visible = true;
+					btneditImage.visible = true;
+				}
+
+				
+			}
+			
+			
+			/**  we send httprequest to server, with new information	**/
+			
+			private function saveprofile():void{
+				if ( inputsValid() == false ){
+					Alert.show(incomInfoM,tryAgainM);
+					return;
+				}
+				CursorManager.setBusyCursor();
+				cancelsave();
+				req_saveprofile.addEventListener(ResultEvent.RESULT,profileedited);	
+				
+				var variables:URLVariables 	= new URLVariables();
+				variables.action		=   "editprofile";
+				variables.id			= 	userdata.@id.toString();
+				variables.name			= 	txtProfilename.text;
+				variables.alias			=	aliasCtrl.text;
+				variables.title			= 	txtTitle.text;
+				variables.company		= 	txtCompany.text;
+				variables.nationality	= 	txtNationality.text;
+				
+				variables.picture		= 	imgPicture.source;
+				variables.email			= 	txtEmail.text;
+				variables.webpage		= 	txtWebpage.text;
+				
+				// ulead start
+				variables.exppf1		= 	exppf1.text;
+				// ulead end
+				
+				variables.location		= 	txtLocation.text;
+				
+				variables.interests		= 	userinterests;
+				variables.description	= 	txtDescription.text;
+		        variables.competences   =   userdata.@competences.toString();
+		        
+		        
+	
+	/*	        
+				variables.name_py		= 	getPyValue(prOpts[namePyOption.selectedIndex].value, namePyGroups.dataProvider as ArrayCollection);
+				variables.title_py		= 	getPyValue(prOpts[titlePyOption.selectedIndex].value, titlePyGroups.dataProvider as ArrayCollection);
+				variables.company_py	= 	getPyValue(prOpts[companyPyOption.selectedIndex].value, companyPyGroups.dataProvider as ArrayCollection);
+				variables.nationality_py= 	getPyValue(prOpts[nationalityPyOption.selectedIndex].value, nationalityPyGroups.dataProvider as ArrayCollection);
+				variables.picture_py	= 	getPyValue(prOpts[picturePyOption.selectedIndex].value, picturePyGroups.dataProvider as ArrayCollection);
+				variables.emailid_py		= 	getPyValue(prOpts[emailPyOption.selectedIndex].value, emailPyGroups.dataProvider as ArrayCollection);
+				variables.url_py	= 	getPyValue(prOpts[urlPyOption.selectedIndex].value, urlPyGroups.dataProvider as ArrayCollection);
+				variables.location_py	= 	getPyValue(prOpts[locationPyOption.selectedIndex].value, locationPyGroups.dataProvider as ArrayCollection);
+				variables.interests_py	= 	getPyValue(prOpts[interestsPyOption.selectedIndex].value, interestsPyGroups.dataProvider as ArrayCollection);
+				variables.profile_py= 	getPyValue(prOpts[profilePyOption.selectedIndex].value, profilePyGroups.dataProvider as ArrayCollection);
+		        variables.competences_py=   getPyValue(prOpts[competencesPyOption.selectedIndex].value, competencesPyGroups.dataProvider as ArrayCollection);
+		
+		*/        
+				req_saveprofile.url 	= 	app.ServerPath + app.graphData + "change.php";
+				req_saveprofile.request = 	variables;
+				req_saveprofile.send();
+				this.favvidlist = new XMLList;
+				 this.favoritedataprovider();
+				helpBoxVideos2.dataProvider = favvidlist	;
+			}
+			
+			private function getPyValue(pyval:String, pyGroups:ArrayCollection):String {
+				if(pyval == '#EVERYBODY#' || pyval == '#AUTHORONLY#')
+					return pyval;
+				else if(pyval == '#GROUPS#') {
+					for each(var obj:Object in pyGroups) {
+						if(!obj.isSelected)
+							continue;
+						pyval += obj.gid + ',';
+					}
+					if(pyval == '#GROUPS#')
+						return pyval;
+					else
+						return pyval.substr(0, pyval.length - 1);
+				} else return '#EVERYBODY#';
+			}
+			
+			public var waitingforupdate:Timer	=	new Timer(1000,0);
+			
+			/**  1. once we get the Success message, we reload the network.
+				 2. waitingforupdate:Timer will wait for reloading to be completed.
+				 	so that, it the page can be refreshed to see the updated profile
+				 3. also load the list of interests from controlpanel table
+			*/
+			
+			private function profileedited(r:ResultEvent):void{
+				try{
+	   				var responseMessage:String;
+	  				responseMessage = r.result.rsp.message;
+		   			if ( responseMessage == 'Success' ){
+		   				app.onAppCreationComplete();
+		   				loaduserinterests();
+		   				app.dataloaded		=	false;
+						waitingforupdate.start();		   				
+		   			}
+		   			else{
+		   				Alert.show('Update failed','Try again');
+		   			}		   				
+	   			}
+	   			catch(e:Error){
+	   				trace('Update failed','Try again');
+	   			}	
+	   			CursorManager.removeBusyCursor();
+	   			return;
+			}
+			
+			/**  this is the timer listener for waitingforupdate:Timer
+					it will check for dataloaded to be true, 
+					which becomes true, only when the new data is loaded into application
+			**/
+			private function readId(t:TimerEvent):void{
+				if ( app.dataloaded	=	true ){	
+					app.dataloaded	=	false;
+					waitingforupdate.stop();
+					waitingforupdate.reset();
+					displayprofile(new FlexEvent(FlexEvent.ADD));
+					Alert.show(profileSavedM,successAlert);
+				}
+			}
+
+			
+			private function RemoveMe():void{
+				setEditable(false);		
+			}
+			
+			
+			/** FUNCTION TO LOAD INTERESTS FROM CONTROL PANEL TABLE 	**/ 
+		
+			public function loaduserinterests():void{	
+				app.loadinterests.url 	= app.ServerPath + app.graphData + "loadinterests.php";	
+				app.loadinterests.addEventListener(ResultEvent.RESULT,loadint_resp);			
+		     	app.loadinterests.send();	
+			}
+			
+			/** event listener for loadinterests http request 
+			 * 	This will load the list of interests which the users had entered.
+			 *  we use interestslist:Array in register page and edit profile page		
+			 *	
+			 * **/
+			 
+			private function loadint_resp(r:ResultEvent):void{
+	   			try{
+	   				if ( r.result.rsp.interests == null )		
+	   					return;
+	   				var list:String		=	r.result.rsp.interests;
+		   			app.interestslist 	= 	list.split(',');   	
+		   			intslist			=	app.interestslist;
+		   			// the following lines are added to append tags and compentences to the intslist
+		   			var i:int;
+		   			for  (i=0;i< app.tags_list.length;i++) {
+   				        intslist.push(app.tags_list[i].@name.toString());
+   		        	//	Alert.show(competencesArray[i].@name,"future name");
+   				        
+   			      }					
+		   	//		intslist.concat(tagslist);
+		   			app.competencesArray;
+		   			for  (i=0;i< app.competencesArray.length;i++) {
+   				        intslist.push(app.competencesArray[i].@name.toString());
+   		        	
+   				        
+   			      }		
+	   			
+	   			intslist = app.removeDupli(intslist);
+	   			intslist.sort();
+	   			
+	   			}
+	   			catch(e:Error){
+	   				trace('Unable to load "control panel" table in database','Contact administrator');
+	   			}	
+	   			return;
+	    	}
+	    	
+	    	
+
+			private function saveprofileFault():void{
+						trace("saveprofileFault()");
+				}
+	    	
+	    	private function getNewCompId():void
+	    	{
+	    		
+	    		newCompPanel.visible=false;
+	    		Alert.show(upDatabaseM,successAlert);
+	    		
+	    		cancelNewCompetence();
+	    		app.loadnetwork.send();	
+	    	}
+         public function generateXMLFileFault():void
+         {
+           Alert.show(errM,errM);
+         }
+         
+        public function favoritedataprovider():XMLList
+       {
+       	       
+       	       //var favvidlist:XMLList = new XMLList();
+       	       var peoplelist2:Array		=	app.people_list;
+				//tileProfiles.dataProvider	=	peoplelist;	
+				var profileId:String	=	app.detailedprofileId;
+				var item:Item			=	app.fullGraph.find( profileId );
+				var theuser:XML				=	new XML(item.data);
+				
+				var list:String		=	theuser.@myfavorite.toString();
+		   		var vididarray:Array 	= 	list.split(',');  
+		   		var vidnamearray:Array = new Array(); 
+		   		for each(var vidid:String in vididarray)
+		   		{
+		   			vidnamearray.push(getVideoNameById(vidid));	
+		   			var videoName: String;
+						
+					for each ( var videodata:XML in app.videos_list ){
+						var tempVideoId1:String = videodata.@id.toString();
+						if (tempVideoId1 == vidid ){
+							favvidlist = favvidlist + videodata;
+						}
+					}
+		   		}
+			  
+			 	  return favvidlist;
+			}
+		   			
+		   			
+		   			
+		   
+		]]>
+	</mx:Script>
+	
+	<mx:HTTPService id="req_saveprofile" fault="saveprofileFault();" useProxy="false" method="POST">
+	   </mx:HTTPService>
+	   <mx:HTTPService id="updateCompetences"  resultFormat="xml"
+				url="{app.ServerPath}GraphData/updateCompetences.php" useProxy="false" method="POST"
+			    fault="Alert.show(event.fault.faultString, 'Opps...');" result="getNewCompId();">
+	</mx:HTTPService>
+	<mx:HTTPService id="generateXMLFile"  resultFormat="xml"
+				url="{app.ServerPath}GraphData/generateXMLFileXper.php" useProxy="false" method="POST"
+			    fault="Alert.show(event.fault.faultString, 'Opps...');">
+	</mx:HTTPService>
+	<mx:HTTPService id="chPwdService" method="POST" url="{app.ServerPath}GraphData/change.php">
+		<mx:request xmlns="">
+			<action>chPwd</action>
+			<loginId>{app.id_selectedbyeadmin}</loginId>
+			<newPwd>{newPwd.text}</newPwd>
+		</mx:request>
+		<mx:result>
+			<![CDATA[
+				var mess:String = chPwdService.lastResult.rsp.message;
+				if(mess == 'Success') {
+					chPwdCancelBtn.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+					Alert.show(passChnagedSM, successAlert)
+				}
+				else if(mess == 'Wrong Password')
+					Alert.show(wopPCPM, errM);
+				else {
+					chPwdCancelBtn.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+					Alert.show(mess, errM);
+				}
+			]]>
+		</mx:result>
+	</mx:HTTPService>
+	
+	<mx:HTTPService id="settingsService" method="POST" url="{app.ServerPath}GraphData/settings.php">
+		<mx:request xmlns="">
+			<action>setsettings</action>
+			<userid>{app.id_selectedbyeadmin}</userid>
+	<!--		<freq>{showrepfreq.selectedLabel}</freq>  -->
+	<freq>{showrepfreq.selectedItem.@id.toString()}</freq>
+	
+		</mx:request>
+		
+		<mx:result>
+			<![CDATA[
+				var mess:String = settingsService.lastResult.rsp.message;
+				var freq:int =0;
+				switch(mess)
+				{
+	
+		case '-1':
+			freq=0;
+			break;
+		
+		case '-7':
+			freq=1;
+			break;
+		case '-15':
+			freq=2;
+			break;
+		case '-30':
+			freq=3;
+			break;
+		case '0':
+			freq=4;
+			break;
+		default:
+			
+			break;	
+	
+				}
+				if(settingsService.request.action=='getsettings')
+				showrepfreq.selectedIndex=freq;
+				if(mess == 'Success') {
+					settingsCancelBtn.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+					Alert.show(setCSM, successAlert)
+				}
+				
+				else if(mess == 'Failed:'){
+					chPwdCancelBtn.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+					Alert.show(mess, errM);
+				}
+			]]>
+		</mx:result>
+	</mx:HTTPService>
+	   
+	   
+</mx:TitleWindow>

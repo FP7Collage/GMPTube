@@ -1,0 +1,1669 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<!--
+When copying this file to other project(s), please use the same name
+in a case-sensitive manner, i.e., Tentube.mxml but not TenTube.mxml
+-->
+
+
+<mx:Application  xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="100%"
+	height="100%" verticalScrollPolicy="on" left="0" right="0" top="0" bottom="0"
+	applicationComplete="{InitializeFullScreenHandler(event);}"  verticalPageScrollSize="20"	paddingTop="0" paddingBottom="0"
+ 	creationComplete="{load_constants();preload();}"
+ 	xmlns:draggable="com.dragable.*"
+ 	xmlns:controls="com.controls.*"
+ 	xmlns:comp="component.CountDownClock"
+	xmlns:fs="com.fs.*" 			xmlns:files="com.fileio.*"
+	xmlns:fc="http://www.adobe.com/2006/fc"  	xmlns:component="component.*"
+	xmlns:ns1="http://www.adobe.com/2006/fc" 	xmlns:ns2="*" creationPolicy="all"
+	xmlns:assets="component.assets.*"
+	xmlns="com.Rating.*"
+	xmlns:ImageOps="Asfiles.image_upload.*"
+
+	styleName="{(styling == 'tentube')? 'newBg':''}" xmlns:ytplayer="com.ytplayer.*" currentState="empty">
+	
+	<!--	xmlns:controls="com.controls.*"
+	height="100%"		height="1000"-->
+	
+	<!--  these are the action script files 
+		 they contain the majority of the code and important implementations
+		 1.	as_root				-	has functions related to the main application ( timers, loading data from server )
+		 2. as_videochannel		-	related to playing video ( stop, pause . etc. )	
+		 3. as_visualization	-	related to network visualization
+		 4. as_game				-	related to tentubegame ( but most of the game functions are in form_gamepage.mxml )
+		 5. as_admin			-	admin functions like delete comment, remove user, video node
+		 6. as_variables		-	for importing classes and declaring variables
+		 -->	
+    
+    <mx:Script source="Asfiles/as_variables.as" />
+    <mx:Script source="Asfiles/as_root.as" />
+    <mx:Script source="Asfiles/as_videochannel.as" />
+    <mx:Script source="Asfiles/as_visualization.as" />
+    <mx:Script source="Asfiles/as_game.as" />
+    <mx:Script source="Asfiles/as_admin.as" />
+    <mx:Script source="Asfiles/as_comments.as" />
+    <mx:Script source="Asfiles/as_lab.as" />
+     <mx:Script source="Asfiles/as_constants.as" />   
+    
+<!-- heya! CVS Rocks!! -->
+     <mx:Script>
+     	<![CDATA[
+     		import mx.collections.XMLListCollection;
+     		import component.thumbRenderer;
+     		import component.helpWindow;
+     		import flash.net.navigateToURL;
+     		import mx.collections.ArrayCollection;
+     		
+     		[Bindable] public var showPlayBtn:Boolean = true;
+     		[Embed(source="/media/control_play_blue.png")]
+     		[Bindable] private var playLogo:Class;
+     		[Embed(source='/media/control_pause_blue.png')]
+     		[Bindable] private var pauseLogo:Class;
+			
+			[Bindable] public var uploadError:String;
+			[Bindable] public var  tubeShortName:String;
+			[Bindable] public var  tubeCode:String;
+			[Bindable] public var  tubeLabel:String;
+			[Bindable] public var useFMS:String;
+			[Bindable] public var individual_invite:Boolean;
+			[Bindable] public var popupAgent:Boolean;
+			[Bindable] public var useKey:String;
+			[Bindable] public var privacyEnabled:Boolean;
+			[Bindable] public var tradeEnabled:Boolean;
+			[Bindable] public var tradeUrl:String;
+			[Bindable] public var LearnWebXML :XML;
+			
+			[Bindable] public var RIEnabled:Boolean = false;
+			[Bindable] public var vCREnabled:Boolean = false;
+			
+			[Bindable] public var firstPopUpShown:Boolean = false;
+			[Bindable] public var enableFirstPopUp:Boolean = false;
+			[Bindable] public var showFirstPopUp:Boolean = false;
+			[Bindable] public var popUpMessage:String = new String();
+			[Bindable] public var secondPopUpMessage:String = new String();
+			[Bindable] public var firstPopUpMessage:String = new String();
+			
+			[Bindable] public var RIUrl:String;
+			[Bindable] public var ROUrl:String;
+			[Bindable] public var EGOVUrl:String;
+			[Bindable] public var vClassRoomUrl:String;
+			[Bindable] public var privacyLinkUrl:String;
+			[Bindable] public var defaultPageState:String;
+			[Bindable] public var homePageLogo:String;
+			[Bindable] public var homePageLogoUrl:String;
+			
+			[Bindable] public var firstChannel:String;
+			[Bindable] public var secondChannel:String;
+			[Bindable] public var thirdChannel:String;
+			[Bindable] public var membersLabel:String;
+			[Bindable] public var videoExtension:String;
+			[Bindable] public var conversionFormat:String;
+			
+			
+				
+					
+			[Bindable] public var firstLogo:String;
+			[Bindable] public var secondLogo:String;
+			[Bindable] public var thirdLogo:String;
+			[Bindable] public var firstUrl:String;
+			[Bindable] public var secondUrl:String;
+			[Bindable] public var thirdUrl:String;
+			[Bindable] public var useFirst:Boolean=false;
+			[Bindable] public var useSecond:Boolean=false;
+			[Bindable] public var useThird:Boolean = false;
+			[Bindable] public var use4:Boolean = false;
+			[Bindable] public var use5:Boolean = false;
+			[Bindable] public var use6:Boolean = false;
+			[Bindable] public var logo4:String;
+			[Bindable] public var logo5:String;
+			[Bindable] public var logo6:String;
+			
+			
+			[Bindable] public var laboranovaideasurl:String;
+			[Bindable] public var laboranovausersurl:String;
+			[Bindable] public var laboranovaevalurl:String;
+			
+			
+			[Bindable] public var default_channelIndex:Number;
+			[Bindable] public var enableSixth_videoCategory:Boolean;
+			[Bindable] public var enableFifth_videoCategory:Boolean;
+			[Bindable] public var enableFourth_videoCategory:Boolean;
+			[Bindable] public var EnableVideoChat:Boolean;
+			[Bindable] public var EnableGame:Boolean;
+			[Bindable] public var EnableRecording:Boolean;
+			[Bindable] public var EnableRegisteration:Boolean;
+			[Bindable] public var helpLink:String;
+			[Bindable] public var helpMail:String;
+			[Bindable] public var AnonymousAccess:Boolean;
+			[Bindable] public var enableLinkedIn:Boolean;
+			
+			
+			
+			[Bindable] public var XpertumEnabled:Boolean = true;
+			
+			[Bindable] public var camera_bandwidth:Number =0;
+			[Bindable] public var camera_quality:Number =100;
+			[Bindable] public var camera_fps:Number =15;
+			[Bindable] public var camera_width:Number;
+			[Bindable] public var camera_height:Number;
+			
+			
+			
+			[Bindable] public var styling:String;
+ 	 		
+			[Bindable] public var video_conferencePath:String;
+ 	 		
+			[Bindable] public var ServerNameConstant:String;
+			[Bindable] public var VideoPath:String;
+			public var adminOn:Boolean = false;
+			public var alreadyEdited:Boolean=false;
+			[Bindable] public var aboutUs:String ;
+			
+			[Bindable] public var videoTypes_PanelLabel:String;
+			[Bindable] public var videoCategory_CDLabel:String;
+			[Bindable] public var videoCategory_CDOppLabel:String;
+			[Bindable] public var videoCategory_CDExpertsLabel:String;
+			[Bindable] public var label_fourth_videoCategory:String;
+			[Bindable] public var label_fifth_videoCategory:String;
+			[Bindable] public var label_sixth_videoCategory:String;
+			
+			
+			[Bindable] public var demoVideoId:String;
+					 
+
+			[Bindable] public var taboowords:String ;
+			[Bindable] public var demo_taboowords_for_display:String ;
+			[Bindable] public var demo_taboowords_array:Array;
+			
+			
+			/*
+			 Constants are moved to as constants
+			
+			*/
+			
+			
+			[Bindable] public var gotoGroupId:String = "";
+			// modification group Rakesh 
+			
+			
+			
+			[Bindable] public var groupsAvailable:Boolean;
+			public var groupObjects:Array;
+			
+			[Bindable] public var rated:Boolean = false;
+			[Bindable] public var created:Boolean = false;
+			
+			[Bindable] public var gamepage_title:String;
+			[Bindable] public var gameDescription:String;
+			[Bindable] public var video_catagories:Array=new Array();
+     		[Bindable] public var linksListData:Array = new Array();
+     		[Bindable] public var docsListData:Array = new Array();
+     		[Bindable] public var attachButtonVisible:Boolean=true;
+     		[Bindable] public var competencesArray:Array=new Array();
+     		[Bindable] public var competenceTypesArray:Array=new Array();
+     		[Bindable] public var competenceCategories:Array=new Array();
+     		[Bindable] public var groupList:Array=new Array();
+     		
+     		[Bindable] public var servTypeList:Array=new Array();
+     		[Bindable] public var resTypeList:Array=new Array();
+     		
+     		[Bindable] public var actionToClick :String;
+         	[Bindable] public var firstPlay :Boolean = false;
+     		[Bindable] public var firstTimeAnony :Boolean = true;
+     		 [Bindable] public var moreObj:Array=new Array();
+
+     		
+     		
+     		
+     		//variables
+     	
+     	]]>
+     </mx:Script>
+
+    <mx:Script>
+    	<![CDATA[
+    		import component.FirstPopUp;
+    		import mx.messaging.channels.AMFChannel;
+    		import component.helpWindow;
+    		import mx.managers.PopUpManager;
+    		import mx.controls.Alert;
+    		import component.IFrame;
+    		import mx.events.CloseEvent;
+    		import mx.managers.CursorManager;
+    		import mx.events.ItemClickEvent;
+    		import flash.external.ExternalInterface;
+        	import flash.geom.Point;
+        	import flash.net.navigateToURL;
+    		
+       	    [Bindable] public var display_user_name:String = new String();
+    		[Bindable] public var Univ_LoginId1:String = new String();
+    		public var tempEv:ItemClickEvent ;
+    		public var isFirst:Boolean = true;
+    		public var i:int=0;	
+    		
+    		public function openHomePageLogoUrl():void{
+				 if (homePageLogoUrl == ""){  
+				 return;}
+				 
+ 				var urlStr:String = homePageLogoUrl;
+				var webPageURL:URLRequest = new URLRequest( urlStr );
+	  		    navigateToURL(webPageURL, '_blank');
+
+ 			}
+
+    		
+    		public function openPrivacyLink():void{
+
+ 				var urlStr:String = privacyLinkUrl;
+				var webPageURL:URLRequest = new URLRequest( urlStr );
+	  		    navigateToURL(webPageURL, '_blank');
+
+ 			}
+    		
+    		private function slider_thumbPress():void {
+    			ytp.pause();                
+            }
+
+            private function slider_thumbRelease():void {
+            	ytp.seekTo(ytSlider.value/1000);
+            	ytp.play();              
+                
+            }	
+    		
+    		private function slider_thumbPressFMS():void {                
+                vPlayer.pause();
+            }
+
+            private function slider_thumbReleaseFMS():void {
+            	vPlayer.playheadTime = vSlider.value;
+                vPlayer.play();
+                
+            }
+            
+            private function timeConversion(item:Object):String{            	
+            	            	
+				var pT:Number = item.valueOf() || 0.1;
+				var pTimeMS:Date = new Date(pT * 1000);				
+									
+				return formatTime(pTimeMS);
+					}
+			 private function formatTime(item:Date):String {
+                return dateFormatter.format(item);
+            }		
+    		
+    		
+    		private function initTabs():void{
+    			
+    			tabnavigator1.selectedIndex = default_channelIndex;
+    			
+    			tabnavigator1.getTabAt(3).visible = enableFourth_videoCategory;
+    			tabnavigator1.getTabAt(4).visible = enableFifth_videoCategory;
+    			tabnavigator1.getTabAt(5).visible = enableSixth_videoCategory;
+    			
+    		}
+    		
+    		
+    		public function openUrl():void {
+    			
+			var urlRequest:URLRequest = new URLRequest("http://www.calt.insead.edu");
+			navigateToURL(urlRequest, '_blank');
+		} 
+		
+		
+    		public function setheight():void{
+    			
+    		//	i=i+1;
+    		//	if(i!=1)
+    		//	panel2.width=comments_window.width;
+    		}
+    		
+    		
+    		public function viewVideoNetwork(vdata: Object):void{
+	        	centre_id = vdata.@id.toString();
+    		//	Univ_LoginId = detailedprofileId;
+    		//	new_current_id = detailedprofileId;
+    		   new_current_id = centre_id; 
+ 				currentState = 'spring_view';
+ 				LoadVideoNetwork(centre_id);
+      			//LoadNetwork();
+      			showSpringgraph();
+      		    Univ_LoginId = Univ_LoginId1
+				return;
+	        	
+	        }
+	        
+	        public function openCopyLink(vdata: Object):void{
+	        	var vid = vdata.@id.toString();
+	      //  	var vUrl = ServerPath  + Application.application.parameters.tubeName + ".html?actionName=playvideoByPassLogin&userName=anonymous@gmail.com&key=lab1&videoid=" + vid ;
+	      var vUrl = ServerPath  + Application.application.parameters.tubeName + ".html?actionName=playmyvideo&videoid=" + vid ;
+	      
+	        
+	            directVideoObj = vdata;	        
+	            openPublicLink(vdata);
+	        	 return;
+	        	 
+	        }
+	        
+	        public function openGDLink(vdata: Object):void{
+	        	var vid = vdata.@id.toString();
+	        	       	
+	        	var vUrl = ServerPath  + "GraphData/gddoc.php?vid=" + vid + "&youremail=" + Application.application.Univ_LoginId; ;
+	        	var urlRequest:URLRequest = new URLRequest(vUrl);
+	     		navigateToURL(urlRequest, '_blank');        	        
+	            return;
+	        	 
+	        }
+	        
+	        public function openPPTLink(vdata: Object):void{
+	        	var vid = vdata.@id.toString();
+	        	       	
+	        	var vUrl = ServerPath  + "GraphData/gdppt.php?vid=" + vid + "&youremail=" + Application.application.Univ_LoginId; ;
+	        	var urlRequest:URLRequest = new URLRequest(vUrl);
+	     		navigateToURL(urlRequest, '_blank');        	        
+	            return;
+	        	 
+	        }
+	        
+	        
+	        
+    		
+    		
+    		/*This function is called when the user presses the View Network button in the
+    		Profiles*/
+    		public function viewNet():void{
+    			centre_id = detailedprofileId;
+    			Univ_LoginId = detailedprofileId;
+    			new_current_id = detailedprofileId;
+ 				currentState = 'spring_view';
+      			LoadNetwork();
+      			showSpringgraph();
+     			Univ_LoginId = Univ_LoginId1;
+				//Univ_LoginId = detailedprofileId;
+				//homebtnhandler(tempEv);
+
+				/*
+				currentState			=	'spring_view';
+				var targItem:Item = new Item(detailedprofileId) ;
+				focusnode(targItem);
+				*/
+				return;
+			}
+			// functions used for upload panel in newUI state
+
+			// variable declaration used for uploading of documents and links 
+			public var newui_documents_list_for_upload:String = new String();
+			public var newui_documents_list_for_display:String = new String();
+			private var newui_fileref:FileReference;
+         	public var newui_docTypes:FileFilter 	= new FileFilter("All Files", "*.*");
+	        public var newui_docfilter:Array 		= new Array(newui_docTypes);
+         	public var newui_docname:String;
+         	public var newui_docsUploadVideoId:String=new String();
+         	
+         	public var replaceVideoId:String=new String();
+         	
+         	public var directVideoObj: Object;
+			
+			
+			private function newui_onBrowseUploadDocuments():void {
+		        newui_fileref = new FileReference();
+				newui_fileref.addEventListener(Event.SELECT, newui_selectHandler);
+				newui_fileref.addEventListener(Event.COMPLETE, newui_completeHandler);
+				//newui_fileref.browse(newui_docfilter);
+				newui_fileref.browse(); 
+	        }
+	        
+			private function newui_selectHandler(event:Event):void {
+            	try{
+	            	var filesize:Number = event.target.size;
+	            	if ( (filesize/1000000) > 300 ){		//  max size is 10 mb
+	            		Alert.show(uploadSizeMessage,uploadSizeAlert);
+	            		return;
+	            	}
+	            	
+		            var params:URLVariables = new URLVariables();
+	                newui_docname = newui_fileref.name;
+		            var request:URLRequest  = new URLRequest();
+			        request.url				= ServerPath + '/GraphData/uploadDocs.php';
+	        		request.method 			= URLRequestMethod.POST;
+	        		CursorManager.setBusyCursor();
+	        		newui_fileref.upload(request);
+	    		}
+	    		catch (error:Error){
+	        		trace("Unable to upload file.");
+	        		Alert.show(uploadErrorMessage,uploadErrorAlert);
+	   			}    
+	        }
+	        
+	     	private function newui_completeHandler(event:Event):void {
+				CursorManager.removeBusyCursor();
+				if(newui_documents_list_for_upload.length==0) {
+					newui_documents_list_for_upload=newui_fileref.name.toString();
+					newui_documents_list_for_display=newui_fileref.name.toString();
+				} else {
+					newui_documents_list_for_upload += "| "+newui_fileref.name.toString();
+					newui_documents_list_for_display += "\n"+newui_fileref.name.toString();            
+				}
+				//docsListData=newui_documents_list_for_display.split("\n");
+				docsListData.push(newui_fileref.name.toString());
+				newui_progressText.dataProvider=docsListData;
+         	}
+         	
+         private function newui_uploadLinks():void{
+         	var variables:URLVariables = new URLVariables();
+         //	Alert.show(documents_list_for_upload,"Docs List");
+         //   variables.docLinks      =   newui_documents_list_for_upload;
+		//	Alert.show(adminpanel_externalLinks.text,"External Links");
+			var i:int;
+			if(linksListData.length>0){
+				variables.externalLinks=linksListData[0].toString();
+			}
+			for(i=1;i<linksListData.length;i++){
+				variables.externalLinks=variables.externalLinks+"\r"+linksListData[i].toString();
+			}
+			if(docsListData.length>0){
+				variables.docLinks=docsListData[0].toString();
+			}
+			for(i=1;i<docsListData.length;i++){
+				variables.docLinks= variables.docLinks+"|"+docsListData[i].toString();
+			}
+//			variables.externalLinks =   newui_externalLinks.data.toArray().join("\r");
+         	variables.videoId=newui_docsUploadVideoId;
+         	newui_update_docs_links_list.clearResult();
+         	newui_update_docs_links_list.addEventListener(ResultEvent.RESULT,newui_docsUploaded);
+  			newui_update_docs_links_list.request = variables;									 
+			newui_update_docs_links_list.send();
+			CursorManager.setBusyCursor();
+         }
+         public function newui_docsUploaded(r:ResultEvent):void{
+						newui_uploadDocsPanel.visible=false;
+						
+						docupload_log();
+						
+						Alert.show(updatedDataBaseMessage,successAlert);
+						
+						onAppCreationComplete();
+						CursorManager.removeBusyCursor();
+						
+						//UPDATE RELATED MATERIAL VIEW WITH THE NEW STUFF. SSK:8/8/08.
+						if(playingvideo != null && playingvideo.data != null && playingvideo.data.@id != null && playingvideo.data.@id.toString() == newui_docsUploadVideoId) {
+							if((r.result.rsp.externalLinks as String) != null)
+								playingvideo.data.@externalLinks = r.result.rsp.externalLinks as String;
+							if((r.result.rsp.docLinks1 as String) != null)
+								playingvideo.data.@docLinks = r.result.rsp.docLinks1 as String;
+							putLinks();
+						}
+			}
+			
+		public function docupload_log():void{
+			
+						var variables:URLVariables = new URLVariables();
+						
+						variables.action='updatelog';
+						variables.actiontype='docLinkUpload';
+						variables.takenby=Univ_LoginId1;
+						variables.takenon=newui_docsUploadVideoId;
+						
+						update_log.url 		= ServerPath + graphData + "useractions.php";
+						update_log.request 	= variables;
+						update_log.send();
+		}
+		
+		
+		private function addLinkCallBack():void{
+			if(linkInput.text.length!=0){
+				if(linkInput.text.substr(0,4)!="http"){
+					linkInput.text = "http://"+linkInput.text;
+				}
+				if(linksListData.length==1 && linksListData[0]=='')
+				linksListData[0]=titleInput.text+"--"+linkInput.text;
+				else
+				linksListData.push(titleInput.text+"--"+linkInput.text);
+				newui_externalLinks.dataProvider = linksListData;
+				titleInput.text="";
+				linkInput.text="";
+			}
+		}	
+        private function removeLinkCallBack():void{
+        	Alert.show(removeQMessage + newui_externalLinks.selectedItem.toString(),confirmAlert,Alert.YES | Alert.NO,this,confirmDeleteLink,null,Alert.NO);
+        	
+        }
+        
+        private function confirmDeleteLink(ev:CloseEvent):void{
+        	if (ev.detail==Alert.YES) {
+        		linksListData.splice(newui_externalLinks.selectedIndex,1);
+        		newui_externalLinks.dataProvider=linksListData;
+        	}
+        }
+			
+		private function removeDocsCallBack():void{
+       	Alert.show(removeQMessage +newui_progressText.selectedItem.toString(),confirmAlert ,Alert.YES | Alert.NO,this,confirmDeleteDoc,null,Alert.NO);
+		}	
+			
+        private function confirmDeleteDoc(ev:CloseEvent):void{
+        	if (ev.detail==Alert.YES) {
+        		docsListData.splice(newui_progressText.selectedIndex,1);
+        		newui_progressText.dataProvider=docsListData;
+        	}
+        }
+        
+        private function tradeclicked():void{
+        	//navigateToURL(new URLRequest(tradeUrl + '?username=' + Univ_LoginId1), '_blank');
+        	var href1:String=new String;
+        	href1=tradeUrl + '?username=' + Univ_LoginId1;
+        	ExternalInterface.call("popup",href1,'IDeM');
+        }
+        private function openTagCrowd():void{
+        	var urlStr: String = new String();
+        	var dataStr: String = new String();
+        	urlStr = ServerPath + "GraphData/TagCrowd.php";
+        	dataStr = ServerPath + "GraphData/generateTagCrowdData.php";
+        	navigateToURL(new URLRequest(urlStr + '?tagUrl=' + dataStr), '_blank');
+        
+        }
+        
+        private function helpclicked():void {
+        	addChild(helpWin);
+        	helpWin.visible = true;
+        }
+        
+    	private function dragiframe():void{
+    		ExternalInterface.call("moveIFrame",tradeWindow.x+10,tradeWindow.y+40,tradeWindow.width-25,tradeWindow.height-45);
+    		//Alert.show('dragging');
+    	}
+    	
+    	public function Invite_Startgame():void{
+   			
+   			if(onlineUsersListgame.selectedItems.length==0){
+   				return;
+   			}
+   			
+			var num:Number=onlineUsersListgame.selectedIndex;
+			var obj:Object=new Object();
+			obj=onlineUsersListgame.selectedItem;
+			lblgame.text=obj.id.toString();
+			
+			if(obj.id.toString()==Univ_LoginId1){
+				lblgame.text=cannotplayMessage;
+				return;
+			}
+			var str:String=new String();
+			str=obj.id.toString();
+			pg_gamemodule.startgame(str);
+			
+    	}
+    	public function initHorizScreen():void{
+    		//trace("entering in horiz screen");
+    	}
+    	
+    	
+          public function openFirstPopUp(){
+	        	
+	            var firstPop:FirstPopUp = FirstPopUp(PopUpManager.createPopUp(this,FirstPopUp,true));       
+				firstPop.setStyle("borderAlpha", 0.9);
+				
+			//	firstPop.data = this.data;
+				PopUpManager.centerPopUp(firstPop);
+					
+	        }
+	
+    
+    
+    	
+    
+    	
+    	
+        
+    	]]>
+    </mx:Script>
+    
+	<mx:HTTPService id="newui_update_docs_links_list"  resultFormat="object"
+				url="{ServerPath}GraphData/modifyDocs.php" useProxy="false" method="POST"
+			    fault="Alert.show(event.fault.faultString, 'Opps...');" >
+	</mx:HTTPService>
+	
+	 <!-- *		login and logout actions are stored in useractions table in database.
+		 		all those requests pass through this HTTPService. it calls the useractions.php -->
+	 <mx:HTTPService id="update_log" useProxy="false" fault="updatelogFault();" method="POST">
+	   </mx:HTTPService>
+	   
+	   
+	 <!-- *	this service loads the complete database. it calls the loadnetwork.php 
+	  			and it returns Nodetypes, Edgetypes, Nodes, Edges.  -->
+	<mx:HTTPService  id="loadnetwork" url="{ServerPath + 'GraphData/loadnetwork_ssk.php'}" result="{loadnetwork_showresponse()}"
+		fault="loadnetworkFault();" useProxy="false" method="POST" resultFormat="e4x" showBusyCursor="true">
+		<mx:request xmlns="">
+			<loginId>{Univ_LoginId1}</loginId>
+			<admin>{adminMode? 'True':'False'}</admin>
+		</mx:request>
+	</mx:HTTPService>
+	
+	
+	<mx:HTTPService  id="loadconstants"  result="loadconstants_showresponse();" fault="{loadconstantsFault();}" useProxy="false" method="POST" resultFormat="e4x">		   
+	   </mx:HTTPService>
+	
+	<!-- The following 3 http services are used by the chat. their names explain what they do. -->
+	<mx:HTTPService id="loadOnlineUsers" result="{onlineUsersLoad()}" useProxy="false" method="POST" resultFormat="e4x" url="{ServerPath}GraphData/onlineUsers.php" fault="onlineUsersFault();"/>
+	<mx:HTTPService id="loadNewMessage" result="{newMessageLoad();}" useProxy="false" method="POST" resultFormat="e4x" url="{ServerPath}GraphData/checkMessage.php" fault="checkMessageFault();"/>
+	<mx:HTTPService id="sendMessage" result="sentMessageStatus()" useProxy="false" method="POST" resultFormat="object" url="{ServerPath}GraphData/sendMessage.php" fault="sendMessageFault();"/>
+	
+	<mx:HTTPService id="changehttp" fault="changehttpFault();" useProxy="false" method="POST">
+		</mx:HTTPService>
+		
+	<!--*  	Checks for game invite every 5 seconds. it calls checkinvite.php
+		*	variables:	user id 
+		*	checks the invite field in peoplenodes table for that user id .
+			parses and returns it. 	-->
+	<mx:HTTPService id="checkinvite" fault="checkinviteFault();" useProxy="false" method="POST" resultFormat="xml">
+	
+		</mx:HTTPService>
+	
+	
+	<!--*  	the user can respond YES/NO to the game invite. 
+		*	if the user says NO, then through thus service we send NOT ACCEPTED message
+		*	to server  	-->
+	<mx:HTTPService id="setinvite" fault="setinviteFault();" useProxy="false" method="POST">
+		</mx:HTTPService>
+
+
+	<!--*  	this one returns the a list of interests the user has typed in.
+		*	we use the returned values only in register form 
+		*  	the user can select one from the list or enter his own interests when 
+		*	filling the registration form -->
+	<mx:HTTPService id="loadinterests" fault="loadinterestsFault();" useProxy="false" method="POST">
+	   </mx:HTTPService>
+	<mx:HTTPService id="loadCompetences" fault="loadCompetencesFault();" useProxy="false" method="POST" resultFormat="e4x">
+	   </mx:HTTPService>
+	  
+	<!--*  	this one returns the a list of people 
+		*	we use the returned values only in register form 
+		*  	the user can select the user who has invited him into the channel 
+	-->
+	<mx:HTTPService id="loadpeople" fault="loadpeopleFault();" useProxy="false" method="POST" resultFormat="e4x">
+	   </mx:HTTPService>
+	   
+	
+	<!--*  	all the admin services are carried out by this one.
+		*	deleting a video, removing a user, deleting a comment, deleting a tag from the database
+		*  	-->
+	<mx:HTTPService id="adminreq" fault="adminreqFault();" useProxy="false" method="POST" resultFormat="object">
+	   </mx:HTTPService>
+	   
+	   <mx:HTTPService id="edit_comments" result="refreshcomments();" fault="addCommentFault();" useProxy="false" method="POST"
+          showBusyCursor="true" >
+          </mx:HTTPService>
+
+	<mx:HTTPService id="edit_scraps" result="refreshscraps();" fault="addScrapFault();" useProxy="false" method="POST"
+          showBusyCursor="true" >
+          </mx:HTTPService>
+          
+          
+          
+	 
+	<mx:HTTPService id="getnoofusersHTTP" fault="adminreqFault();" useProxy="false" result="update_noofusers();"
+		method="POST" showBusyCursor="false" url="{ServerPath + 'GraphData/groupmanager.php'}">
+		<mx:request xmlns="">
+			<action>{'noofchatusers'}</action>
+		</mx:request>
+	</mx:HTTPService>
+	
+	  
+	    
+	 <!--* all the group creation actuvities are carried by this
+	 	 * -->
+	 	<!-- Labronova integraton
+	 --> 
+	<mx:HTTPService id="evalinfoService" fault="labEvalFault(event);" showBusyCursor="true">
+	</mx:HTTPService> 	 
+	 	 	
+	<mx:HTTPService id="ideainfoService" fault="labIdeaFault(event);" showBusyCursor="true">
+	</mx:HTTPService> 
+	
+	<mx:HTTPService id="userinfoService" fault="labUserFault(event);" showBusyCursor="true">
+	</mx:HTTPService> 
+	
+	
+	 	 <mx:Canvas id="playCanvas" x="200" y="150" width="210" height="380" visible="false"  styleName="videoProgressCanvas" backgroundColor="#000000" backgroundAlpha="0.9" creationComplete="addDragFn();" mouseUp="playCanvas.stopDrag();" >
+					
+				<mx:VBox horizontalAlign="center" verticalAlign="middle">
+					<mx:Label id="lblonlineuser" text="{selPlayerM}" color="#FFFFFF" fontSize="12" fontWeight="bold"/>
+					<mx:List selectable="true"  color="#000000" id="onlineUsersListgame"  width="148" height="269" visible="true"  borderStyle="none" verticalScrollPolicy="on">
+						<mx:itemRenderer>
+							<mx:Component>
+								<mx:Label width="100%" text="{data.name}"/>
+							</mx:Component>
+						</mx:itemRenderer>
+					</mx:List>
+					<mx:Label  id="lblgame" text="" color="#FFFFFF"/>
+					<mx:HBox horizontalAlign="center" verticalAlign="middle">
+						<mx:Button id="inviteSend" visible="true"  label="{inviteM}" width="100" click="{Invite_Startgame();}" />
+						<mx:Button id="cancelinvite" visible="true"  label="{cancelM}" width="100" click="playCanvas.visible=false;" />
+					</mx:HBox>
+				</mx:VBox>
+					
+		  </mx:Canvas>
+	 	 
+	 	 
+	 	 
+		
+		<mx:ApplicationControlBar right="10" left="10" top="5" height="43" id="applicationcontrolbar1"  verticalAlign="middle" styleName="{(styling == 'tentube')? 'ApplicationControlBar1':'ApplicationControlBar2'}">
+				<!--<mx:Image visible="{useInsead}" id="imginsead" source="{inseadlogo}" height="{applicationcontrolbar1.height - 5}" width="{useInsead? 80:0}" click="{navigateToURL(new URLRequest(inseadUrl), '_blank')}" useHandCursor="true"/>-->
+				<mx:Image visible="{useFirst}" id="imgFirst" source="{firstLogo}" click="{clickLogo()}" verticalAlign="top"  useHandCursor="true"/>
+			<!--	<mx:Image visible="{useSecond}" id="imgfiat" source="{secondLogo}" verticalAlign="top" click="{navigateToURL(new URLRequest(secondUrl), '_blank')}" useHandCursor="true"/>
+				<mx:Image visible="{useThird}" id="imglaboranova" source="{thirdLogo}" verticalAlign="top" click="{navigateToURL(new URLRequest(thirdUrl), '_blank')}" useHandCursor="true"/>
+				
+				<mx:Image visible="{use4}" id="L4" source="media/l4.jpg" verticalAlign="top"  useHandCursor="true"/>
+				<mx:Image visible="{use5}" id="L5" source="media/l5.jpg" verticalAlign="top"  useHandCursor="true"/>
+				<mx:Image visible="{use6}" id="L6" source="media/l6.jpg" verticalAlign="top"  useHandCursor="true"/>	
+				-->
+				
+				<mx:Label text="{tubeLabel}" height="100%" fontAntiAliasType="advanced" id="tenlabel" condenseWhite="false" styleName="maintitle"/>
+				<mx:Spacer width="100%"/>
+				<mx:Label text="{display_user_name}" toolTip="{Univ_LoginId1}" color="#FFFFFF" textAlign="right" fontWeight="bold" id="txtLoginId" fontSize="11"/>
+				<mx:LinkButton click="{clickLogo();}" toolTip="Home" label="Home"  color="#BBBBBB"  textAlign="center" fontWeight="bold" fontSize="11" id="lblHome"/>
+				<mx:LinkButton icon="@Embed(source='media/refresh.png')" click="{refreshAllData()}" toolTip="{refreshTM}" label="{refreshM}"  color="#BBBBBB"  textAlign="center" fontWeight="bold" fontSize="11" id="lblrefresh"/>
+				<mx:LinkButton icon="@Embed(source='media/logoff.png')" click="{Session_Logoff()}" toolTip="{logoutTM}" label="{logoutM}"  color="#BBBBBB"  textAlign="center" fontWeight="bold" fontSize="11" id="lblLogout"/>
+				<mx:VRule  visible="false" id="vrule1" height="14"/>
+		</mx:ApplicationControlBar>
+		
+	   	<mx:ApplicationControlBar right="10" left="10" top="48" width="100%" height="35" id="applicationcontrolbar2" backgroundColor="blue" styleName="ApplicationControlBar2">	
+	   		   	<mx:LinkButton id="welBtn" visible="false" label="{welcomeMessage}" color="white" click="{welcAgent.open(event)}"/>
+	   		   	<mx:LinkButton id="recBtn" visible="false" label="{recoMessage}" color="white" click="{showRecoAgent()}"/>
+	   		   	
+	   		   	<mx:LinkButton label="{tagCrowdMessage}" id="tagCrowdBtn" color="white"  click="{openTagCrowd();}"/>
+	   		   	<mx:LinkButton label="{newsMessage}" id="Newsbtn" color="white"  click="{opennews.newsopen(event)}"/>	   		   	
+	   		   	<mx:Spacer width="100%" height="0"/>
+	   		   	<mx:ToggleButtonBar horizontalGap="3" itemClick="{homebtnhandler(event.label)}" height="24" id="togglebuttonbar1" enabled="false" dataProvider="{ctrls}">
+	   		   	</mx:ToggleButtonBar>
+	   		   	<mx:ComboBox id="moreBox" enabled="{togglebuttonbar1.enabled}" width="100"  dropdownWidth="200" rowCount="6" dataProvider="{ctrlsMore}" change="{(moreBox.selectedIndex != 0)?homebtnhandler(moreBox.selectedLabel):0}" />
+	   			<!--<mx:Button id="helpBtn" label="Help" click="{helpclicked()}"/>-->
+	   		   	<!--mx:ButtonBar itemClick="{homebtnhandler(event)}" id="togglebuttonbar1" enabled="false" dataProvider="{ctrls}" bottom="0"/-->
+	   		   	
+	   		   	<mx:ComboBox id="RIBox" visible="{RIEnabled}" enabled="{togglebuttonbar1.enabled}" width="130"  dropdownWidth="200" rowCount="3" dataProvider="{RIMore}" change="{(RIBox.selectedIndex != 0)?homebtnhandler(RIBox.selectedLabel):0}" />
+	   		   	
+	   		  <!-- 	<mx:Button  label="{tradeM}" visible="{tradeEnabled}" click="{tradeclicked();}"/>-->
+
+	   		   <mx:Spacer width="100%" height="0"/>
+		</mx:ApplicationControlBar>
+		<mx:Array id="ctrls">
+			<mx:Object label="{Channel_ItemLabel}" icon="@Embed(source='media/film_go.png')"/>
+			<mx:Object label="{Network_ItemLabel}" icon="@Embed(source='media/visualization.png')"/>
+			<mx:Object label="{Profiles_ItemLabel}" icon="@Embed(source='media/profiles.png')"/>
+			<mx:Object label="{Conferencing_ItemLabel}"/>
+		</mx:Array>
+		<mx:Array id="ctrlsMore">
+			<mx:Object label="{moreBtnLabel}" />
+	<!--		<mx:Object label="{Tengame_ItemLabel}" />  
+	-->
+			<mx:Object label="{RecoAgent_ItemLabel}" />
+			<mx:Object label="{Groups_ItemLabel}" />
+<!--			<mx:Object  label="{v1072}"  />
+
+--> 
+			<mx:Object label="{Admin_ItemLabel}" icon="@Embed(source='media/configure.png')"/>
+			<mx:Object label="{Help_ItemLabel}" />			
+		</mx:Array>
+		
+		<mx:Array id="RIMore">
+			<mx:Object label="{v1064}" />
+			<mx:Object label="{v1062}" />
+			<mx:Object label="{v1063}" />
+						
+		</mx:Array>
+		
+	<!-- 	we use the cubic ease in, easout functions for smooth transition between new_ui 
+		*  	and  fullscreen -->
+		<mx:transitions>
+	       <mx:Transition fromState="new_ui" toState="*">
+		       <mx:Parallel>
+		       	<mx:Resize target="{panel1}" easingFunction="Cubic.easeOut" duration="3000" hideChildrenTargets="{[panel1 ,vPlayer]}" />
+		       	<mx:Resize target="{vPlayer}" easingFunction="Cubic.easeIn" duration="3000" />
+		       </mx:Parallel>    
+		             
+	       </mx:Transition>
+	       <mx:Transition fromState="full_screen" toState="*">
+		       <mx:Parallel>
+		       	<mx:Resize target="{panel1}" easingFunction="Cubic.easeIn" duration="3000" hideChildrenTargets="{[panel1 , vPlayer]}" />
+		       	<mx:Resize target="{vPlayer}" easingFunction="Cubic.easeIn" duration="3000" />
+		       </mx:Parallel>          
+	       </mx:Transition>
+	
+	       <mx:Transition fromState="horizontal_vscreen" toState="*">
+		       <mx:Parallel>
+		       	<mx:Resize target="{panel1}"  easingFunction="Cubic.easeOut" duration="3000" hideChildrenTargets="{[panel1 ,vPlayer]}" />
+		       	<mx:Resize target="{vPlayer}"  easingFunction="Cubic.easeIn" duration="3000" />
+		       </mx:Parallel>    
+		             
+	       </mx:Transition>
+    
+	    </mx:transitions>
+	    
+	    
+	<mx:states>
+		
+		<mx:State name="horizontal_vscreen" enterState="initHorizScreen();" basedOn="new_ui">
+			<mx:SetStyle target="{vPlayCanvas}" name="left" value="10"/>
+			<mx:SetProperty target="{playerStack}" name="x" value="0"/>
+			<mx:SetProperty target="{playerStack}" name="y" value="0"/>
+			<mx:SetStyle target="{button111}" name="icon" value="@Embed('media/arrow_in_hor.png')"/>
+			<mx:SetEventHandler target="{button111}" name="click" handler="currentState = 'new_ui';"/>
+			<mx:SetProperty target="{tabnavigator1}" name="x" value="0"/>
+			<mx:SetProperty target="{tabnavigator1}" name="y" value="20"/>
+			<mx:SetProperty target="{panel1}" name="layout" value="absolute"/>
+			<mx:SetStyle target="{panel1}" name="right"/>
+			<mx:SetStyle target="{panel1}" name="left"/>
+			<mx:SetStyle target="{panel1}" name="top"/>
+			<mx:SetStyle target="{panel1}" name="bottom"/>
+			<mx:SetProperty target="{panel1}" name="width" value="0"/>
+			<mx:SetProperty target="{playerStack}" name="width" value="100%"/>
+			<mx:SetProperty target="{playerStack}" name="height" value="100%"/>
+			<mx:SetProperty target="{vPlayCanvas}" name="height" value="100%"/>
+			</mx:State>
+	
+		
+	
+		<mx:State name="gamemoduledemo" enterState="addChildren();" exitState="{removeChildren();GameVideo_Play('pause');}">
+		
+			<mx:AddChild position="lastChild">
+				<mx:Text  selectable="false" x="815" y="104" text="Score" width="67" color="#FFFFFF" fontWeight="bold" fontSize="20" fontFamily="eddi"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Text selectable="false"  x="815" y="179" text="{timeLeftM} " width="108" color="#FFFFFF" fontWeight="bold" fontSize="20" fontFamily="eddi"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Text selectable="false"  x="815" y="141" text="030" width="152" color="#E86363" fontWeight="bold" fontSize="20" fontFamily="eddi" id="txtScore"/>
+			</mx:AddChild>
+			
+			<mx:AddChild position="lastChild">	
+				<component:CountDownClock height="24" color="#E86363" 	width="152"		
+				 fontSize="20" fontWeight="bold" fontFamily="eddi" id="countDownClock"
+				 paddingBottom="0" text="2:30" x="815" y="217"/>	
+			</mx:AddChild>	
+			<mx:AddChild position="lastChild">
+				<mx:Panel x="91" y="409" width="534" height="87" layout="absolute">
+					<mx:TextInput enabled="false" x="243" y="25" color="#000000" width="239" id="userGuess" backgroundColor="#EFFAD8"/>
+					<mx:Text selectable="false"  x="10" y="21" text="{typeNextGuessMessage}" width="225" color="#FFFFFF" fontWeight="bold" fontSize="16" fontFamily="luna"/>
+					<mx:Text toolTip="{GoNextVideoMessage}" id="txtPassMsg" selectable="false"  visible="false" x="121" y="-4" text="{partnerWantPassMessage}" width="244" color="#C6B600" fontWeight="bold" fontSize="13" fontFamily="Times New Roman"/>
+				
+				</mx:Panel>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:TextArea enabled="false" selectable="false" editable="false" id="guessesList" x="633" y="104" height="284" width="174" textAlign="center" fontWeight="bold" text="{yourGuessM}" color="#4790DB" fontSize="18" backgroundColor="#FFFFFF" fontFamily="Georgia" styleName="eddi"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+			<mx:Panel layout="absolute" title="{videoM}" id="gamePlayerPanel" x="91" y="85" width="534" height="327" fontWeight="bold">
+				<mx:ViewStack id="gplayerStack" selectedIndex="0" width="322" height="270">
+							
+							<mx:Box name="FMSG" width="322" height="270" horizontalAlign="center">
+								<fs:FSVideoDisplay width="322" height="270" id="gameVidPlayer" maintainAspectRatio="true" x="10" y="0" cornerRadius="10"/>
+							</mx:Box>
+							
+							<mx:Box name="SWFG" width="100%" height="100%" horizontalAlign="center">
+								<mx:SWFLoader autoLoad="true" width="100%" height="100%" maintainAspectRatio="true" />
+							</mx:Box>
+							
+							<mx:Box name="YTBG" width="100%" height="100%" horizontalAlign="center">
+								<ytplayer:YTPlayer id="ytpGame" height="100%" width="100%" monitorPlayback="true" maintainAspectRatio="false"/>
+							</mx:Box>
+						
+						</mx:ViewStack>
+						
+				<mx:TextArea selectable="false" editable="false" height="270" width="173" 
+					textAlign="center" fontWeight="bold" text="{demo_taboowords_for_display}" color="#9F693E" fontSize="18" x="340" y="0" backgroundColor="#FFFFFF" fontFamily="Georgia" styleName="eddi"/>
+				<mx:Button id="gameplayer_playbtn" click="GameVideo_Play('play');" textAlign="center" icon="@Embed('/media/control_play_blue.png')" width="27" x="0" y="275" height="19"/>
+				<mx:Button visible="false" id="gameplayer_pausebtn" click="{GameVideo_Play('pause')}" textAlign="center" icon="@Embed('/media/control_pause_blue.png')" x="0" y="275" width="27" height="19"/>	
+				<mx:Button visible="true" click="gameVolButton.visible=false;gameVolSlider.visible=true;" toolTip="{toolTip_volumeSlider}" x="35" y="271" id="gameVolButton" width="37" icon="@Embed(source='media/aWebserver.png')" height="23"/>
+				<mx:VSlider mouseUp="gameVolButton.visible=true;gameVolSlider.visible=false" toolTip="{moveSliderM}" visible="false"  change="{updateGameVolume(gameVolSlider.value)}"  x="46" y="204" height="80" id="gameVolSlider" liveDragging="true" snapInterval="0.01" value="0.75" maximum="1.0"/>
+			</mx:Panel>
+				
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Button toolTip="{toolTip_startVideo}" click="Gamepass()" x="633" y="409" label="{startM}" id="btnPass" themeColor="#FFFFFF" borderColor="#FFFFFF" color="#91D2FF" cornerRadius="15" height="39" fillColors="#91D2FF" fontSize="16" fontWeight="bold" fontFamily="Verdana" width="103"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:Button  toolTip="{reportM}" enabled="false" x="633" y="456" visible="false" label="{flagM}" id="btnFlag" color="#F76D6D" height="39" fontSize="16" fontWeight="bold" fontFamily="Verdana" width="103"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:ProgressBar id="bar" labelPlacement="bottom"  trackHeight="15"
+				  	minimum="0" visible="true" maximum="100" label="{matchesM}"  themeColor="#258DEE" 
+				    direction="right" mode="manual" width="534" y="504" x="91" height="38" textAlign="center" color="#FFFFFF" borderColor="#3999F2" fontFamily="Arial" fontWeight="bold" indeterminate="false"/>
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+						<mx:Label x="633" y="456" text="{startDemoVideoMessage}" width="324" color="#F7052D" fontSize="12"/>
+			</mx:AddChild>
+		</mx:State>
+		
+	<!--	normal state  	-->
+
+		<mx:State name="new_ui" enterState="addChildren();setheight(); " exitState="removeChildren()">
+		
+				
+			<mx:AddChild position="lastChild">
+					
+				<mx:HDividedBox top="85" left="10" right="10" height="455" horizontalGap="20"
+						liveDragging="false" horizontalAlign="center" id="upperBox">
+					
+					<mx:Canvas width="100%" height="100%" minWidth="500" id="vPlayCanvas">
+													
+							<!--
+							height="{panel2.height}" width="{panel2.width}"
+							height="1" width="100%"
+							-->
+						<mx:Panel title="{videoPlayerM}" fontWeight="bold" styleName="title" horizontalAlign="center" id="panel2"
+								width="100%" height="100%" minWidth="500" visible="true">
+								
+							
+							<mx:ViewStack id="playerStack" selectedIndex="0" width="100%" height="100%">
+								
+								<mx:Box name="FMS" width="100%" height="100%" horizontalAlign="center">
+									<fs:FSVideoDisplay autoPlay="true" autoRewind="true" width="100%" height="100%" id="vPlayer" horizontalCenter="0" volume="0"
+											verticalCenter="0" bufferTime="5.0" maintainAspectRatio="true" visible="true" playheadUpdate="VideoOver(event)"/>
+								</mx:Box>
+								
+								<mx:Box name="SWF" width="100%" height="100%" horizontalAlign="center">
+									<mx:SWFLoader autoLoad="true" width="100%" height="100%" id="sPlayer" maintainAspectRatio="true" />
+								</mx:Box>
+								
+								<mx:Box name="YTB" width="100%" height="100%" horizontalAlign="center">
+									<ytplayer:YTPlayer id="ytp" height="100%" width="100%" monitorPlayback="true" maintainAspectRatio="false"/>
+								</mx:Box>
+							
+							</mx:ViewStack>
+							
+							
+							<mx:ControlBar>
+								<mx:Button id="vPlay_btn" click="{showPlayBtn?prePlay():pausevideo()}; bigplaybutton.visible=false; " textAlign="center" icon="{showPlayBtn?playLogo:pauseLogo}" width="30" height="20"/>
+								<!--mx:Button visible="{!vPlay_btn.visible}" id="vPause_btn" click="{pausevideo()}" textAlign="center" icon="@Embed('/media/control_pause_blue.png')" width="{vPlay_btn.visible? 0:30}" height="20"/-->
+								<mx:Button click="stopVideo()" icon="@Embed('media/control_stop_blue.png')" width="30" left="40" bottom="2" height="20"/>
+								<mx:Button id="btnVolslider" click="slid_volume.visible=!slid_volume.visible" toolTip="{toolTip_volumeSlider}"
+									icon="@Embed(source='media/aWebserver.png')" width="20" height="20"/>
+								<mx:ViewStack width="100%" height="100%" selectedIndex="{playerStack.selectedIndex}">
+									<mx:HBox width="100%" height="100%">
+										<mx:Text selectable="false" visible="true" styleName="playheadTimeLabel" text="{formatPositionToolTip(vPlayer.playheadTime)}-{formatPositionToolTip(vPlayer.totalTime)}"
+											height="15" id="playheadtext" verticalCenter="0" left="70" width="91"/>
+										<mx:HSlider id="vSlider" height="5" dataTipFormatFunction="timeConversion" showDataTip="true" width="100%" verticalCenter="0"
+											slideDuration="0" thumbPress="slider_thumbPressFMS()"
+                thumbRelease="slider_thumbReleaseFMS()"  change="vPlayer.playheadTime = vSlider.value" value="{vPlayer.playheadTime}" minimum="0" maximum="{vPlayer.totalTime}"/>
+									</mx:HBox>
+									<mx:Canvas width="100%" height="100%" backgroundColor="BLACK"/>
+									<mx:HBox width="100%" height="100%">
+										<mx:Text selectable="false" visible="true" color="{colorreturn()}" styleName="playheadTimeLabel" text="{formatedYouTubeTime(ytp.currentTime) + '-' + formatedYouTubeTime(ytp.duration)}"
+											height="15" verticalCenter="0" left="70" width="91" valueCommit="VideoOver(event)"/>
+										<mx:HSlider id="ytSlider" height="5" dataTipFormatFunction="timeConversion" showDataTip="true" width="100%" verticalCenter="0"
+											slideDuration="0" thumbPress="slider_thumbPress()"
+                thumbRelease="slider_thumbRelease()" change="ytp.seekTo(ytSlider.value/1000,true)" value="{ytp.currentTime}" minimum="0" maximum="{ytp.duration}"/>
+									</mx:HBox>
+								</mx:ViewStack>
+							<mx:Button icon="@Embed('media/arrow_out.png')" width="30" color="{colorreturn()}" borderColor="blue" id="button1" right="2" bottom="2" height="20"
+									 click="this.stage.displayState=StageDisplayState.FULL_SCREEN;currentState='full_screen';"/>
+								 
+								
+							<!--	<mx:Button icon="@Embed('media/arrow_out.png')" width="30" color="{colorreturn()}" borderColor="blue" id="button1" right="2" bottom="2" height="20"
+									 click="ytp.fullscreen();currentState='full_screen';"/>
+							-->		 
+									<mx:Button icon="@Embed('media/arrow_out_hor.png')" width="30" borderColor="blue" id="button111" right="4" bottom="2" height="20"
+									 click="currentState='horizontal_vscreen';"/>
+									 	 
+							</mx:ControlBar>
+						</mx:Panel>
+						
+						<mx:Button top="170" left="230" id="bigplaybutton"  icon="@Embed('media/images.jpg')"  visible="false" click="prePlay();bigplaybutton.visible=false;panel2.visible=true;" />
+
+						<mx:VSlider mouseUp="btnVolslider.visible=true;slid_volume.visible=false" toolTip="{moveSliderM}" visible="false" change="{updateVolume(slid_volume.value)}"
+				click="slid_volume.visible=true" liveDragging="true" id="slid_volume" snapInterval="0.01" value="0.75" maximum="1.0" height="100" width="24.3" left="80" bottom="30"/>
+						
+						<mx:TitleWindow x="50" y="40" width="80%" height="80%" layout="absolute" title="{relatedMaterialM}" id="newui_uploadDocsPanel" mouseUp="newui_uploadDocsPanel.stopDrag()" visible="false" showCloseButton="true" close="newui_uploadDocsPanel.visible=false;">
+							<mx:Canvas fontWeight="bold">
+								<mx:Label x="0" y="3" color="red" text="{relatedLinkM} "/>
+								<mx:List height="100" width="250" id="newui_externalLinks" textAlign="left" dataProvider="{linksListData}" y="9" x="100" color="black"/>
+								<mx:Button label="{addLinkM}" click="{relatedLinksWindow.visible=true;}" x="100" y="115" width="100"/>
+								<mx:Button label="{deleteLinkM}" click="removeLinkCallBack();" x="250" y="115" width="120"/>
+								<!--<mx:TextArea height="95" width="277" id="newui_externalLinks" textAlign="left"  y="4-0" x="102" editable="false"/>-->
+						   <!--       <mx:TitleWindow title="Add a Document" id="relatedDocsWindow" showCloseButton="true" close="relatedDocsWindow.visible=false;" x="0" y="0" width="388" height="133" layout="absolute" visible="true">
+									<mx:Label x="0" y="0" text="Title -" width="46"/>
+									<mx:TextInput x="75" y="-1" width="262"/>
+									<mx:Label x="0" y="44" text="Document -" width="95"/>
+								  </mx:TitleWindow>-->
+							</mx:Canvas>
+							<mx:Canvas label="{attachDocM}" x="0" y="143" visible="true">
+								<mx:Label x="0" y="3" color="red" text="{relatedDocM}"/>
+								<mx:Label text="{alreadyAttachDocM}" width="261" y="3" x="110"/>
+								<mx:Button label="{addDocM}" width="120" click="{newui_onBrowseUploadDocuments()}" x="100" y="115"/>
+								<mx:Button label="{removeDocM}" width="120" click="removeDocsCallBack();" x="250" y="115"/>
+					<!--            <mx:Text width="256" id="newui_progressText" height="137" color="#FDFAFA" textAlign="left" y="53" x="122"/>-->
+								<mx:List width="250" id="newui_progressText" height="80" dataProvider="{docsListData}" color="black" textAlign="left" y="29" x="100"/>
+								<mx:TitleWindow title="{addLinkM}" id="relatedLinksWindow" mouseUp="relatedLinksWindow.stopDrag()" showCloseButton="true" close="relatedLinksWindow.visible=false;" x="0" y="0"  width="300" height="139"  visible="false">
+									<mx:Form width="100%">
+										<mx:FormItem label="{titleLinkM}" width="100%">
+											<mx:TextInput id="titleInput" width="100%"/>
+										</mx:FormItem>
+										<mx:FormItem label="{linkM}" width="100%">
+											<mx:TextInput id="linkInput" width="100%"/>
+										</mx:FormItem>
+										<mx:FormItem width="100%">
+											<mx:Button label="{addLinkM1}" click="addLinkCallBack();"/>
+										</mx:FormItem>
+									</mx:Form>
+								</mx:TitleWindow>
+							</mx:Canvas>
+							<mx:ControlBar>
+								<mx:Button x="181" y="350" label="{saveM}" click="newui_uploadLinks()"/>
+							</mx:ControlBar>
+						</mx:TitleWindow>
+					</mx:Canvas>
+				
+					<mx:Panel title="{videoTypes_PanelLabel}" fontWeight="bold" id="panel1" width="100%" height="100%" layout="absolute">
+											
+					<mx:LinkButton icon="@Embed(source='media/add.png')" label="{submitVideoM}"  click="{showVideoScreen()}" toolTip="{submitVideoTipM}"   color="{colorreturn()}" rollOverColor="0xEEFEE6"
+    selectionColor="#ffffff"  textRollOverColor="#fff000"  textSelectedColor="#fff000" x="397" y="0" top="0" right="0"
+     toggle="false"  fontWeight="bold"  id="btnUploadSubmit" visible="true"/>
+     			
+				<!--	<mx:Button  id="btnUpload" click="{showVideoScreen()}" width="{btnUpload.height}" top="0" right="0" toolTip="Submit Your Video" x="397" y="0" icon="@Embed(source='media/add.png')"/>-->
+				
+					
+						<mx:TabNavigator  width="100%" height="100%" fillColors="[#000000, #000000]" borderColor="#000000"
+								color="#000000" id="tabnavigator1" x="0" y="20" creationComplete="initTabs()"  resizeToContent="true">
+						
+							<mx:Canvas toolTip="{toolTip_videoCategory_CDLabel}" label="{videoCategory_CDLabel}" width="100%" height="100%"
+									color="#ffffff" tabIndex="0" id="canvas2">
+								<mx:DataGrid variableRowHeight="true" id="generalVideos" dataProvider="{cd_general_Xml}" 
+										showHeaders="false" height="100%" width="100%" change="changeCurVideo(videoCategory_CDLabel);">
+									<mx:columns>
+										<mx:DataGridColumn itemRenderer="component.videoInfo" dataField="name"/>
+										<mx:DataGridColumn itemRenderer="component.thumbRenderer" dataField="picture" />
+										<mx:DataGridColumn itemRenderer="component.userResponse" dataField="grandrating" />
+									</mx:columns>
+								</mx:DataGrid>
+							</mx:Canvas>
+						
+							<mx:Canvas toolTip="{toolTip_videoCategory_CDOppLabel}" label="{videoCategory_CDOppLabel}" width="100%" height="100%" backgroundColor="#000000" borderColor="#000000" borderStyle="none" color="#ffffff" tabIndex="2">
+								<mx:DataGrid variableRowHeight="true" id="oppurtunityVideos" dataProvider="{cd_oppurtunity_Xml}"
+										showHeaders="false" height="100%" width="100%" color="#000000" change="changeCurVideo(videoCategory_CDOppLabel);">
+									<mx:columns>
+										<mx:DataGridColumn itemRenderer="component.videoInfo" dataField="name"/>
+										<mx:DataGridColumn itemRenderer="component.thumbRenderer" dataField="picture" />
+										<mx:DataGridColumn itemRenderer="component.userResponse" dataField="grandrating" />
+									</mx:columns>
+								</mx:DataGrid>
+							</mx:Canvas>
+						
+							<mx:Canvas toolTip="{toolTip_videoCategory_CDExpertsLabel}" label="{videoCategory_CDExpertsLabel}" width="100%" height="100%" backgroundColor="#000000"
+									borderColor="#000000" borderStyle="none" color="#ffffff">
+								<mx:DataGrid showHeaders="false" variableRowHeight="true" dataProvider="{cd_experts_Xml}"
+										id="expertsVideos" height="100%" width="100%" color="#000000" change="changeCurVideo(videoCategory_CDExpertsLabel);">
+									<mx:columns>
+										<mx:DataGridColumn itemRenderer="component.videoInfo" dataField="name"/>
+										<mx:DataGridColumn itemRenderer="component.thumbRenderer" dataField="picture" />
+										<mx:DataGridColumn itemRenderer="component.userResponse"  dataField="grandrating" />
+									</mx:columns>
+								</mx:DataGrid>
+							</mx:Canvas>
+							
+							<mx:Canvas id="fourth_VC_Canvas"  toolTip="{toolTip_fourth_videoCategory}" label="{label_fourth_videoCategory}" width="100%" height="100%" backgroundColor="#000000"
+									borderColor="#000000" borderStyle="none" color="#ffffff">
+								<mx:DataGrid showHeaders="false" variableRowHeight="true" dataProvider="{fourth_videoCategory_Xml}"
+										id="fourth_videoCategory_id" height="100%" width="100%" color="#000000" change="changeCurVideo(label_fourth_videoCategory);">
+									<mx:columns>
+										<mx:DataGridColumn itemRenderer="component.videoInfo" dataField="name"/>
+										<mx:DataGridColumn itemRenderer="component.thumbRenderer" dataField="picture" />
+										<mx:DataGridColumn itemRenderer="component.userResponse"  dataField="grandrating" />
+									</mx:columns>
+								</mx:DataGrid>
+							</mx:Canvas>
+							
+								<mx:Canvas id="fifth_VC_Canvas"  toolTip="{toolTip_fifth_videoCategory}" label="{label_fifth_videoCategory}" width="100%" height="100%" backgroundColor="#000000"
+									borderColor="#000000" borderStyle="none" color="#ffffff">
+								<mx:DataGrid showHeaders="false" variableRowHeight="true" dataProvider="{fifth_videoCategory_Xml}"
+										id="fifth_videoCategory_id" height="100%" width="100%" color="#000000" change="changeCurVideo(label_fifth_videoCategory);">
+									<mx:columns>
+										<mx:DataGridColumn itemRenderer="component.videoInfo" dataField="name"/>
+										<mx:DataGridColumn itemRenderer="component.thumbRenderer" dataField="picture" />
+										<mx:DataGridColumn itemRenderer="component.userResponse"  dataField="grandrating" />
+									</mx:columns>
+								</mx:DataGrid>
+							</mx:Canvas>
+							
+							<mx:Canvas id="sixth_VC_Canvas"  toolTip="{toolTip_fifth_videoCategory}" label="{label_sixth_videoCategory}" width="100%" height="100%" backgroundColor="#000000"
+									borderColor="#000000" borderStyle="none" color="#ffffff">
+								<mx:DataGrid showHeaders="false" variableRowHeight="true" dataProvider="{sixth_videoCategory_Xml}"
+										id="sixth_videoCategory_id" height="100%" width="100%" color="#000000" change="changeCurVideo(label_sixth_videoCategory);">
+									<mx:columns>
+										<mx:DataGridColumn itemRenderer="component.videoInfo" dataField="name"/>
+										<mx:DataGridColumn itemRenderer="component.thumbRenderer" dataField="picture" />
+										<mx:DataGridColumn itemRenderer="component.userResponse"  dataField="grandrating" />
+									</mx:columns>
+								</mx:DataGrid>
+							</mx:Canvas>
+							
+							
+					
+						</mx:TabNavigator>
+					</mx:Panel>
+				</mx:HDividedBox>
+			</mx:AddChild>
+		
+					
+			<mx:AddChild position="lastChild">
+				<mx:Text selectable="false" x="10" y="916" click="openUrl()" text="Calt.Insead" width="107" color="#C8C8C8" fontFamily="Georgia" fontSize="16" fontWeight="bold"/>
+			</mx:AddChild>
+			<mx:SetProperty name="verticalLineScrollSize" value="20"/>
+			<mx:AddChild position="lastChild">
+				
+				<mx:HDividedBox left="10" right="10" y="548" minWidth="500" height="360" horizontalGap="20" id="lowerBox">
+					<mx:TabNavigator id="vCRTab" height="100%" width="100%">
+						<mx:Canvas label="{comRespM}" width="100%" height="100%">
+							<mx:Panel id="commentspanel" width="100%" height="100%" layout="absolute"
+									title="" horizontalScrollPolicy="off" verticalScrollPolicy="auto" headerHeight="15">
+								<ns2:form_videocomments top="0" bottom="0" right="0" left="0" id="comments_window"></ns2:form_videocomments>
+							</mx:Panel>
+						</mx:Canvas>
+						<mx:VBox  label="{relatedMatM}" width="100%" height="100%" id="linksVBox"></mx:VBox>
+					</mx:TabNavigator>
+					
+					<mx:TabNavigator height="100%" width="100%" selectedIndex="2">
+						<mx:Canvas icon="@Embed(source='media/magnifier.png')" label="{searchM}" height="100%" width="100%" toolTip="{findVideoTM}" verticalScrollPolicy="off">
+							<ns2:form_searchvideo top="5" bottom="5" right="5" left="5"></ns2:form_searchvideo>
+						</mx:Canvas>
+						<mx:Canvas label="{simAgentM}" width="100%" height="100%">
+							<ns2:AgentSimilarity top="5" bottom="5" right="5" left="5"></ns2:AgentSimilarity>
+						</mx:Canvas>
+						<mx:Canvas label="{higRatM}" width="100%" height="100%">
+							<ns2:RatingBased top="5" bottom="5" right="5" left="5"></ns2:RatingBased>
+						</mx:Canvas>
+						
+						<mx:Canvas label="{mostViewM}" width="100%" height="100%">
+							<ns2:MostViewed top="5" bottom="5" right="5" left="5"></ns2:MostViewed>
+						</mx:Canvas>
+						
+						<mx:Canvas label="{byNameM}" width="100%" height="100%">
+							<ns2:VideoByName top="5" bottom="5" right="5" left="5"></ns2:VideoByName>
+						</mx:Canvas>
+						
+						
+						
+					</mx:TabNavigator>
+				</mx:HDividedBox>
+			</mx:AddChild>
+					</mx:State>
+		
+		<!--	full screen state	 -->
+		<mx:State name="full_screen" basedOn="new_ui"  enterState="addChildren();" exitState="removeChildren()">
+			<!--mx:SetStyle target="{panel2}" name="left" value="10"/>
+			<mx:SetStyle target="{button1}" name="icon" value="@Embed('media/arrow_in.png')"/>
+			<mx:SetEventHandler target="{button1}" name="click" handler="currentState = 'new_ui';"/>
+			<mx:SetProperty target="{tabnavigator1}" name="x" value="0"/>
+			<mx:SetProperty target="{tabnavigator1}" name="y" value="0"/>
+			<mx:SetProperty target="{panel1}" name="layout" value="absolute"/>
+			<mx:SetStyle target="{panel1}" name="right"/>
+			<mx:SetStyle target="{panel1}" name="left"/>
+			<mx:SetStyle target="{panel1}" name="top"/>
+			<mx:SetStyle target="{panel1}" name="bottom"/>
+			<mx:SetProperty target="{panel1}" name="width" value="0"/>
+			<mx:SetProperty target="{vPlayer}" name="width" value="100%"/>
+			<mx:SetProperty target="{vPlayer}" name="height" value="100%"/-->
+			<!--mx:SetProperty target="{canvas1}" name="height" value="100%"/-->
+			<mx:RemoveChild target="{panel1}"/>
+			<mx:SetProperty target="{panel1}" name="width" value="100%"/>
+			<mx:SetProperty target="{application}" name="verticalScrollPolicy" value="false"/>
+			<mx:RemoveChild target="{lowerBox}"/>
+			<mx:RemoveChild target="{applicationcontrolbar1}"/>
+			<mx:RemoveChild target="{applicationcontrolbar2}"/>
+			<mx:SetProperty target="{upperBox}" name="height" value="100%"/>
+			<mx:SetStyle target="{upperBox}" name="top" value="0"/>
+			<mx:SetStyle target="{upperBox}" name="right" value="0"/>
+			<mx:SetStyle target="{upperBox}" name="left" value="0"/>
+			<mx:SetStyle target="{button1}" name="icon" value="@Embed('media/arrow_in.png')"/>
+			<mx:SetEventHandler target="{button1}" name="click"
+				handler=" this.stage.displayState=StageDisplayState.NORMAL;currentState = 'new_ui';"/>
+		</mx:State>
+		
+		<!--	network visualization state 	-->
+		<mx:State name="spring_view" enterState="addChildren();" exitState="removeChildren()">			
+			
+			<!-- *	the tempUIComponent:UIComponent plays a important role here.
+				 *	when the user dynamically creates an edge, it is drawn on this surface,
+				 *	after the user clicks on destination node, we draw the edge on 
+				 *  springgraph:SpringGraph	-->
+				 
+			<mx:AddChild position="lastChild">	
+				<mx:UIComponent id="tempUIComponent" right="0" left="0" bottom="0" top="75"/>
+			</mx:AddChild>
+			
+			<mx:AddChild position="lastChild">
+				<ns1:SpringGraph click="EndEdgeDraw(new MouseEvent(MouseEvent.CLICK))" mouseMove="Continue_Draw()" id="springgraph" repulsionFactor="{repulsion.value}"
+					   itemRenderer="FlexItem" verticalPageScrollSize="20" horizontalPageScrollSize="20"
+					   show_arrow="{chkArrow.selected}" right="0" left="10" bottom="-11" top="86" >	
+					<fc:removeItemEffect>			
+						<mx:Fade alphaFrom="1" alphaTo="0" duration="250"/>				
+					</fc:removeItemEffect>
+										
+					<fc:addItemEffect>
+						<mx:Fade alphaFrom="0" alphaTo="1" duration="500"/>
+					</fc:addItemEffect>	
+				</ns1:SpringGraph> 
+			</mx:AddChild>
+			
+			<!-- * 	the control panel set	
+				 * 	thorugh this we can
+				 	1. increase the repulsion factor between nodes
+				 	2. decrease the size of nodes and switch on/off the zoom effect on mouse over event 
+				 	3. toggle between full screen / normal view
+				 	4. open the search window ( to query nodes and relations )
+				 	5. see history
+				 	6. show edges of a single type
+			-->
+			
+			<mx:AddChild position="lastChild">
+				<mx:TitleWindow horizontalScrollPolicy="off" verticalScrollPolicy="off"	horizontalAlign="center" title="{controlPanelM}" id="controlpanelwindow"					
+					verticalAlign="middle" close="btn_show_controlpanel.visible=true;controlpanelwindow.visible=false;" 
+					visible="true" layout="absolute" height="400" showCloseButton="true" top="86" fontWeight="bold" width="230" left="10">
+					
+					<mx:Button visible="false" id="backbutton"  width="21" click="showbackhistory()" icon="@Embed(source='media/rewind.png')" toolTip="{showPrevNetTipM}" left="0" bottom="0"/>
+			      	<mx:Button visible="false" id="forwardbutton"  width="24" click="showforwardhistory()" icon="@Embed(source='media/forward.png')" toolTip="{showNextNetTipM}" height="24" right="0" bottom="0"/>
+			
+					<mx:Label id="repulsionfactor" visible="true" text="{spacingM}" color="{colorreturn2()}" width="53" textAlign="left" fontWeight="normal" top="0" x="122"/>
+					<mx:HSlider visible="true" width="114" id="repulsion" value="0.45" minimum="0.0" maximum="1.5" liveDragging="true" tabEnabled="true" tabIndex="0" x="0" height="25.3" top="-7.3"/>
+					<mx:CheckBox visible="true" label="{showArrowsM}" toolTip="{toolTip_displayArrowEdge}" width="118" change="myGraph.changed();" color="{colorreturn2()}" fontWeight="normal" id="chkArrow" selected="true" height="17" tabIndex="4" tabEnabled="true" x="-4" y="26"/> 
+					<mx:CheckBox visible="true" label="{retaionM}" color="{colorreturn2()}" fontWeight="normal" id="retaincheck" selected="true" width="87" tabIndex="2" tabEnabled="true" height="17" y="26" x="122"/>
+					
+					<mx:Button visible="true" label="{searchM}" id="btnSearch" click="ShowSearchWindow()" width="74.8" height="25" tabIndex="5" tabEnabled="true" x="0" y="74.95" fontWeight="normal"/>
+					
+					<mx:Button icon="@Embed('media/arrow_out.png')" visible="true" id="btnFullscreen" toolTip="{switchFullScrM}"
+						 click="toggleFullScreen()" width="25" height="25" tabEnabled="true" tabIndex="6" x="158" y="130.95"/>
+					<mx:Button icon="@Embed('media/arrow_in.png')" visible="false" toolTip="{switchNorScrM}"
+						 click="toggleFullScreen()" id="btnNormalscreen" width="25" height="25" x="158.8" y="74.95"/>
+					
+					<!--<mx:Label visible="true" id="NumofNodes" text="n items visible" width="184" height="20" color="#FFFFFF" x="0" y="215"/>			
+			      	<mx:Label visible="false" id="nodesizeinfo" text="Make the nodes smaller" width="153" height="19" color="#FFFFFF" x="0" y="68.9"/>		-->
+					<mx:HSlider visible="true" toolTip="{chngNodeSizeTM}" width="114" change="ChangeNodeSize()" id="nodeSizeSlider" value="1.0" minimum="0.5" maximum="1" liveDragging="true" snapInterval="0.05" tabIndex="3" tabEnabled="true" y="47" x="0" height="16"/>
+					<mx:CheckBox visible="false" label="{zoomM}" toolTip="{toolTip_switchZoomOn}" width="60" change="ChangeZoomSetting()" color="{colorreturn2()}" fontWeight="bold" id="chkZoom" selected="false" tabEnabled="true" tabIndex="1" height="20" y="51" x="122"/>	
+				<!--	<mx:ComboBox dataProvider="[Knows,Has seen,Has submitted,Has tags,Is previous version,Is Connected To]" id="showparticularedgetype" x="0" y="132.9" width="150"></mx:ComboBox>
+				
+					<mx:ComboBox dataProvider="[Knows,Has seen,Has submitted,Has tags,Is previous version,Is Connected To,Relates To,Has Interest]" rowCount="8" id="showparticularedgetype" x="0" y="132.9" width="150"></mx:ComboBox> 
+					<mx:Text x="0" y="109.9" text="Display Only:" width="83" color="#F8FBFC"/>
+				-->
+					<mx:Button x="77.8" y="74.95" label="{timeMachineM}" id="timeLineButton" enabled="true" click="activateTimeLine()" width="131.2" height="26.95"/>
+					<!-- a new button to take to the linear view state.. linear_view 
+					-->
+					
+					<!-- a new button to take to the relationships to display 
+					-->
+					<!--This is the code for button of relationships-->
+					<!--<mx:Button x="28.9" y="132.9" label="Display Relationships" id="relDispButton" enabled="true" click="openPopDisp();" width="130" height="26.95"/>
+-->
+					<!--<mx:Button x="0" y="100" label="S" visible="true" id="selrelButton" enabled="true" click="ShowSelrelWindow();//currentState='linear_view';" width="137" height="26.95"/>-->
+					<mx:Button x="0" y="132.9" label="{selRelM}" visible="true" id="selrelButton" enabled="true" click="ShowSelrelWindow();//currentState='linear_view';" width="150" height="26.95"/>
+					
+					<mx:Button x="28.9" y="186" label="{linViewM}" id="linearviewButton" enabled="true" click="currentState='linear_view';" width="154.1" height="26.95"/>
+					<mx:Button x="28.9" y="221" label="{refRelM}" toolTip="{recRLTM}" id="refreshRelations" enabled="true" click="refreshRelationShips();" width="154.1" height="26.95"/>
+					
+					<mx:Button x="28.9" y="256" label="{showEvalM}" visible="{islab()}" id="evalinfoButton" enabled="true" click="evalinfo();//currentState='linear_view';" width="154.1" height="26.95"/>
+					
+					<!--
+					new button for labronova repository
+					-->
+				<!--	<mx:Button x="28.9" y="290" label="{showRepoM}" visible="{false}" id="repoButton" enabled="true" click="repoinfo();//currentState='linear_view';" width="154.1" height="26.95"/>
+					<mx:Button x="28.9" y="295" label="{RepoM}" visible="{islab()}" id="repoButton2" enabled="true" click="repoinfo2();" width="154.1" height="26.95"/>
+-->
+				</mx:TitleWindow>			
+			</mx:AddChild>	
+			
+			<mx:AddChild position="lastChild">
+				<mx:Button visible="false" toolTip="{showConPanTM}" 
+					click="controlpanelwindow.visible=true;btn_show_controlpanel.visible = false;" 
+					id="btn_show_controlpanel" width="21" height="25" color="#C0D2EB" fillAlphas="[0.37, 0.37]" fillColors="[#AD7373, #EF4D4D]" cornerRadius="0" alpha="1.0" labelPlacement="right" label="+" left="10" top="86"/>
+			</mx:AddChild>
+			<mx:AddChild>
+					<mx:TitleWindow x="216" y="86" title="{timeMachineM}" width="776" height="68" mouseDown="timeLineBox.startDrag();" mouseUp="timeLineBox.stopDrag();" layout="absolute" id="timeLineBox" visible="false" showCloseButton="true" close="timeLineBox.visible=false;">
+							<mx:HBox x="50" y="0" width="689" height="31">
+								<mx:Button icon="@Embed('/media/2leftarrow_big.png')" width="63" fontSize="19" fontWeight="bold" id="back3" click="backThree()" toolTip="{prevTM}"/>
+								<mx:Button icon="@Embed('/media/2leftarrow_medium.png')" width="43" fontSize="16" fontWeight="bold" id="back2" click="backTwo()" toolTip="{prevDTM}"/>
+								<mx:Button icon="@Embed('/media/1leftarrow.png')" width="31" fontSize="14" fontWeight="bold" id="back1" click="backOne()" toolTip="{prevHTM}"/>
+								<mx:Text text="Text" width="120" fontSize="12" id="machineTime" enabled="true" click="setCurrentTime()" color="#F5F9FA" toolTip="{setCTTM}"/>
+								<mx:Button icon="@Embed('/media/1rightarrow.png')" width="31" fontSize="14" fontWeight="bold" id="forward1" click="forwardOne()" toolTip="{nextHTM}"/>
+								<mx:Button icon="@Embed('/media/2rightarrow_medium.png')" width="43" fontSize="16" fontWeight="bold" id="forward2" click="forwardTwo()" toolTip="{nextDTM}"/>
+								<mx:Button icon="@Embed('/media/2rightarrow_big.png')" width="63" fontSize="19" fontWeight="bold" id="forward3" click="forwardThree()" toolTip="{nextMTM}"/>
+								<mx:Spacer width="90"/>
+								<mx:Button label="{autoTLM}" width="134" height="29" id="autoSim" enabled="true" click="startAutoSim()"/>
+							</mx:HBox>
+						</mx:TitleWindow>
+			</mx:AddChild>
+			<mx:SetProperty target="{this}" name="verticalScrollPolicy" value="off"/> 
+		
+		</mx:State>
+		
+		<!--
+		linear view state
+		-->
+		<mx:State name="linear_view" enterState=";" exitState=";">
+			<mx:AddChild >
+				<ns2:linearview id="linearview_component" right="10" left="10" bottom="10" top="86">
+				</ns2:linearview>
+			</mx:AddChild>
+		</mx:State>
+		
+		
+		
+		<!-- 	ProfileView state
+			*	this state is based on spring_view state. in the sense, only from spring_view state,
+				this state can be reached. 
+			*	when the user clicks view profile ( people node ) or view info ( video node ) 
+				we change the state to ProfileView.
+			*	the state has a Vbox at the left corner in which the profiles ( box_peopleprofile.mxml 
+				and box_videoprofile.mxml ) will be added
+			*	after the user closes all the profiles we change to spring_view state
+			*	also, when the user clicks the togglebutton bar in the top of the screen, we remove 
+				all the profiles from the vbox and then change the state correspondingly
+		-->
+		<mx:State name="ProfileView" basedOn="spring_view" enterState="addChildren();" exitState="removeChildren()">
+			<mx:AddChild relativeTo='{this}' position="lastChild">															
+			<mx:VBox horizontalScrollPolicy="off" verticalGap="2" verticalPageScrollSize="50" verticalScrollPolicy="auto" id="profilebox"  left="15" top="300" height="{springgraph.height-70}"   width="280">
+				</mx:VBox>
+			</mx:AddChild>
+			<mx:SetStyle target="{forward3}" name="icon" value="@Embed(source='media/2rightarrow_big.png')"/>
+			<mx:SetProperty target="{forward3}" name="label"/>
+			<mx:SetStyle target="{back3}" name="icon" value="@Embed(source='media/2leftarrow_big.png')"/>
+			<mx:SetProperty target="{back3}" name="label"/>
+			<mx:SetProperty target="{back2}" name="label"/>
+			<mx:SetStyle target="{back2}" name="icon" value="@Embed(source='media/2leftarrow_medium.png')"/>
+			<mx:SetProperty target="{back1}" name="label"/>
+			<mx:SetStyle target="{back1}" name="icon" value="@Embed(source='media/1leftarrow.png')"/>
+			<mx:SetProperty target="{forward1}" name="label"/>
+			<mx:SetStyle target="{forward1}" name="icon" value="@Embed(source='media/1rightarrow.png')"/>
+			<mx:SetProperty target="{forward2}" name="label"/>
+			<mx:SetStyle target="{forward2}" name="icon" value="@Embed(source='media/2rightarrow_medium.png')"/>
+			<mx:SetProperty target="{forward2}" name="visible" value="true"/>
+		</mx:State>
+		
+		
+		<mx:State name="IdeaView" basedOn="spring_view" enterState="addChildren();" exitState="removeChildren()">
+			<mx:AddChild relativeTo='{this}' position="lastChild">															
+			<mx:VBox horizontalScrollPolicy="off" verticalGap="2" verticalPageScrollSize="50" verticalScrollPolicy="auto" id="ideabox"  left="15" top="300" height="{springgraph.height-40}"   width="320">
+				</mx:VBox>
+			</mx:AddChild>
+			<mx:SetStyle target="{forward3}" name="icon" value="@Embed(source='media/2rightarrow_big.png')"/>
+			<mx:SetProperty target="{forward3}" name="label"/>
+			<mx:SetStyle target="{back3}" name="icon" value="@Embed(source='media/2leftarrow_big.png')"/>
+			<mx:SetProperty target="{back3}" name="label"/>
+			<mx:SetProperty target="{back2}" name="label"/>
+			<mx:SetStyle target="{back2}" name="icon" value="@Embed(source='media/2leftarrow_medium.png')"/>
+			<mx:SetProperty target="{back1}" name="label"/>
+			<mx:SetStyle target="{back1}" name="icon" value="@Embed(source='media/1leftarrow.png')"/>
+			<mx:SetProperty target="{forward1}" name="label"/>
+			<mx:SetStyle target="{forward1}" name="icon" value="@Embed(source='media/1rightarrow.png')"/>
+			<mx:SetProperty target="{forward2}" name="label"/>
+			<mx:SetStyle target="{forward2}" name="icon" value="@Embed(source='media/2rightarrow_medium.png')"/>
+			<mx:SetProperty target="{forward2}" name="visible" value="true"/>
+		</mx:State>
+		
+		
+		
+		<mx:State name="EvalView" basedOn="spring_view" enterState="addChildren();" exitState="removeChildren()">
+			<mx:AddChild relativeTo='{this}' position="lastChild">															
+			<mx:VBox horizontalScrollPolicy="off" verticalGap="2" verticalPageScrollSize="50" verticalScrollPolicy="auto" id="evalbox"  left="15" top="300" height="{springgraph.height-40}"   width="320">
+				</mx:VBox>
+			</mx:AddChild>
+			<mx:SetStyle target="{forward3}" name="icon" value="@Embed(source='media/2rightarrow_big.png')"/>
+			<mx:SetProperty target="{forward3}" name="label"/>
+			<mx:SetStyle target="{back3}" name="icon" value="@Embed(source='media/2leftarrow_big.png')"/>
+			<mx:SetProperty target="{back3}" name="label"/>
+			<mx:SetProperty target="{back2}" name="label"/>
+			<mx:SetStyle target="{back2}" name="icon" value="@Embed(source='media/2leftarrow_medium.png')"/>
+			<mx:SetProperty target="{back1}" name="label"/>
+			<mx:SetStyle target="{back1}" name="icon" value="@Embed(source='media/1leftarrow.png')"/>
+			<mx:SetProperty target="{forward1}" name="label"/>
+			<mx:SetStyle target="{forward1}" name="icon" value="@Embed(source='media/1rightarrow.png')"/>
+			<mx:SetProperty target="{forward2}" name="label"/>
+			<mx:SetStyle target="{forward2}" name="icon" value="@Embed(source='media/2rightarrow_medium.png')"/>
+			<mx:SetProperty target="{forward2}" name="visible" value="true"/>
+		</mx:State>
+		
+		
+		<!--  gamemodule state
+			the tentube game page. this is shown when the user clicks tentube game button in top of screen-->
+			
+		<mx:State name="gamemodule" enterState="addChildren();" exitState="removeChildren()">
+			<mx:AddChild position="lastChild">
+				<ns2:form_gamepage id="pg_gamemodule" left="10" right="10" bottom="-2" top="86">
+				</ns2:form_gamepage>
+			</mx:AddChild>
+		</mx:State>
+		
+		<!-- 	login state
+			this is the login page and the 1st page the user sees. in the future we need to put some more 
+		content here, like information about Tentube, Laboronova, Calt. etc..
+		 if its a new user, he can register his name  -->
+		<mx:State name="login">
+			<mx:RemoveChild target="{applicationcontrolbar1}"/>
+			<mx:RemoveChild target="{applicationcontrolbar2}"/>
+			<mx:AddChild position="lastChild">
+				<ns2:form_login id="loginForm" x="99" y="196" horizontalCenter="0" verticalCenter="0">
+				</ns2:form_login>
+				
+			</mx:AddChild>
+			<mx:AddChild position="lastChild">
+				<mx:LinkButton icon="@Embed(source='./media/privacy.jpg')" id="privacyId"  toolTip="{v1085}"  click="{openPrivacyLink();}" horizontalCenter="0" verticalCenter="160" width="80"/>
+			</mx:AddChild>			
+		</mx:State>
+		
+		<!--
+		Home State Starts
+		--> 
+		<mx:State name="home" enterState="addChildren();" exitState="removeChildren()">
+			<mx:RemoveChild target="{applicationcontrolbar1}"/>
+			<mx:RemoveChild target="{applicationcontrolbar2}"/>
+	
+			<mx:AddChild position="lastChild">
+				<ns2:home id="homePage">
+				</ns2:home>
+			</mx:AddChild>
+		</mx:State>
+	
+		<!--
+		Home State Ends
+		--> 
+		
+		
+		<!-- 	videoupload state
+		for submitting new videos . There are 3 ways of submitting video
+			1. Link to youtube
+			2. upload from hard disk
+			3. record it live
+			   more information about each of these will be given in form_uploadvideo.mxml -->
+		<mx:State name="videoupload" enterState="addChildren();" exitState="removeChildren()">
+			<mx:AddChild position="lastChild">
+				<ns2:form_uploadvideo id="uploadwindow" right="10" left="10" bottom="10" top="86">
+				</ns2:form_uploadvideo>
+			</mx:AddChild>
+		</mx:State>
+		
+		<mx:State name="videoreplace" enterState="addChildren();" exitState="removeChildren()">
+			<mx:AddChild position="lastChild">
+				<ns2:form_replacevideo id="replacewindow" right="10" left="10" bottom="10" top="86">
+				</ns2:form_replacevideo>
+			</mx:AddChild>
+		</mx:State>
+		
+		
+		
+		<!--	registerpage state	
+			*	This is a registration page. New user can enter their information and they
+			*	are saved in the server. Picture can be uploaded
+			*	User can either select the interests or add a new one to the list
+		-->
+		<mx:State name="registerpage">
+			<mx:AddChild position="lastChild">
+				<ns2:form_register id="tentube_registerpage" right="15" left="15" bottom="15" top="15" >
+				</ns2:form_register>
+			</mx:AddChild>
+			<mx:RemoveChild target="{applicationcontrolbar1}"/>
+			<mx:RemoveChild target="{applicationcontrolbar2}"/>
+		</mx:State>
+		
+		<!-- *	user can view all the profiles here and edit his own.
+		-->
+		<mx:State name="profilingdim" enterState="addChildren();" exitState="removeChildren()">
+			<mx:AddChild position="lastChild">
+				<ns2:form_detailedprofile id="tentube_profile" right="11" left="9" bottom="4" top="86">
+				</ns2:form_detailedprofile>
+			</mx:AddChild>
+			<mx:SetProperty target="{applicationcontrolbar2}" name="width"/>
+		</mx:State>
+		
+		<!-- *	this state is password protected :) . the key is ten1
+			 *  after entering, the user can delete comments or delete videos or delete
+			 *	users or delete tags.
+		-->
+		<mx:State name="adminmode" basedOn="new_ui" enterState="addChildren();" exitState="removeChildren()">
+			<mx:AddChild relativeTo="{panel1}" position="before">
+				<component:adminPanel id="adminpanel" title="{adminM}" width="100%" height="100%" minWidth="500" layout="absolute" color="{colorreturn2()}" fontWeight="bold">
+				</component:adminPanel>
+			</mx:AddChild>
+			<mx:RemoveChild target="{vPlayCanvas}"/>
+		</mx:State>
+		
+		<mx:State id="grpMode" name="groupmode" enterState="addChildren();" exitState="removeChildren()">
+				<mx:AddChild position="lastChild">
+					<ns2:form_groupmanager id="tentube_group" right="11" left="9" bottom="4" top="86">
+					</ns2:form_groupmanager>
+				</mx:AddChild>
+		</mx:State>
+		
+		<mx:State id="conference" name="pubconference" enterState="addChildren();" exitState="removeChildren()">
+				<mx:AddChild position="lastChild">
+					<ns2:vidconference id="tentube_vidcon" right="11" left="9" bottom="4" top="86">
+					</ns2:vidconference>
+				</mx:AddChild>
+		</mx:State>
+		
+		<mx:State name="empty">
+			<mx:RemoveChild target="{applicationcontrolbar1}"/>
+			<mx:RemoveChild target="{applicationcontrolbar2}"/>
+			<mx:SetProperty target="{application}" name="verticalScrollPolicy" value="false"/>
+		</mx:State>
+		
+		</mx:states>
+		
+	<!-- obsidian.css is the css style file we use. we probably will change that very soon,
+		 as the UI appears too dark.   	-->	
+	
+	<mx:Style source="./ui/themes/obsidian/main.css"/>
+	<mx:Style source="./ui/themes/common.css"/>
+	
+	
+<!--	<mx:Style source="./ui/themes/obsidian/inno.css"/>
+	<mx:Style source="./ui/themes/common.css"/>-->
+	
+	<!-- This is the main chat window where there is a list of online users and also the public chat interface.
+		A point to note is that online users list has an item renderer "chatListRenderer" which at the moment 
+		just displays the name of the online user. Can be expanded to include icons and other info.
+		Also for further info on chat search for userstimer(which is used to repetitively download the 
+		onine users list from server) and messagetimer(which is used to repetitively download
+		new messages from the server.
+		
+		Also, involved with the chat are 3 HTTPservices 
+		loadOnlineUsers - this loads the list of users currently online
+		loadNewMessage - this loads new messages from the server
+		sendMessage - when the user sends any message, this service communicates the message
+						to the server
+		 -->
+				
+
+<mx:Canvas id="helpPanel" visible="false" width="465" height="214" x="53" y="134" alpha="0.8"  creationComplete="addDragListener();" mouseUp="helpPanel.stopDrag();" >	
+   <component:helpBox height="212" width="465" id="helpBoxId"/>
+   <mx:Canvas x="147" y="0" width="308" height="24" backgroundColor="#FFFFFF">
+   </mx:Canvas>
+   <mx:Text x="210.5" y="0" text="{connectToM}" color="#000000" fontWeight="normal" fontStyle="normal" fontSize="10"/>
+   <mx:Text id="closeId" x="440" y="0" text="X" color="#000000" click="helpPanel.visible=false;helpBoxId.visible=false;helpPanel.height=20;showId.visible=true;closeId.visible=false;" fontWeight="normal" fontSize="10"/>
+   <mx:Text id="showId" x="155" y="0" text="{showM}" color="#000000" visible="false" click="helpPanel.height=214;helpBoxId.visible=true;showId.visible=false;closeId.visible=true;" fontWeight="normal" fontSize="10"/>
+</mx:Canvas>
+
+<mx:Canvas id='agentWindow' width="500" height="250" x="53" y="134" mouseUp="agentWindow.stopDrag()" horizontalScrollPolicy="off">
+	<component:WelcomeAgent id="welcAgent"/>
+</mx:Canvas>
+
+<!--
+<mx:Canvas id='popWindow1' width="500" height="250" x="200" y="200" mouseUp="popWindow1.stopDrag()" horizontalScrollPolicy="off">
+	<component:FirstPopUp id="popAgent1"/>
+</mx:Canvas>
+-->
+
+<mx:Canvas  visible="false" id="tradeWindow" width="900" height="550" x="53" y="134" mouseUp="tradeWindow.stopDrag()" horizontalScrollPolicy="off" autoLayout="true"  dragEnter="{dragiframe();}" dragOver="{dragiframe();}" click="{dragiframe();}" dragDrop="{dragiframe();}" move="{dragiframe();}" >
+	<component:tradeAgent id="trdAgent"/>
+</mx:Canvas>
+
+	<mx:TitleWindow showCloseButton="true" close="weeklyReportPanel.visible=false;" mouseDown="weeklyReportPanel.startDrag();" mouseUp="weeklyReportPanel.stopDrag();" width="404.5" height="478" layout="absolute" id="weeklyReportPanel" title="{weeklyRepM}"
+		horizontalAlign="center" verticalAlign="top" fontFamily="Verdana" fontWeight="bold" textDecoration="normal" fontStyle="normal" color="#F41D1D" x="348.5" y="75"  visible="false">
+		<mx:Label x="10" y="10" text="{totalNumAccessM}" width="192" color="#FBF6F6"/>
+		<mx:Label x="222" y="10" color="#BC04F4" id="totalNoOfAccessesLabel" width="33" height="18"/>
+		<mx:Label x="10" y="22" text="{threeToAccessM}" width="253" color="#F7F3F3"/>
+		<mx:Label x="77" y="39" width="298.5" height="49" color="#BC04F6" id="threeTopUsersLabel"/>
+		<mx:Label x="10" y="87" text="{numNewUserM}" width="166" color="#F7EEEE"/>
+		<mx:Label x="222" y="87" color="#BC04F3" id="NoOfNewUsersLabel" width="33"/>
+		<mx:Label x="10" y="111" text="{newUsersM}" width="70" color="#FBF9F9"/>
+		<mx:Label x="77" y="111" width="298.5" height="66" id="newUsersLabel" color="#BC04F9"/>
+		<mx:Label x="0" y="234" text="{numNewVidSubM}" width="201" color="#FBF5F5"/>
+		<mx:Label x="222" y="234" width="36" id="noOfNewVideosLabel" height="18" color="#BC04F9"/>
+		<mx:Label x="0" y="260" text="{newVideosM}" width="81" color="#F6F0F0"/>
+		<mx:Label x="67" y="260" width="308.5" height="92" id="newVideosLabel" color="#BC04F9"/>
+		<mx:Label x="0" y="350" text="{numDifVidSeenM}" width="201" color="#F7F5F5"/>
+		<mx:Label x="222" y="350" id="noOfDifferentVideosLabel" width="35" color="#BC04F9"/>
+		<mx:Label x="0" y="362" text="{numNewCommM}" width="201" color="#FDF9F9"/>
+		<mx:Label x="222" y="362" id="noOfCommentsLabel" width="35" color="#BC04F9"/>
+		<mx:Label x="0" y="376" text="{numNewConnCreM}" width="220" color="#F7EFEF"/>
+		<mx:Label x="222" y="376" width="35" id="noOfNewConnectionsLabel" color="#BC04F9" height="18"/>
+		<mx:Label x="0" y="388" text="{numGamesPlayedM}" width="210" color="#FBFAFA"/>
+		<mx:Label x="222" y="388" width="35" id="noOfTimesGamePlayedLabel" color="#BC04F9"/>
+		<mx:Button x="156" y="414" label="{okM}" id="btnReportOk" click="removeChild(weeklyReportPanel);" visible="true"/>
+		<mx:Label x="10" y="176" text="{threeMostViewVidM}" width="136" color="#FAF5F5" fontSize="9"/>
+		<mx:Label x="77" y="185" width="298.5" height="50" color="#BC04F9" id="topThreeVideosLabel"/>
+	 </mx:TitleWindow>
+	
+	<mx:TitleWindow id="ratingWindow" x="301" y="347" width="400" height="139" layout="absolute" title="{ratingM}" showCloseButton="true"
+		 close="ratingWindow.visible=false" showEffect="Fade" visible="false" show="userRating.document.data=playingvideo.data">
+		<Ratings horizontalGap="3" value="{data.@grandrating.toString()}" id="userRating" enabled="true" click="loadnetwork.send()"
+			width="100" height="26" points="5" innerRadius="10" outerRadius="10" angle="0"  y="49" x="71"/>
+		<mx:Text x="2" y="10" text="{plzOpnVidM}" color="#FDFFFF" fontSize="12"/>
+		<mx:Text x="0" y="49" text="{wasteTimeM}" color="#FAFCFD" height="35" width="63"/>
+		<mx:Text x="179" y="50" text="{veryInterestM}" color="#FAFCFD" height="34" width="71"/>
+	</mx:TitleWindow>
+	
+	<component:helpWindow id="helpWin" visible="false" x="{(this.width/2)-(helpWin.width/2)}" y="200" />
+	
+	<mx:DateFormatter id="dateFormatter" formatString="NN:SS" />
+	
+
+	
+
+</mx:Application>
+
+<!--title="Recommendations" showCloseButton="true" close="helpPanel.visible=false;"-->
+

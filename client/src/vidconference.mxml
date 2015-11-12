@@ -1,0 +1,426 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+
+
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" layout="absolute"  visible="true"
+	 title="{pubConfM}" fontWeight="bold"  
+ 	   creationComplete="initvidcon();" 
+ 		 color="white" showCloseButton="false"
+ 		  verticalScrollPolicy="off" horizontalScrollPolicy="off" 
+ 		  xmlns:draggable="com.dragable.*"
+ 			xmlns:controls="com.controls.*"
+ 			xmlns:comp="component.CountDownClock"
+			xmlns:fs="com.fs.*" 			xmlns:files="com.fileio.*"
+			xmlns:fc="http://www.adobe.com/2006/fc"  	
+			xmlns:ns1="http://www.adobe.com/2006/fc" 	xmlns:ns2="*" creationPolicy="all"
+			xmlns:assets="component.assets.*"
+			xmlns="com.Rating.*"
+			xmlns:ImageOps="Asfiles.image_upload.*"
+ 		  	xmlns:component="component.*" alpha="1" xmlns:local="*">
+	
+	
+	
+	
+	<mx:VBox  verticalScrollPolicy="off"  horizontalScrollPolicy="off" width="100%" height="100%"  backgroundColor="#FFFFFF" alpha="1" horizontalAlign="center" verticalAlign="middle">
+	
+	<mx:Spacer height="10%" />
+	
+		<mx:HDividedBox id="mainbox" height="361">
+				<mx:Canvas backgroundColor="#000000" alpha="1" height="359" width="450">
+				<mx:Tile  left="10" top="10" height="341" width="431" horizontalScrollPolicy="on" verticalScrollPolicy="on" backgroundColor="#FFFFFF">
+				
+				<mx:Repeater id="rpUsers" dataProvider="{ dpUsers }">
+					<local:VideoPod nc="{ nc }"
+						isSender="{ rpUsers.currentItem.name == app.people_id_name[app.Univ_LoginId1] }"
+						userItem="{ rpUsers.currentItem }" />
+				</mx:Repeater>
+				
+				
+				</mx:Tile>
+				</mx:Canvas>
+				
+				<mx:Canvas id="chatCanvas" width="450" height="360" defaultButton="{chatSend}" visible="true"  styleName="videoProgressCanvas" backgroundColor="#000000" backgroundAlpha="0.9" >
+					<mx:TextArea id="chatText" liveScrolling="true" text="" x="10" y="35" height="221" width="273" wordWrap="true" editable="false" visible="true" updateComplete="app.setScrollPosition();" />
+<!--					<mx:List height="218" id="onlineUsersList" enabled="true" itemRenderer="component.chatListRenderer"></mx:List>-->
+<!--					<mx:List id="activeUsersList" x="291" y="36" width="148" height="251" itemRenderer="component.chatListRenderer" visible="{isChatMin}" dataProvider="{activeChats}" itemClick="chatText.text=activeUsersList.selectedItem.chat.toString();"></mx:List>-->
+					<mx:List  color="#000000" id="onlineUsersList" x="291" y="36" width="148" height="269" visible="true" itemClick="app.startChat(onlineUsersList.selectedItem)">
+						<mx:itemRenderer>
+							<mx:Component>
+								<mx:Label width="100%" text="{data.name}"/>
+							</mx:Component>
+						</mx:itemRenderer>
+					</mx:List>
+					<mx:TextInput id="chatInput" x="10" y="264" width="273" visible="true" height="41" editable="true"/>
+					<mx:Button id="chatSend" visible="true" x="85" y="313" label="{sendM}" width="89" click="app.sendMessage0();"/>
+					<mx:Label x="52" y="9" text="{pubChatM}" visible="true" width="147" color="#FFFFFF" fontSize="11" textAlign="center"/>
+					<mx:Label x="197" y="9" text="{onlineUsersM}" visible="true" width="200" color="#FFFFFF"  fontSize="11" textAlign="center" height="19"/>
+					
+				</mx:Canvas>
+				
+			
+			
+		</mx:HDividedBox>
+		<mx:HBox height="50" width="100%" horizontalAlign="center" verticalAlign="middle" left="10">
+			<mx:Button icon="@Embed('/media/volume.png')"   width="40" height="40" enabled="false"/>
+			
+			<mx:HBox height="100%" width="227" horizontalAlign="center" verticalAlign="middle">
+				<mx:HSlider id="hslv" enabled="true"  value="5" minimum="0" maximum="10" snapInterval="1" toolTip="{hslv.value}" width="200" height="30" showDataTip="true" allowTrackClick="true" change="change_volume();" />
+			</mx:HBox>
+			
+			<mx:HBox visible="{app.EnableVideoChat}" height="100%" width="353" horizontalAlign="center" verticalAlign="middle">
+				<mx:Button label="{connVChatM}" id="connectbtn" width="150" height="20" click="createConnection();"/>
+				<mx:Button label="{disConnVChatM}"  enabled="false" id="logoutbtn" width="150" height="20" click="conlogout();"/>
+			</mx:HBox>
+		</mx:HBox>
+		
+		<mx:Spacer height="5" />
+	
+	</mx:VBox>
+	
+	
+	
+	<!--mx:Script source="Asfiles/as_root.as" /-->
+
+    <mx:Script source="Asfiles/as_constants.as" />	
+	
+	<mx:Script>
+		<![CDATA[
+		
+			import mx.managers.CursorManager;
+    		import mx.events.ItemClickEvent;
+		// Variables declared here
+		
+			import mx.controls.Label;
+			import mx.automation.delegates.controls.LabelAutomationImpl;
+			
+			import mx.rpc.events.FaultEvent;
+			import mx.collections.ArrayCollection;
+			import flash.display.DisplayObject;
+			import flash.events.*;
+			import flash.net.FileFilter;
+			import flash.net.FileReference;
+			import flash.net.URLRequest;
+			import flash.net.URLRequestMethod;
+			import flash.net.URLVariables;
+			
+			import mx.controls.Alert;
+			import mx.controls.DataGrid;
+			import mx.controls.ProgressBar;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import mx.core.Application;
+			
+			import mx.collections.ArrayCollection;
+			
+			
+			[Bindable]public var app:Tentube	=Tentube(Application.application);
+			
+			import mx.managers.PopUpManager;
+			//import component.VideoPod;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			
+			[Bindable]private var haveCamera:Boolean;
+			
+			[Bindable]public var nc:NetConnection;
+			
+			[Bindable]public var dpUsers:ArrayCollection;
+				
+			public var users_so:SharedObject;
+				
+			
+		
+			[Bindable] public var source_mic:Microphone = Microphone.getMicrophone();
+			
+			public var conmessageTimer:Timer=new Timer(1000,0); //timer for getting new messages
+    		public var conlatestTime:String=""        //will store the time of the latest message fetched from the server
+    		public var confaultCount:int = 0;  // will store the number of times a send message has returned a fault
+
+			
+			
+			
+		
+		// Functions written here
+		
+		
+		
+		
+		public function change_volume():void{
+			//source_mic.setGain(hslv.value);
+			source_mic.gain=(hslv.value)*10;
+		}
+		
+		
+		// text video chat functions start from this place
+		//public video chat
+		
+		
+		
+		public function createConnection():void
+			{
+				//RIALogger.debug( "MAIN:createConnection" );
+				// Check the user name length
+				if (haveCamera = ( Camera.getCamera() != null )) {
+					// Create Connection and setup Events
+					nc = new NetConnection();
+					nc.objectEncoding = ObjectEncoding.AMF0;
+					nc.addEventListener( NetStatusEvent.NET_STATUS, netStatusHandler );
+					// A simple Identifier for the asc side
+					var identifier:String = app.people_id_name[app.Univ_LoginId1];
+					while( identifier.search( " " ) > 0 )
+						identifier = identifier.replace( " ", "_" );
+					nc.connect( app.video_conferencePath, app.people_id_name[app.Univ_LoginId1], identifier );
+					
+					connectbtn.enabled=false;
+					logoutbtn.enabled=true;
+					
+				} else {
+					Alert.show( plzConVCamM );
+				}
+			}	
+			
+			
+		public function netStatusHandler( event:NetStatusEvent ):void
+			{
+				//RIALogger.debug( "MAIN:connectionSuccess:Success" );				
+				switch( event.info.code ) {
+					case "NetConnection.Connect.Success":
+						// Connection succeeded now create components
+						connectComponents();
+						// Change to Video view
+						//vsMain.selectedChild = pnlVideo;
+					break;
+					case "NetConnection.Connect.Rejected":
+						Alert.show( limitedUserM, limitedRestUserM );
+					break;					
+				}
+
+			}
+		
+		
+		public function connectComponents():void
+			{
+				//RIALogger.debug( "MAIN:connectComponents" );
+				// Simple User shared object and event handling
+				SharedObject.defaultObjectEncoding  = flash.net.ObjectEncoding.AMF0;
+				users_so = SharedObject.getRemote("users_so", nc.uri, false);
+				users_so.addEventListener( SyncEvent.SYNC, usersSyncHandler );
+				users_so.connect( nc );
+			}
+			
+			
+		public function usersSyncHandler( event:SyncEvent ):void
+			{
+				//RIALogger.debug( "MAIN:usersSyncHandler" + event.target.data );
+				var results:Object = event.target.data;
+				var usersArray:Array = new Array();
+				for( var a:String in results ) {
+					var obj:Object = new Object();
+					obj.name = results[ a ];
+					obj.identifier = a;
+					usersArray.push( obj );
+				}
+				dpUsers = new ArrayCollection( usersArray );
+			}
+			
+		
+		public function conlogout():void
+			{
+				//RIALogger.debug( "MAIN:connectComponents" );
+				if(users_so!=null){
+					users_so.close();
+				}
+				if(nc!=null){
+					nc.close();
+				}
+				
+				dpUsers = null;
+				users_so = null;
+				nc = null;
+				
+				conmessageTimer.stop();
+				
+				connectbtn.enabled=true;
+				logoutbtn.enabled=false;
+					
+				//vsMain.selectedChild = pnlLogin;
+			}		
+			
+				
+		
+		
+		// text chat functions start from this place
+		//public text chat
+		
+			
+		public function close_vidcon_popup():void{
+			PopUpManager.removePopUp(this);
+		}
+			
+			
+		
+		public function initvidcon():void{
+			
+		}
+		/*
+		private function consendMessageRequest(t:TimerEvent):void{
+			var variables:URLVariables=new URLVariables();
+			variables.id=app.Univ_LoginId1;
+			variables.time=conlatestTime;
+			conloadNewMessage.request=variables;
+			conloadNewMessage.send();
+		}
+		*/
+		/*
+		private function initallTimers():void{
+			
+			timestampHTTP.send();
+			
+			var variables:URLVariables=new URLVariables();
+			variables.id=app.Univ_LoginId1;
+			
+            conmessageTimer.addEventListener(TimerEvent.TIMER,consendMessageRequest);
+            conmessageTimer.reset();
+            conmessageTimer.start();
+
+		}
+		
+		public function pubconsendMessage():void{
+			if(conchatInput.text=="") {return;}
+			var tx:String = conchatInput.text;
+			conchatInput.text = "";
+			consendChatMessage(tx,'all');
+			conchatText.text=conchatText.text + app.people_id_name[app.Univ_LoginId1] +" : "+tx+"\n";
+		}
+		
+		public function consendChatMessage(txt:String,id:String):void{
+            if(txt==""){return;}
+            var variables:URLVariables=new URLVariables();
+            variables.fromid=app.Univ_LoginId1;
+            if(id=="all"){
+                variables.fromid = variables.fromid + "@";
+            }
+            variables.toid=id;
+            variables.message=txt;
+            HTTPconsendMessage.request=variables;
+            HTTPconsendMessage.send();
+        }
+		
+		private function connewMessageLoad():void{
+              var msgData:Object=conloadNewMessage.lastResult;
+              conloadNewMessage.clearResult();
+              var messagesXml:XML=new XML(msgData);
+              var isNewMessage:Boolean=false;
+              var index:int=-1;
+            for each(var node:XML in messagesXml.descendants("Message")){
+                    if(node.@time.toString()>conlatestTime){
+                        conlatestTime = node.@time.toString();        
+                    }
+                    var nodeid:String = node.@id.toString();
+                    if(nodeid.charAt(nodeid.length-1)=="@"){
+                        nodeid = nodeid.substr(0,nodeid.length-1);
+                        if(nodeid!=app.Univ_LoginId1)
+                        conchatText.text = conchatText.text + app.people_id_name[nodeid]+" : "+ node.@text.toString()+"\n";
+                        continue;
+                    }
+                    
+            }
+            
+            conchatText.verticalScrollPosition=conchatText.maxVerticalScrollPosition;
+            
+            conmessageTimer.reset();    
+            conmessageTimer.delay = 2000;
+            conmessageTimer.start();
+        }       
+
+        public function HTTPconsentMessageStatus():void{
+            try{
+              var status:String=HTTPconsendMessage.lastResult.rsp.status.toString();
+              if(status.search("Success")==-1){
+                  confaultCount=0;       
+              }
+              HTTPconsendMessage.clearResult();
+              }catch(e:Error){
+                  HTTPconsendMessage.clearResult();
+              }
+             return;            
+        }
+*/
+ /*
+        private function concheckMessageFault():void{
+            trace("There was an error in checking messages");
+            conmessageTimer.reset();
+            conmessageTimer.delay = 2000;
+            conmessageTimer.start();
+        }
+       
+        private function consendMessageFault():void{
+        	//Alert.show('Error in sending Message');
+            if(confaultCount<5){
+                HTTPconsendMessage.send();
+                confaultCount++;
+            }
+            else{
+                confaultCount=0;
+            }
+        }
+		*/
+		private function timefault():void{
+			trace('Serve time stamp not returned');
+		}
+		
+		
+		public function getservertimestamp():void{
+			var responseMessage:String;
+			responseMessage = timestampHTTP.lastResult.rsp.message;
+				
+				if(responseMessage==''){
+					Alert.show('Unable to Load data from server !!');
+					return;
+				}
+			
+			conlatestTime=responseMessage.toString();
+			
+			timestampHTTP.clearResult();
+		}
+		]]>
+	</mx:Script>
+	
+	
+
+	<mx:HTTPService id="timestampHTTP" fault="timefault();" useProxy="false" result="getservertimestamp();"
+		method="POST" showBusyCursor="true" url="{app.ServerPath + 'GraphData/groupmanager.php'}">
+		<mx:request xmlns="">
+			<action>{'timestamp'}</action>
+		</mx:request>
+	</mx:HTTPService>
+</mx:TitleWindow>

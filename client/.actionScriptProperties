@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actionScriptProperties mainApplicationPath="home.mxml" version="3">
+<compiler additionalCompilerArguments="-locale en_US -warnings=false" copyDependentFiles="false" enableModuleDebug="true" flexSDK="Flex 2.0.1 Hotfix 3" generateAccessible="false" htmlExpressInstall="true" htmlGenerate="true" htmlHistoryManagement="true" htmlPlayerVersion="9.0.28" htmlPlayerVersionCheck="true" outputFolderPath="bin-debug" sourceFolderPath="src" strict="true" useApolloConfig="false" verifyDigests="true" warn="true">
+<compilerSourcePath/>
+<libraryPath defaultLinkType="1">
+<libraryPathEntry kind="4" path="">
+<modifiedEntries>
+<libraryPathEntry kind="3" linkType="4" path="${PROJECT_FRAMEWORKS}/libs/framework.swc" useDefaultLinkType="true">
+<crossDomainRsls>
+<crossDomainRslEntry autoExtract="true" policyFileUrl="" rslUrl="framework_3.0.0.477.swz"/>
+<crossDomainRslEntry autoExtract="true" policyFileUrl="" rslUrl="framework_3.0.0.477.swf"/>
+</crossDomainRsls>
+</libraryPathEntry>
+</modifiedEntries>
+</libraryPathEntry>
+<libraryPathEntry kind="1" linkType="1" path="libs"/>
+<libraryPathEntry kind="3" linkType="1" path="C:/wamp/www/prototyping/SpringGraph/bin/SpringGraph.swc" useDefaultLinkType="false"/>
+</libraryPath>
+<sourceAttachmentPath/>
+</compiler>
+<applications>
+<application path="Tentube.mxml"/>
+</applications>
+<modules/>
+<buildCSSFiles>
+<buildCSSFileEntry destPath="bin-debug" sourcePath="styles.css"/>
+<buildCSSFileEntry destPath="bin-debug" sourcePath="src/ui/themes/common.css"/>
+<buildCSSFileEntry destPath="bin-debug" sourcePath="src/ui/themes/obsidian/inno.css"/>
+<buildCSSFileEntry destPath="bin-debug" sourcePath="src/ui/themes/darkroom/darkroom.css"/>
+<buildCSSFileEntry destPath="bin-debug" sourcePath="src/ui/themes/obsidian/main.css"/>
+<buildCSSFileEntry destPath="bin-debug" sourcePath="src/ui/themes/darkroom/main.css"/>
+</buildCSSFiles>
+</actionScriptProperties>

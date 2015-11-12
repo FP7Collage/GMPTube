@@ -1,0 +1,402 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" 
+	width="100%"
+	height="100%"
+	creationComplete="init();generate_allvideos();">
+	
+	<mx:XML xmlns="" id="allvideonodes" >
+	<Node id="home" label="home" >
+	
+		<Node id="CDLabel" name="{app.videoCategory_CDLabel}" >
+			
+			
+		</Node>
+		<Node id="CDOppLabel" name="{app.videoCategory_CDOppLabel}" >
+			
+		
+		</Node>	
+		<Node id="CDExpertsLabel" name="{app.videoCategory_CDExpertsLabel}" >
+			
+			
+		</Node>
+		
+	    <Node id="fourthLabel" name="{app.label_fourth_videoCategory}" >
+			
+			
+		</Node>
+		
+		<Node id="fifthLabel" name="{app.label_fifth_videoCategory}" >
+			
+			
+		</Node>
+		
+		<Node id="sixthLabel" name="{app.label_sixth_videoCategory}" >
+			
+			
+		</Node>
+
+
+			
+	
+	</Node>
+	</mx:XML>
+	
+	<mx:XML xmlns="" id="structure" >
+	<Node id="home" label="home" >
+	
+			
+		
+	</Node>
+	</mx:XML>
+	
+<mx:HBox height="100%" width="100%">
+	<mx:Tree id="networktree"
+	width="85%"
+	height="100%"
+	labelField="@name"
+	showRoot="false"
+	dataProvider="allvideonodes"
+	rotation="0"
+	doubleClickEnabled="true"
+		/>
+	<mx:VBox width="15%" height="100%">
+		<mx:Text text="{dispLinViewM}" color="blue"/>
+		<mx:ComboBox dataProvider="{linearCombList}" rowCount="8" id="showparticularedgetype"  width="173"></mx:ComboBox> 	
+		<mx:Button label="{bacGraphViewM}"  click="app.currentState='spring_view'" id="gotospring_viewbutton"  width="176"/>
+	</mx:VBox>
+</mx:HBox>
+
+<mx:Script source="Asfiles/as_constants.as" />
+
+	<mx:Script>
+		<![CDATA[	
+			import com.byteencoder.Base64;
+      		import mx.graphics.codec.JPEGEncoder;
+      		import mx.events.*;
+			import mx.events.ItemClickEvent;    
+            import mx.core.Application;
+			import mx.managers.CursorManager;
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.ItemClickEvent;
+			import mx.rpc.events.ResultEvent;
+			import flash.net.FileReference;
+			import mx.managers.PopUpManager;
+			
+			import com.adobe.flex.extras.controls.springgraph.Item;
+			[Bindable]public var app:Tentube=Tentube(Application.application);
+/*			public var fourth:XML=<Node id="fourthLabel" name="{app.label_fourth_videoCategory}" >
+			</Node>;	
+	*/		
+			
+			//[Bindable]public var app:Tentube=Tentube(Application.application); 
+	    	 [Bindable]public var allvideoslist:Array=app.videos_list; 
+	     	[Bindable]public var alluserslist:Array=app.people_list; 
+	     [Bindable]public var i:int; 
+	     
+	     [Bindable] public var linearCombList:Array=new Array(v1024,v1025,v1038,v1026,v1027,v1028,v1029,v1030);
+			
+	    
+	    public function init():void{
+	/*    if(app.enableFourth_videoCategory==true)
+				allvideonodes.appendChild(fourth);
+		*/	
+	    showparticularedgetype.addEventListener(DropdownEvent.CLOSE,getedgetype);
+	    networktree.addEventListener(MouseEvent.DOUBLE_CLICK,load);
+	    allvideoslist.sortOn("@name",Array.CASEINSENSITIVE);
+	    alluserslist.sortOn("@name",Array.CASEINSENSITIVE);
+	    }
+	    
+	private function load(e:Event):void{
+	if(networktree.selectedItem.@nodetype=="People")
+	{
+		app.detailedprofileId	=	(networktree.selectedItem.@id).toString();
+		  			app.currentState		=	'profilingdim';	
+	} 
+	else if(networktree.selectedItem.@nodetype=="Videos")
+	{
+		app.currentState="new_ui";
+		app.startLoadingSingleClick(networktree.selectedItem.@id);
+	}
+	}
+
+
+
+
+	private function getedgetype(e:Event):void{
+	if (ComboBox(e.target).selectedIndex.toString() != "-1")
+	switch(showparticularedgetype.selectedLabel)
+	{
+		case(v1024):
+		generate_allvideos();
+		break;
+		case(v1025):
+		generate_allusers();
+		break;
+		case(v1038):
+		generate_knows();
+		break;
+		case(v1027):
+		generate_hassubmitted();
+		break;
+		case(v1026):
+		generate_hasseen();
+		break;
+		case(v1028):
+		generate_hastags();
+		break;
+		case(v1029):
+		generate_ispreviousversion();
+		break;
+		case (v1030):
+		generate_isrelatedto();
+	}
+	
+	}
+
+
+	     public function generate_allvideos():void{
+		var allvideos:XML=new XML(allvideonodes);		
+	     var loopVideoCategory:String=new String();
+	     	for each(var li:Object in allvideoslist)
+		 		{
+		 			
+		 			loopVideoCategory=li.@category.toString();
+		 			if(loopVideoCategory==app.videoCategory_CDExpertsLabel)
+		 			
+		 			allvideos.Node[2].appendChild(li);
+		 			//CDExpertsLabel.push(li);
+		 			else if(loopVideoCategory==app.videoCategory_CDOppLabel)
+		 			allvideos.Node[1].appendChild(li);
+		 			else if(loopVideoCategory==app.label_fourth_videoCategory)
+		 			allvideos.Node[3].appendChild(li); 
+		 			else if(loopVideoCategory==app.label_fifth_videoCategory)
+		 			allvideos.Node[4].appendChild(li); 
+		 			else if(loopVideoCategory==app.label_sixth_videoCategory)
+		 			allvideos.Node[5].appendChild(li);
+		 			
+		 			else allvideos.Node[0].appendChild(li);
+		 			
+		 			//li=treeSource[2].children();
+		 			//else li.selected=false;
+		 			
+		 			
+		 			//var genxml:XML=new XML(li);
+		 			//videos_inspiration.selectedIndices[i]=1;
+		 			//i=i+1;
+		 		}
+		 		//allvideos.sortOn("@name");
+		 		networktree.dataProvider=allvideos;
+		 	
+	     }
+	     
+	       
+	     public function generate_allusers():void{
+			var allusers:XML=new XML(structure);	
+	     //var loopVideoCategory:String=new String();
+	     	for each(var li:Object in alluserslist)
+		 		{
+		 			
+		 			
+		 			allusers.appendChild(li);
+		 			
+		 		}
+		 		//allusers.sortOn("@name");
+		 		networktree.dataProvider=allusers;
+	     }
+
+	     
+	     public function generate_knows():void{
+	    var allusers:XML=new XML(structure);	
+	     
+	 /*
+	     for each(var li:Object in alluserslist)
+		 		{
+		 			
+		 			
+		 			allusers.appendChild(li);
+		 			
+		 		}
+		*/ 		
+		 for each(var li:Object in alluserslist)
+		{
+			var liii:XML=new XML(li);
+			 i=0;
+			for each(var lii:Object in alluserslist){
+				var fromID:String=(li.@id).toString();
+				var toID:String=(lii.@id).toString();
+				app.linkname		=	'Knows';
+				if(app.LinkAlreadyExists(fromID,toID) || app.LinkAlreadyExists(toID,fromID))
+				{
+					i=1;
+					liii.appendChild(lii);
+				}
+				
+			}
+			if(i==1)
+			allusers.appendChild(liii);
+		}
+		 	//allusers.sortOn("@name");
+		 	networktree.dataProvider=allusers;	
+	     }
+	     
+	      public function generate_hassubmitted():void{
+	       var allhassubmitted:XML=new XML(structure);	
+	        
+		 for each(var li:Object in alluserslist)
+		{	var liii:XML=new XML(li);
+		i=0;
+			for each(var lii:Object in allvideoslist){
+				var fromID:String=(li.@id).toString();
+				var toID:String=(lii.@id).toString();
+				app.linkname		=	'Has submitted';
+				if(app.LinkAlreadyExists(fromID,toID))
+				{
+					i=1;
+					liii.appendChild(lii);
+				}
+				
+			}
+			if(i==1)
+			allhassubmitted.appendChild(liii);
+		}
+		 	//allhassubmitted.sortOn("@name");
+		 	networktree.dataProvider=allhassubmitted;	
+	     }
+	     
+	      
+	       public function generate_hasseen():void{
+	     var allhasseen:XML=new XML(structure);	
+	    
+		 for each(var li:Object in alluserslist)
+		{	var liii:XML=new XML(li);
+		i=0;
+			for each(var lii:Object in allvideoslist){
+				var fromID:String=(li.@id).toString();
+				var toID:String=(lii.@id).toString();
+				app.linkname		=	'Has seen';
+				if(app.LinkAlreadyExists(fromID,toID))
+				{
+					i=1;
+					liii.appendChild(lii);
+				}
+				
+			}
+			if(i==1)
+			allhasseen.appendChild(liii);
+		}
+		 	//allhasseen.sortOn("@name");
+		 	networktree.dataProvider=allhasseen;	
+	     }
+	      
+	      public function generate_hastags():void{
+	      var allhastags:XML=new XML(structure);	
+	     
+		 for each(var li:Object in allvideoslist)
+		{	var liii:XML=new XML(li);
+		i=0;
+			for each(var lii:Object in app.tags_list){
+				var fromID:String=(li.@id).toString();
+				var toID:String=(lii.@id).toString();
+				app.linkname		=	'Has tags';
+				if(app.LinkAlreadyExists(fromID,toID))
+				{
+					i=1;
+					liii.appendChild(lii);
+				}
+				
+			}
+			if(i==1)
+			allhastags.appendChild(liii);
+		}
+		 	//allhastags.sortOn("@name");
+		 	networktree.dataProvider=allhastags;	
+	     }
+	     
+	      public function generate_ispreviousversion():void{
+	      var allispreviousversion:XML=new XML(structure);	
+	     
+		 for each(var li:Object in allvideoslist)
+		{	var liii:XML=new XML(li);
+		i=0;
+			for each(var lii:Object in allvideoslist){
+				var fromID:String=(li.@id).toString();
+				var toID:String=(lii.@id).toString();
+				app.linkname		=	'Is previous version';
+				if(app.LinkAlreadyExists(fromID,toID))
+				{
+					i=1;
+					liii.appendChild(lii);
+				}
+				
+			}
+			if(i==1)
+			allispreviousversion.appendChild(liii);
+		}
+		 		//allispreviousversion.sortOn("@name");
+		 	networktree.dataProvider=allispreviousversion;	
+	     }
+	     
+	      public function generate_isrelatedto():void{
+	      var allisrelatedto:XML=new XML(structure);	
+	      
+		 for each(var li:Object in allvideoslist)
+		{	var liii:XML=new XML(li);
+		i=0;
+			for each(var lii:Object in allvideoslist){
+				var fromID:String=(li.@id).toString();
+				var toID:String=(lii.@id).toString();
+				app.linkname		=	'Is Connected To';
+				if(app.LinkAlreadyExists(fromID,toID) || app.LinkAlreadyExists(toID,fromID))
+				{
+					i=1;
+					liii.appendChild(lii);
+				}
+				
+			}
+			if(i==1)
+			allisrelatedto.appendChild(liii);
+		}
+		 	//allisrelatedto.sortOn("@name");
+		 	networktree.dataProvider=allisrelatedto;	
+	     }
+	     
+	      
+	     
+		]]>
+
+	
+	</mx:Script>
+	
+
+</mx:Module>

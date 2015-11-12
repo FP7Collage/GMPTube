@@ -1,0 +1,168 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<?xml version="1.0"?>
+
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"  width="100%" height="100%" horizontalAlign="left"
+    doubleClick="select();" doubleClickEnabled="true" toolTip="{data.@name.toString()}" click="select();" verticalScrollPolicy="off"  horizontalScrollPolicy="off" horizontalCenter="0" verticalCenter="0" >
+    <!-- used to show the thumbnail of video. plays the video on clicking it	-->
+    
+    <mx:VBox height="100%" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+    	<mx:Image  width="50" height="50" id="im1"  horizontalAlign="center"  verticalAlign="middle" source="{data.@picture.toString()}"/>
+    </mx:VBox>
+    	
+    
+                
+    
+    <mx:VBox id="vIdBox" width="190" height="100%"  verticalScrollPolicy="off" horizontalScrollPolicy="off">
+    
+    <mx:Text text="{data.@name.toString()}" id="vId" truncateToFit="true" width="100%" textAlign="left"  selectable="false" color="#007B26" 
+		fontWeight="bold"/>	
+    
+       
+    	
+  <mx:HBox height="22" horizontalGap="0">	
+   <mx:Text  color="#B6B1B1" visible="true" text="{submitByM1}" textAlign="left"  
+		selectable="false" fontStyle="italic"/>
+	<mx:Text text="{getUserName(data.@submittedby.toString())}"   textAlign="left"  selectable="false" color="#B6B1B1"/>		
+	</mx:HBox>
+    	
+    </mx:VBox>
+		
+       
+        <mx:Script source=".././Asfiles/as_constants.as" />
+        <mx:Script>
+        	<![CDATA[
+        		import mx.controls.Alert;
+        		import mx.core.Application;
+        		import mx.managers.PopUpManager;
+        		import mx.events.CloseEvent;
+        		
+        		public var app:Tentube=Tentube(Application.application);
+        		
+        		/*
+        		private function init():void{
+        			this.height = vId.textHeight + 50;
+        			return;
+        		}
+        		*/
+        		
+        private function alertListenerPlayVideo(eventObj:CloseEvent):void {      
+				if (eventObj.detail==Alert.YES) {
+					// continue as anonymous
+					app.firstTimeAnony = false;
+					app.currentState = 'new_ui';
+					setTimeout(loadVideoSCHome,5000);				
+				}		
+				else if(eventObj.detail==Alert.NO) {
+					// let me login first
+					   	app.actionToClick = "loginFirst";			
+						app.forceLogin();
+ 			      		return;	
+				}
+	        } 
+        		        		
+        		
+        		
+       		private function loadVideoSCHome():void{
+        			app.Curr_Video	=	new XML( data );  
+        			app.startLoadingSingleClick( data.@id.toString() );
+        			
+        		}
+        		
+/*        			private function loadVideoHome():void{
+        			app.Curr_Video	=	new XML( data );  
+        			app.startLoading( data.@id.toString() );
+        		}
+        	
+        		
+        		public function PlayVideo():void{        			
+        			app.currentState = 'new_ui';
+					setTimeout(loadVideoHome,5000);	
+				}
+				
+*/				
+				public  function showAnonyAlert():void{
+					Alert.yesLabel = "Continue as Anonymous";
+					Alert.noLabel = "Let me login in first";
+					Alert.buttonWidth = 150;
+			        Alert.show("You are currently not logged in. Are you sure that you want to enter as \"Anonymous\"? Why don’t you first insert your email id and your key? ", "Want to Login?" ,Alert.YES | Alert.NO, this,alertListenerPlayVideo, null, Alert.YES);
+ 					Alert.yesLabel = v1040;
+ 					Alert.noLabel = v1041;
+ 					Alert.buttonWidth = 60; 						      	
+ 			
+					return;
+				}
+				
+				//new function for single click
+				public function select():void{
+										
+					if (! app.isLoggedIn()){
+				
+				//  For anonymous access alert
+				/*		
+							if(app.firstTimeAnony){
+								showAnonyAlert();
+						      	return;		
+							}
+				*/			
+				
+	         			app.actionToClick = "loginFirst";			
+						app.forceLogin();
+ 			      		return;	
+							
+			 			}
+ 			 			
+					
+					
+					app.currentState = 'new_ui';
+					setTimeout(loadVideoSCHome,5000);
+				}
+				
+				private function getUserName(userId :String):String{
+  		  			var userName: String;  			
+  					userName = "";  			
+  			
+  			  			for each ( var ppl:XML in Application.application.people_list ){
+  							if ( ppl.@id.toString().toLowerCase() == userId.toLowerCase() ){
+  								userName =  ppl.@name.toString();
+  								break;  // added to make the code more efficient
+  							}
+  						}
+  		          return userName;
+  		}
+  			
+
+        	]]>
+        </mx:Script>
+</mx:HBox> 

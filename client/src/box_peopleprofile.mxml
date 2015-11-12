@@ -1,0 +1,248 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" 
+    creationComplete="this.addEventListener(MouseEvent.CLICK,windowClicked);" title="{titlename}" x="168" y="86"  height="112" width="276" 
+    backgroundAlpha="1.0" layout="absolute"	 borderThicknessRight="0" 
+    borderThicknessLeft="0" borderThicknessBottom="0" 
+    borderThickness="0" borderThicknessTop="0"	
+    showCloseButton="true" visible="true"
+    close="RemoveMe()" color="#000000" 	addedEffect="Fade" >
+	
+	<!-- the profile of user's are shown using this. 
+		 there are two states: normal, ShowAll
+		 
+		list of attributes shown are:
+			1. name
+			2. jobtitle
+			3. picture
+			4. company
+			5. location 
+			6. nationality
+			7. short description	( State = "ShowAll" )
+			8. link to homepage		( State = "ShowAll" )	  	
+		
+		when it is created, it is added as a child to profilebox:Vbox in profileview:State of Tentube.mxml
+		but later when the button1:Button is clicked, control goes to "ShowAll" State, 
+		we also move the window outside the Vbox ( push into the main screen )
+		now it becomes movable
+		
+		even a double click of the window will have the same effect as clicking button1:Button
+		-->
+	
+	<mx:states>
+		<mx:State name="ShowAll">
+			<mx:SetProperty name="width" value="284"/>
+			<mx:SetProperty name="height" value="168"/>
+			<mx:SetProperty target="{button1}" name="x" value="250"/>
+			<mx:SetProperty target="{button1}" name="y" value="112"/>
+			<mx:AddChild position="lastChild">
+				<mx:TextArea x="5" y="60" width="270" height="50" id="pshortdesc" text="{shortdesc}" editable="false" fontStyle="normal" color="#666363"/>
+			</mx:AddChild>
+			<mx:SetEventHandler target="{button1}" name="click" handler="currentState=''"/>
+			<mx:SetStyle target="{button1}" name="icon" value="@Embed('media/prof_norma.png')"/>
+			<mx:AddChild position="lastChild">
+				<mx:LinkButton x="0" y="114" click="newWin()" label="{goToHPM}" id="linkwebPage" textAlign="left" color="#7C7575"/>
+			</mx:AddChild>
+			<mx:SetProperty target="{pdesignation}" name="width" value="150"/>
+			<mx:SetProperty target="{pcompany}" name="width" value="150"/>
+			<mx:SetProperty target="{pnationality}" name="width" value="150"/>
+		</mx:State>
+	</mx:states>
+	
+	
+	<!-- for smooth resizing  -->				
+	<mx:transitions>
+		<mx:Transition id="Expand" fromState='*' toState='ShowAll'>
+			<mx:Resize target="{this}" />
+		</mx:Transition> 
+		
+		<mx:Transition id="Contract" fromState='ShowAll' toState='*'>
+			<mx:Resize target="{this}" duration="250" />
+		</mx:Transition>
+	</mx:transitions> 
+
+<mx:Script source="Asfiles/as_constants.as" />
+<mx:Script>
+	<![CDATA[
+		import mx.core.UIComponent;
+		import mx.core.Application;
+		import mx.managers.PopUpManager;
+        import mx.controls.Text;
+        import mx.controls.Alert;
+        import flash.net.navigateToURL;
+        import flash.events.MouseEvent;
+        import mx.events.DragEvent;
+       
+
+		[Bindable]public var Url:String=new String();
+		[Bindable]public var nodeid:String=new String();
+		[Bindable]public var titlename:String=new String();
+		[Bindable]public var shortdesc:String=new String();
+		
+		[Bindable]public var jobtitle:String=new String();
+		[Bindable]public var picture:String=new String();
+		[Bindable]public var company:String=new String();
+		[Bindable]public var location:String=new String();
+		[Bindable]public var nationality:String=new String();
+
+		public var insidevbox:Boolean	=	true;
+		public var myRef:UIComponent=new UIComponent();
+		
+		
+		[Bindable]
+ 		public var app:Tentube=Tentube(Application.application);  
+		private var lastMouseDownTime: int = -999999;    
+		
+		
+		
+		/** when the time difference between mouse click is less than 300 ms, it is 
+			considered as a double click
+			and we change the state
+		 **/
+		 
+		public function windowClicked(e:MouseEvent):void{
+   	 		var now: int = getTimer();
+   			if((now - lastMouseDownTime) < 300) {
+   				this.addEventListener(MouseEvent.CLICK,windowClicked);
+   				getLost();
+				return;
+   			}
+   			lastMouseDownTime = now;  		 	
+   		 }
+   		
+   		
+   		/**  push out the window into the main page		**/ 	
+		private function getLost():void{
+			if ( insidevbox == true ){
+				insidevbox			=	false;
+				app.profilebox.removeChild(myRef);
+				app.addshortProfile(this);
+			}
+			if ( currentState == 'ShowAll' )
+				currentState	=	'';
+			else
+				currentState	=	'ShowAll';
+			
+		}
+		
+
+
+	private function openDetailedProfile():void{
+		
+	       var pid: String = new String();
+	       pid = nodeid;
+	    
+			//RemoveMe();
+			//insidevbox			=	false;
+			app.detailedprofileId	=	pid;			
+			app.currentState    = 'profilingdim';					
+			
+		}
+
+
+		
+		/**  function called when the user clicks the close button in the window
+				1. we remove its reference in Vbox_Refs:Array, in which it was pushed when 
+				   it was created in Flexitem.mxml
+				2. we remove the id of profile from Vbox_Ids:Array, in which it was pushed when 
+				   it was created in Flexitem.mxml 
+				3. now, if after removing the reference and id from the correponding arrays,
+				   if the length of profilebox:vBox == 0 in ProfileView state, 
+				   we change the state of application to spring_view
+		**/ 	
+		
+    	public function RemoveMe():void{    							
+			var myIndex:Number; 
+			myIndex =  app.Vbox_Ids.indexOf( nodeid );
+			
+			var friends:Array;
+   		 	var first:Array;
+   		 	var last:Array;
+   		 	
+			friends 		= 	app.Vbox_Ids; 
+			first			=	friends.splice(0,myIndex);
+	   	 	last			=	friends.splice(1,friends.length-1);
+			friends			=	first.concat(last);
+			app.Vbox_Ids	=friends;
+	
+			friends			=	[];	
+			first			=	[];
+			last			=	[];
+			friends 		=	 app.Vbox_Refs; 
+			first			=	friends.splice(0,myIndex);
+	   	 	last			=	friends.splice(1,friends.length-1);
+			friends			=	first.concat(last);
+			app.Vbox_Refs	=	friends;
+   		 	
+   		 	if ( insidevbox == true ){
+   		 		app.profilebox.removeChild(myRef);     			
+      		}	
+      		else{
+      			PopUpManager.removePopUp(this);
+      			// do nothing
+      		}	
+      		
+      		
+        	if 	( app.Vbox_Refs.length == 0 )
+				app.currentState='spring_view';
+   		 										
+        	myRef=null;
+        	Url=null;
+        	nodeid=null;
+        	titlename=null;
+        	shortdesc=null;
+        } 
+        
+        
+        /**  opens the home page of user in new tab		**/
+         
+        private function newWin():void {
+			var urlRequest:URLRequest = new URLRequest(Url);
+			navigateToURL(urlRequest, '_blank');
+		} 
+			
+        
+        
+	]]>
+</mx:Script>
+    <mx:Label color="#666363" text="{titleM}" x="60" y="2" width="79" height="16" id="label1" fontSize="9"/>
+    <mx:Label text="{companyM}" color="#666363"  x="60" y="16" height="16" width="68" id="label2"/>
+    <mx:Image source="{picture}" x="2" y="2" width="55" height="52" id="profPicture"/>
+    <mx:Button color="{app.colorreturn()}"  icon="@Embed('media/prof_exp.png')" x="242" y="56" width="24" id="button1" height="24" click="getLost();" tabEnabled="true" tabIndex="0"/>
+    <mx:Label text="{company}" x="125" y="16" id="pcompany" height="16" fontWeight="bold"  color="#666363"  width="141"/>
+    <mx:Label text="{jobtitle}" x="125" y="2" id="pdesignation" height="16" fontWeight="bold"  color="#666363"  width="141"/>
+    <mx:Label text="{natM}" x="60" y="32" height="16" width="68" id="label3" color="#666363" />
+    <mx:Label text="{nationality}" x="125" y="32" id="pnationality" height="16" fontWeight="bold"  color="#666363"  width="141"/>
+
+    
+</mx:TitleWindow>  
+

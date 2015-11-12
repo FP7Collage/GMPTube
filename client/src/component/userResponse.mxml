@@ -1,0 +1,384 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<?xml version="1.0" encoding="utf-8"?>
+
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="com.Rating.*"
+    height="118" verticalCenter="0" horizontalCenter="0" verticalAlign="top" horizontalAlign="center" verticalGap="3"  horizontalScrollPolicy="off" verticalScrollPolicy="off"  width="157">
+	
+	<mx:Text id="tagsId" text="{getTags(data)}"  toolTip="{tt_getTags}" width="100%"  textAlign="center" selectable="false"  height="20"  color="#007B26" />
+	<mx:Text id="descId" text="{getDescription(data)}" toolTip="{tt_getDescription}" width="100%"  textAlign="center" selectable="false"  height="20" color="#007B26" />
+	
+	<mx:HBox width="145">
+		<mx:Button id="btnAttach" width="65" label="{attachM}"    toolTip="{clickTULM}" visible="{app.attachButtonVisible}" click="openUploadPanel()" height="16"/>
+		<mx:Button id="btnDiscuss" width="65" label="{discussM}" color="{getDiscussBtnColor(data)}"   toolTip="{clickODVM}" visible="{app.attachButtonVisible}" click="openForum()" height="16"/>
+		
+	</mx:HBox>
+	
+<!--	<mx:ComboBox close="confirm_change_videocategory();" id="change_video_category" toolTip="{setTCCVM}" visible="{app.adminenter}" dataProvider="{Application.application.video_catagories}" width="109" height="22" />-->
+	
+	<mx:HBox width="145" horizontalScrollPolicy="off">		
+	<mx:Button label="{v1074}" width="65" height="16"  id="replaceVideoBtn" click="{replaceVideoPage()}" visible="{app.adminenter || (data.@submittedby.toString()==app.Univ_LoginId1) || (data.@authors.toString().indexOf(app.Univ_LoginId1)>=0) }"/>
+		<mx:Button label="{editM}" width="65" height="16" id="editVideoBtn" click="{editVideoPop()}" visible="{app.adminenter || (data.@submittedby.toString()==app.Univ_LoginId1) || (data.@authors.toString().indexOf(app.Univ_LoginId1)>=0) }"/>
+	
+				
+	</mx:HBox>
+	<mx:HBox>
+	<mx:Button label="{v1089}" width="65" height="16" id="alertMembersBtn" toolTip="{v1090}" click="{alertMembersPop()}" visible="{app.adminenter || (data.@submittedby.toString()==app.Univ_LoginId1) || (data.@authors.toString().indexOf(app.Univ_LoginId1)>=0) }"/>
+
+	<mx:LinkButton icon="@Embed(source='../media/delete.png')" click="{deletevideo()}" toolTip="{clickTRVM}"  width="18" height="18" color="#818080"  textAlign="center" fontWeight="bold" fontSize="11" id="lbldelete" visible="{app.adminenter || data.@submittedby.toString()==app.Univ_LoginId1}"/>
+	
+	</mx:HBox>
+	
+	<Ratings horizontalGap="3" tooltips="{ratingToolTipList}" 
+	value="{data.@grandrating.toString()}" id="dynamicRating" enabled="true"
+	width="100%" height="8" points="5" innerRadius="5" outerRadius="5" angle="0" />
+	
+	<!-- contains the tags and rating of the video.
+			in admin mode, it also has a "delete" image, which can be used to delete the video
+			
+	-->
+
+
+<mx:Script source=".././Asfiles/as_constants.as" />	
+	<mx:Script>
+		<![CDATA[
+			import mx.messaging.channels.AMFChannel;
+			import com.adobe.flex.extras.controls.forcelayout.ForceDirectedLayout;
+			import mx.binding.utils.BindingUtils;
+			import com.adobe.flex.extras.controls.springgraph.Item;
+			import mx.messaging.config.ServerConfig;
+			import mx.events.CloseEvent;
+			import mx.controls.Alert;
+			import mx.core.Application;
+			import mx.managers.PopUpManager;
+			import component.editVideoPopup;
+			
+			import mx.managers.ToolTipManager;
+     		import mx.controls.ToolTip;
+     		import mx.events.ToolTipEvent;
+     		
+     	
+     		
+     		public function getDiscussBtnColor(data :Object):uint{
+     			    			   
+     	          if(data.@discussNum.toString()!=""){
+     					return 0xFFAAAA;;
+     				}else{
+     					return 0xFFFFFF;
+     				
+     				}
+     				
+     		}
+     		
+     		public function isVisible():Boolean{
+     			
+     		if(data.@authors.toString().indexOf(app.Univ_LoginId1)>=0){
+     			return true;
+     		}
+     		
+     		if (data.@submittedby.toString()==app.Univ_LoginId1){
+     			return true;
+     		}
+     		
+     		if(app.adminenter== true){
+     			return true;
+     		}
+     			
+     			return false;
+     		}
+
+
+/*
+       // setting the tags and the description
+     		public function initApp():void {
+     			getTagsDesc();
+        	//	tagsId.addEventListener(ToolTipEvent.TOOL_TIP_SHOW, TagsToolTipChanger)
+        	//	descId.addEventListener(ToolTipEvent.TOOL_TIP_SHOW, DescToolTipChanger)
+        		
+     		}
+     
+     public function TagsToolTipChanger(event:ToolTipEvent):void {
+             ToolTipManager.currentToolTip.text = tt_getTags;
+     }
+    
+     
+      public function DescToolTipChanger(event:ToolTipEvent):void {
+             ToolTipManager.currentToolTip.text = tt_getDescription;
+     }
+	
+	*/			
+			[Bindable]
+ 			public var app:Tentube=Tentube(Application.application);  
+ 			public var req_category:String;
+ 			
+ 			[Bindable] private var tt_getTags:String;
+ 			[Bindable] private var tt_getDescription:String;
+ 			
+ 			[Bindable] public var ratingToolTipList:Array=new Array(poorRM,notSM,worthWM,prettyCM,aweM);
+ 			
+ 			
+ 			public function getTagsDesc():void{
+ 				
+ 		//		getTags();
+ 		//		getDescription();
+ 				
+ 			}
+ 			
+ 			public function getTags(data :Object):String{
+ 				
+ 				if(data == null){
+ 					return "Tags...";
+ 				}
+ 				
+ 				if (data.@tags.toString()!= ""){
+ 				    tt_getTags = data.@tags.toString();	
+ 				   	}
+ 				else{
+ 					tt_getTags = noTagsSVM;
+ 				}
+ 			
+ 			return tagsDotM;	
+ 			}
+ 			
+ 			public function getDescription(data:Object): String{
+ 				
+ 				if(data == null){
+ 					return descDotM;
+ 				}
+ 				
+ 				if (data.@description.toString()!= ""){
+ 				    tt_getDescription = data.@description.toString();	
+ 				}
+ 				else{
+ 					tt_getDescription = noDesSVM;
+ 				}
+ 				
+ 				return descDotM;
+ 			}
+ 			
+ 			public function setInvisible():void{
+ 				btnAttach.visible=false;
+ 				
+ 				
+ 			}
+ 			private function openUploadPanel():void
+ 			{
+ 				
+ 		  if (! app.isLoggedIn()){
+ 			      app.forceLogin();
+ 			      return;
+ 			  }   				
+ 		
+ 				
+ 				var docLinksArray:Array;
+ 			   	var j:int;
+ 			   	var tempstr:String=new String();
+ 				if(app.currentState    == 'new_ui') {
+ 					// Alert.show(data.@docLinks.toString(),"Alert");
+ 			  		app.newui_docsUploadVideoId=data.@id.toString();
+// 			  		app.newui_progressText.text= data.@docLinks.toString();
+ 			  		app.newui_documents_list_for_display=data.@docLinks.toString();
+ 			  
+ 			  		if(app.newui_documents_list_for_display.length >0)
+ 			  			docLinksArray = app.newui_documents_list_for_display.split("|");
+ 			  		else
+ 			  			docLinksArray = new Array();
+ 			   
+ 			   		for(j=0;j<docLinksArray.length;j++)
+			  		{ 
+			  	  		if(j==0)
+			  	  			tempstr=docLinksArray[j].toString();
+			  	  		else 
+			  	   			tempstr=tempstr+"\n"+docLinksArray[j].toString();
+			 		}
+			 		app.docsListData=docLinksArray;
+			 		app.newui_progressText.dataProvider=app.docsListData;	  
+//			  		app.newui_progressText.text=tempstr;
+//			  		app.newui_documents_list_for_display=app.newui_progressText.text;
+			 		// Alert.show(app.adminpanel.documents_list_for_display,"DIsplaying text-userresponse.mxml");
+			  		app.newui_documents_list_for_upload=data.@docLinks.toString();
+ 			  		app.linksListData= data.@externalLinks.toString().split("\r");
+ 			  		app.newui_uploadDocsPanel.visible=true;
+ 				} else {
+ 					// Alert.show(data.@docLinks.toString(),"Alert");
+ 			  		app.adminpanel.docsUploadVideoId=data.@id.toString();
+ 			  		app.adminpanel.adminpanel_progressText.text= data.@docLinks.toString();
+ 			  		app.adminpanel.documents_list_for_display=data.@docLinks.toString();
+ 			  
+ 			  		docLinksArray = app.adminpanel.documents_list_for_display.split("|");
+ 			   
+ 			   		for(j=0;j<docLinksArray.length;j++)
+			  		{ 
+			  	  		if(j==0)
+			  	  			tempstr=docLinksArray[j].toString();
+			  	  		else 
+			  	   			tempstr=tempstr+"\n"+docLinksArray[j].toString();
+			 		}	  
+			  		app.adminpanel.adminpanel_progressText.text=tempstr;
+			  		app.adminpanel.documents_list_for_display=app.adminpanel.adminpanel_progressText.text;
+			 		// Alert.show(app.adminpanel.documents_list_for_display,"DIsplaying text-userresponse.mxml");
+			  		app.adminpanel.documents_list_for_upload=data.@docLinks.toString();
+ 			  		app.adminpanel.adminpanel_externalLinks.text= data.@externalLinks.toString();
+ 			  		app.adminpanel.uploadDocsPanel.visible=true;	
+ 			 }
+ 		}
+ 			
+ 			private function openForum():void{
+ 				
+ 				 if (! app.isLoggedIn()){
+ 			      app.forceLogin();
+ 			      return;
+ 			      }   	
+ 				
+ 				var it:Item = app.fullGraph.find(app.Univ_LoginId1);
+ 				var urlStr:String = app.ServerPath+"Forum/InnoForum.html?userid="+app.Univ_LoginId1+"&username="+it.data.@name.toString()+"&videoid="+data.@id.toString();
+				var webPageURL:URLRequest = new URLRequest( urlStr );
+	  		    navigateToURL(webPageURL, '_blank');
+
+ 			}
+ 			
+ 			
+ 			private function deletevideo():void{
+ 				Alert.show(areYouRemoveVM, alertM ,Alert.YES | Alert.NO, this,alertListener, null, Alert.YES);		
+ 			} 		 		
+	 		
+		    private function alertListener(eventObj:CloseEvent):void {      
+				if (eventObj.detail==Alert.YES) {
+					app.deletevideo( data.@id.toString() );				
+				}		
+				else if(eventObj.detail==Alert.NO) {
+					// do nothing	
+				}
+	        }
+	        
+	        private function replaceVideoPage():void{
+	        	
+	        	        	
+		 		if (! app.isLoggedIn()){
+ 			    	  app.forceLogin();
+ 			      	  return;
+ 			         }
+ 			         
+ 			         app.replaceVideoId = data.@id.toString();
+ 			     			        
+				app.pausevideo();
+				app.currentState = 'videoreplace';
+	        }
+	        
+	        
+			private function editVideoPop():void{
+				
+				// sort the people list
+			    app.people_list.sortOn("@id",Array.CASEINSENSITIVE);
+				
+				var editPop:editVideoPopup = editVideoPopup(PopUpManager.createPopUp(app,editVideoPopup,true));
+				editPop.data = this.data;
+				PopUpManager.centerPopUp(editPop);
+	        }
+	        
+	        private function alertMembersPop():void{
+	        	
+	       
+				var amPop:alertMembersPopup = alertMembersPopup(PopUpManager.createPopUp(app,alertMembersPopup,true));
+				 amPop.setStyle("borderAlpha", 0.9);
+				amPop.data = this.data;
+				PopUpManager.centerPopUp(amPop);
+					
+	        }
+	        
+	        
+	        
+/*	        
+			public function confirm_change_videocategory():void{
+				if(change_video_category.selectedLabel!="")
+					Alert.show(areYouChgCVM, alertM ,Alert.YES | Alert.NO, this,alertListener_confirm_change_videocategory, null, Alert.YES); 
+			}
+			
+*/			
+	       private function alertListener_confirm_change_videocategory(eventObj:CloseEvent):void {
+		    	      
+				if (eventObj.detail==Alert.YES) {
+				/*	
+					switch(change_video_category.selectedLabel)
+       	        	{
+	        		
+	        		case 'Innovation':
+	        		  if(data.@category.toString()==change_video_category.selectedLabel)
+	        		  {
+	        		    Alert.show("The Video is present in****itself", "Alert");   
+	        		    return; 
+	        		  } 
+	        		  req_category = "CD";
+	        		 break;
+	        		 
+	        		case 'CD Opportunities':
+	        		  if(data.@category.toString()=="CD Opportunities")
+	        		  { 
+	        		  	 Alert.show("The Video is present in CD Opportunities itself", "Alert");
+	        		  	 return;
+	        		  }
+	        		  
+	        		  req_category = "CD Opportunities";
+	        		 break;
+	        		 
+	        		case 'CD Experts':
+	        		   if(data.@category.toString()=="CD Experts")
+	        		   {
+	        		   	  Alert.show("The Video is present in CD Experts itself", "Alert");
+	        		   	  return;
+	        		   } 
+	        		req_category = "CD Experts";
+	        		 break;
+	        	}
+
+					*/
+/*
+
+has disabled the change category
+					req_category =change_video_category.selectedLabel;
+								app.change_videocategory( data.@id.toString(),req_category );
+								
+*/										
+				}		
+				else if(eventObj.detail==Alert.NO) {
+					// do nothing	
+				}
+	        }
+	        
+	        
+	        
+			
+		]]>
+	</mx:Script>
+</mx:VBox>

@@ -1,0 +1,189 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" horizontalAlign="left"
+	x="0" y="410"
+	verticalAlign="bottom" close="PopUpManager.removePopUp(this);app.SelrelWindowOpen = false"
+	title="{selRePM}" layout="absolute" height="400" width="270"  showCloseButton="true">
+	<!--
+	 <mx:Vbox id="relvbox" />
+	 -->
+	<mx:VBox y="20" height="320" width="229">
+		<mx:CheckBox id="chkKnows" label="{v1038}" color="{app.colorreturn()}" />
+		<mx:CheckBox id="chkHasseen" label="{v1026}" color="{app.colorreturn()}"/>
+		<mx:CheckBox id="chkHassubmitted" label="{v1027}" color="{app.colorreturn()}"/>
+		<mx:CheckBox id="chkHastags" label="{v1028}" color="{app.colorreturn()}"/>
+		<mx:CheckBox id="chkIspreviousversion" label="{v1029}" color="{app.colorreturn()}"/>
+		<mx:CheckBox id="chkIsConnectedTo" label="{v1030}" color="{app.colorreturn()}"/>
+		<mx:CheckBox id="chkRelatesTo" label="{v1031}" color="{app.colorreturn()}"/>
+
+		<mx:CheckBox id="chkHasInterest" label="{v1032}" color="{app.colorreturn()}"/>
+		<mx:CheckBox id="chkHasCommented" label="{v1033}" visible="{app.islab()}" color="{app.colorreturn()}"/>
+		<mx:CheckBox id="chkHasRated" label="{v1034}" visible="{app.islab()}" color="{app.colorreturn()}"/>
+		<mx:CheckBox id="chkHasGiven" label="{v1035}" visible="{app.islab()}" color="{app.colorreturn()}"/>
+		<mx:CheckBox id="chkHasBeenAssesed" label="{v1036}" visible="{app.islab()}" color="{app.colorreturn()}"/>
+		<mx:CheckBox id="chkHasBeenInvolved" label="{v1037}" visible="{app.islab()}" color="{app.colorreturn()}"/>	
+
+	
+
+	</mx:VBox>
+	<mx:Button label="{submitRM}" click="draw();" x="10" y="335"/>
+	
+	<mx:Script source="Asfiles/as_constants.as" />
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.Text;
+			import mx.containers.*;
+			import mx.events.DropdownEvent;
+			import mx.controls.*;
+			import mx.core.Application;
+			import mx.managers.PopUpManager;
+			import com.adobe.flex.extras.controls.springgraph.Item; 
+			[Bindable]public var app:Tentube=Tentube(Application.application); 
+
+			/*
+			private function init():void
+			{
+				var relvbox:VBox= new VBox();
+				var relarray:Array= new Array("Knows","Has seen","Has submitted","Has tags","Is previous version","Is Connected To","Relates To","Has Interest");
+				var i:int=0;
+				for each(var rel:String in relarray)
+				{
+					var relhbox:HBox= new HBox();
+					var relchkbox:CheckBox= new CheckBox();
+					relchkbox.id="chk" +i.toString();
+					var reltext:TextArea=new TextArea();
+					reltext.height=15;
+					reltext.editable=false;
+					reltext.text=rel;
+					//reltext.
+					relhbox.addChild(relchkbox);
+					relhbox.addChild(reltext);
+					relvbox.addChild(relhbox);
+					i++;
+				}
+				this.addChildAt(relvbox,0);
+				
+				
+			}
+	*/
+			private function selectall():void
+			{
+				
+				chkKnows.selected = true;
+				chkHassubmitted.selected=true;
+				chkHasseen.selected=true;
+				chkHastags.selected=true;
+				chkIspreviousversion.selected=true;
+				chkIsConnectedTo.selected=true;
+				chkRelatesTo.selected=true;
+				chkHasInterest.selected=true;
+				chkHasGiven.selected=true;
+				chkHasBeenInvolved.selected=true;
+				chkHasRated.selected=true;
+				chkHasCommented.selected=true;
+				chkHasBeenAssesed.selected=true;
+				
+			}
+			private function deselectall():void
+			{
+				
+				chkKnows.selected = false;
+				chkHassubmitted.selected=false;
+				chkHasseen.selected=false;
+				chkHastags.selected=false;
+				chkIspreviousversion.selected=false;
+				chkIsConnectedTo.selected=false;
+				chkRelatesTo.selected=false;
+				chkHasInterest.selected=false;
+				chkHasGiven.selected=false;
+				chkHasBeenInvolved.selected=false;
+				chkHasRated.selected=false;
+				chkHasCommented.selected=false;
+				chkHasBeenAssesed.selected=false;
+			}
+			private function draw():void
+			{
+				var i:int=0;
+				var drawarray:Array= new Array();
+				
+				// the lables are conidered as case sen
+								
+				if(chkKnows.selected==true)
+					drawarray.push("Knows");
+				if(chkHassubmitted.selected==true)
+					drawarray.push("Has submitted");
+				if(chkHasseen.selected==true)
+					drawarray.push("Has seen");
+				if(chkHastags.selected==true)
+					drawarray.push("Has tags");
+				if(chkIspreviousversion.selected==true)
+					drawarray.push("Is previous version");
+				if(chkIsConnectedTo.selected==true)
+					drawarray.push("Is Connected To");
+				if(chkRelatesTo.selected==true)
+					drawarray.push("Relates To");
+				if(chkHasInterest.selected==true)
+					drawarray.push("Has Interest");
+				if(chkHasGiven.selected==true)
+					drawarray.push("Has given");
+				if(chkHasBeenInvolved.selected==true)
+					drawarray.push("Has been involved in");
+				if(chkHasRated.selected==true)
+					drawarray.push("Has Rated");
+				if(chkHasCommented.selected==true)
+					drawarray.push("Has Commented");
+				if(chkHasBeenAssesed.selected==true)
+					drawarray.push("Has been assessed in");
+				
+					
+				
+				app.drawmultedgetypes(drawarray);
+			}
+	
+		]]>
+	</mx:Script>
+	<mx:LinkButton x="98" y="-4" click="selectall()" label="{allM}" color="yellow" id="selectchk" fontWeight="bold"/>
+	<mx:LinkButton x="160" y="-4" click="deselectall()" label="{noneM}" color="yellow" id="deselect" fontWeight="bold" fontThickness="12"/>
+	<mx:Label x="10" y="-2" text="{selectM}" width="80" color="red"  height="20"/>
+
+</mx:TitleWindow> 
+
+
+
+
+
+
+
+
+
+
+

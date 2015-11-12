@@ -1,0 +1,120 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" width="362" height="134" layout="absolute" 
+	 title="{plzEAKM}" fontWeight="bold" horizontalAlign="center" verticalAlign="middle" 
+ 		 creationComplete="init()" horizontalCenter="0" verticalCenter="0"
+ 		  color="white" showCloseButton="true" close="PopUpManager.removePopUp(this)"
+ 		  verticalScrollPolicy="off" horizontalScrollPolicy="off">
+	
+	<!-- this window pops up for administrator login, 
+			the administrator is also an user with 
+				username	:	admin
+				key			:	ten1		
+			but we ask the user to enter just the admin key
+			we send request to server to authenticate the key, and change the state correspondingly
+	-->
+	
+	<mx:HTTPService id="check" url="{app.ServerPath}GraphData/authenticate.php" result="showresponse();" useProxy="false" method="POST" showBusyCursor="true">
+		<mx:request xmlns="">
+			<username>admin</username>
+			<password>{vKey.text.replace(new RegExp("\s"), '')}</password>
+		</mx:request>
+	</mx:HTTPService>
+	
+	<mx:Script source=".././Asfiles/as_constants.as" />
+
+	<mx:Script>
+		<![CDATA[
+			import mx.events.CloseEvent;
+			import mx.core.Application;
+			import mx.managers.PopUpManager;
+	    	import mx.controls.Alert;
+        	import flash.events.MouseEvent; 
+
+			[Bindable]
+   			public var app:Tentube	=Tentube(Application.application);
+
+			private function init():void{
+				//vKey.dispatchEvent(new Event('mouseUp'));
+				vKey.setFocus();
+			}
+			
+			private function Authenticate():void {   
+	     		check.send();
+
+				return;
+			}
+			
+			public function showresponse():void{
+	    		var responseMessage:String;
+	    		try{
+		    		responseMessage = check.lastResult.rsp.message;
+		   			switch ( responseMessage ){
+		   				case 'Success':
+							app.adminenter 		= 	true;
+							app.stopVideo();
+							app.currentState	=	'adminmode';
+							app.adminstatus=true;
+							app.adminMode=true;
+							app.attachButtonVisible=false;
+							PopUpManager.removePopUp(this);	
+		   				break;
+		   				default:
+		   					Alert.show(responseMessage,'Error');
+		   			}
+	     			app.loadnetwork.send();
+	    		}
+	    		catch(e:Error) {
+	    			Alert.show('Unable to connect to server.','Error !');	
+	    		}
+	   			return;
+		    }
+     
+		]]>
+	</mx:Script>
+	
+	<mx:Form label="{loginM}" width="100%" defaultButton="{adminAuthBtn}">
+			<mx:FormItem width="100%" label="{keyM}">
+				<mx:TextInput id="vKey" displayAsPassword="true" tabEnabled="true" tabIndex="0" width="100%" enter="{adminAuthBtn.dispatchEvent(new MouseEvent(MouseEvent.CLICK))}"/>
+			</mx:FormItem>
+		</mx:Form>
+	<mx:ControlBar>
+		<mx:Button label="{cancelM}" paddingLeft="10" labelPlacement="bottom" click="this.dispatchEvent(new CloseEvent(CloseEvent.CLOSE))"/>
+		<mx:Spacer width="100%"/>
+		<mx:Button id="adminAuthBtn" label="{authAM}" click="Authenticate();" tabEnabled="true" tabIndex="1"/>
+	</mx:ControlBar>
+	
+</mx:TitleWindow>
+

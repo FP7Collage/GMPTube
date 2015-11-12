@@ -1,0 +1,110 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="390" height="24">
+	<mx:HSlider id="strengthSlider" x="238" y="0" width="150" minimum="0" value="{findStrength(data.toString())}" maximum="100" snapInterval="10" allowTrackClick="true" height="14" enabled="true" change="changed9();" toolTip="{strengthSlider.value}"/>
+	<mx:Text x="10" y="0" text="{findName(data.toString())}" width="220" height="24"/>
+	<mx:Script>
+		<![CDATA[
+			    import mx.core.Application;
+        		import mx.managers.PopUpManager;
+        		import com.adobe.flex.extras.controls.springgraph.Item;
+        		import mx.controls.Alert;
+				import com.adobe.flex.extras.controls.springgraph.Item;	
+        		
+        		public var app:Tentube=Tentube(Application.application);
+        		private function findName(id:String):String{
+        			for each(var comp:XML in app.tentube_registerpage.competencesArray){
+        				if(comp.@id.toString()==id){
+        					return comp.@name.toString();
+        				}
+        			}
+        			return null;
+        		}
+        		private var strengthIndex:int;
+        		private var endIndex:int;
+        		private function changed9():void{
+                       var tempstr2:Number=new Number(strengthSlider.value);
+                    var competences:String= app.tentube_registerpage.compString.toString();
+        		    strengthIndex=competences.search(data.toString());
+       				if(strengthIndex==-1)
+       				{   
+       					 if(app.tentube_registerpage.compString.toString()=="")
+       					 {
+       					   app.tentube_registerpage.compString=data.toString()+"?"+tempstr2;
+       					   return;
+       					 }
+       					app.tentube_registerpage.compString=app.tentube_registerpage.compString.toString()+","+data.toString()+"?"+tempstr2;
+       			//	    Alert.show(app.tentube_registerpage.compString.toString(),"tommy");
+     				    
+       				    return;
+       				}
+       				
+       				 var tempstr:String=data.toString()+"?";
+        		     strengthIndex=strengthIndex+tempstr.length;
+        		     var p:int;
+        		  var strengthString:String="";
+        		  for(p=strengthIndex;competences.charAt(p)!="," && p<competences.length;p++)
+        		  {}
+        		  endIndex=p; 
+                     //Alert.show(tempstr2.toString(),"tempstr2");
+                 
+                 
+                    
+        			app.tentube_registerpage.compString=app.tentube_registerpage.compString.substring(0,strengthIndex)+tempstr2.toString()+app.tentube_registerpage.compString.substring(endIndex);
+            //           Alert.show(tempstr2.toString(),"My dear temp string...");
+               //       Alert.show(app.tentube_registerpage.compString.toString()); 
+        		}
+        		private function findStrength(id:String):Number{
+        		
+        		  var competences:String= app.tentube_registerpage.compString.toString();
+        		  strengthIndex=competences.search(id);
+        		  if(strengthIndex==-1)
+        		    return 0; 
+        		  var tempstr:String=id+"?";
+        		  strengthIndex=strengthIndex+tempstr.length;
+        		  var p:int;
+        		  var strengthString:String="";
+        		  for(p=strengthIndex;competences.charAt(p)!="," && p<competences.length;p++)
+        		  {
+        		     strengthString=strengthString+competences.charAt(p);     
+        		  }
+        		  // Alert.show(strengthString,"strength str"); 
+        		  endIndex=p;  
+        		 //strengthIndex=strengthIndex-tempstr.length;
+        		  return uint(strengthString);
+        		} 
+		]]>
+	</mx:Script>
+</mx:Canvas>

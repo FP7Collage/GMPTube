@@ -1,0 +1,609 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow creationComplete="init()" xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="482" height="436" xmlns:ns1="*">
+	
+	
+	<mx:FormItem label="{tagM}" color="#A49494" fontWeight="bold" width="402.5" x="10" y="122" height="90">
+	    <mx:Text text="{selectTagDM}"/>
+	    <mx:HBox width="100%">
+	        <mx:ComboBox labelField="@name" dataProvider="{app.tags_list}" id="cmbTags" width="165"></mx:ComboBox>
+	        <mx:TextInput id="newTagInput" visible="false"/>
+	    </mx:HBox>
+	    <mx:HBox width="100%">
+	        <mx:Button label="{delTagM}" id="btnDeletetag" width="85" click="confirm_tag()"/>
+	        <mx:Button label="{editTagM}" width="85" id="btnEditTag" click="editTagButton()"/>
+<!--	        <mx:Button width="67" id="hiddenButton" click="sendTagEditReq()" label="Update" visible="false"/>
+-->	    </mx:HBox>
+	   
+	</mx:FormItem>
+	<mx:FormItem label="User id" color="#9D8B8B" fontWeight="bold" width="402.5" borderColor="#958B8B" x="11.5" y="10" height="91">
+	    <mx:Text text="{selectUDM}"/>
+	    <mx:ComboBox labelField="@id" dataProvider="{app.people_list}" id="cmbPeople" width="216"></mx:ComboBox>
+	    <mx:Button label="{deleteUserM}" width="97" id="btnDeleteuser" click="confirm_user()"/>
+	</mx:FormItem>
+	<mx:HTTPService id="update_docs_links_list"  resultFormat="xml"
+				url="{app.ServerPath}GraphData/modifyDocs.php" useProxy="false" method="POST"
+			    fault="Alert.show(event.fault.faultString, 'Opps...');" >
+	</mx:HTTPService>
+	
+	
+	
+	<mx:HTTPService  id="generateReport"  result="generateWeeklyReport_showresponse();" fault="generateReportFault();" useProxy="false" method="POST" resultFormat="e4x">		   
+	   </mx:HTTPService>
+	<mx:HTTPService  id="mailReport"  result="mailReport_showresponse();" fault="mailReportFault();" useProxy="false" method="POST" resultFormat="e4x">		   
+	   </mx:HTTPService>
+	<mx:HTTPService  id="constantsload"  url= "{app.ServerPath + 'GraphData/newsdesc.php'}" result="loadconstants_show();" fault="{loadconstantsFault();}" useProxy="false" method="POST" resultFormat="e4x">		   
+	   </mx:HTTPService>
+	<!-- this contains some administrator functions 
+			admin can delete a tag or delete a user from this page
+	-->
+
+<mx:Script source=".././Asfiles/as_constants.as" />
+
+	<mx:Script>
+		<![CDATA[
+			import mx.containers.Panel;
+			import mx.collections.ArrayCollection;	
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.controls.Alert;
+			import mx.core.Application;
+			import mx.managers.CursorManager;
+			
+			
+			[Bindable]public var peoplelist:ArrayCollection	=	new ArrayCollection();	
+			[Bindable]public var tagslist:ArrayCollection	=	new ArrayCollection();	
+			
+			[Bindable]public var app:Tentube=Tentube(Application.application); 
+			
+			public var waitingforupdate:Timer	=	new Timer(1000,0);
+		 
+		     // variable declaration used for uploading of documents and links 
+			public var documents_list_for_upload:String = new String();
+			public var documents_list_for_display:String = new String();
+			private var fileref:FileReference;
+         	public var docTypes:FileFilter 	= new FileFilter("All Files", "*.*");
+	        public var docfilter:Array 		= new Array(docTypes);
+         	public var docname:String;
+         	public var docsUploadVideoId:String=new String();
+			
+			
+			
+			/**************************************/
+			/** 	VARIABLES FOR NEWS THING 	 **/
+			/**************************************/
+         	import Newsdisplay.*;
+         	import mx.containers.Panel;
+         	import mx.containers.Canvas;
+         	import mx.managers.PopUpManager;
+         	import com.NewsActionscript.*;
+         	
+         	public var newsadder:addnews = new addnews();
+         	[Bindable]
+            public  var id_tick:String;
+            [Bindable]
+            public  var title_tick:String;
+            [Bindable]
+            public  var desc_tick:String;
+             
+            private var yht:Number = 30;
+            //private var newxml:XML  = 	new XML();
+			private var xmlnew:XML  = 	new XML();
+			[Bindable] public var xmldata:Object = new Object;
+            private var Panuphere:Canvas = new Canvas();
+			
+			public var Pnlupdate:Panel = new Panel();
+			
+			/**************************************/
+			/** 	VARIABLES FOR NEWS THING 	 **/
+			/**************************************/
+			
+			
+			public function init():void{
+				
+			 	Newsadmin.visible = app.newsadminenable ;
+				this.addEventListener(FlexEvent.ADD,showme);
+				showme(new FlexEvent(FlexEvent.ADD));
+			}
+			
+			
+			/** each time the window gets focus,this function is called 
+					we read the values of arrays and show them in combo box
+			*/
+			
+			public function generateWeeklyReport():void
+			{
+			   generateReport.url			= app.ServerPath + "GraphData/generateReport.php";
+		       CursorManager.setBusyCursor();
+		       generateReport.send();
+		       
+			}
+			public function sendReportMails():void
+			{
+				var variables:URLVariables = new URLVariables();
+			    variables.tubeName   		= 	app.tubeLabel;
+				mailReport.url             =Application.application.parameters.servername + "/prototyping/MailReport/mailReport.php";
+				mailReport.request         =variables;
+				CursorManager.setBusyCursor();
+				mailReport.send();
+			}
+			
+			public function mailReport_showresponse():void
+			{
+			   CursorManager.removeBusyCursor();	
+			   Alert.show(mailSentM, mailReportM);	
+			
+			}
+			
+		 public function generateWeeklyReport_showresponse():void{
+	
+			var xmldata_report:Object	= new Object();
+			  xmldata_report=generateReport.lastResult;
+			generateReport.clearResult();
+			CursorManager.removeBusyCursor();
+		    var weeklyReport:XML= 	new XML(xmldata_report);
+		  //  Alert.show(weeklyReport.toString(),"WeeklyReport");
+		   // Alert.show(weeklyReport.NoOfTimesGamePlayed.toString(),"GamePlayed");
+		    var dispStr:String=new String();
+		    
+		   // dispStr="Total Number of Accesses:"+weeklyReport.TotalNoOfAccesses+"\n3 top users with most number of accesses:"+weeklyReport.topThreeUsers+"\nNumber of New Users:"+weeklyReport.NoOfNewUsers+"\nNew Users:"+weeklyReport.NewUsers+"\n3 top Videos with most number of accesses:"+weeklyReport.topThreeVideos+"\nNumber of New Videos Submitted:"+weeklyReport.NoOfNewVideos+"\nNew Videos:"+weeklyReport.NewVideos+"\nNumber of Different Videos Seen:"+weeklyReport.NoOfDifferentVideosSeen+"\nNumber of Times Game was Played:"+weeklyReport.NoOfTimesGamePlayed+"\nNumber of New Connections Created:"+weeklyReport.NoOfNewConnections+"\nNumber of New Comments:"+weeklyReport.NoOfNewComments;
+		  //  Alert.show(dispStr,"Weekly Report");
+
+            app.totalNoOfAccessesLabel.text=weeklyReport.TotalNoOfAccesses;
+            app.threeTopUsersLabel.text=weeklyReport.topThreeUsers;
+            app.NoOfNewUsersLabel.text=weeklyReport.NoOfNewUsers;
+            app.newUsersLabel.text=weeklyReport.NewUsers;
+            app.topThreeVideosLabel.text=weeklyReport.topThreeVideos;
+            app.noOfNewVideosLabel.text=weeklyReport.NoOfNewVideos;
+            app.newVideosLabel.text=weeklyReport.NewVideos;
+            app.noOfDifferentVideosLabel.text=weeklyReport.NoOfDifferentVideosSeen;
+            app.noOfCommentsLabel.text=weeklyReport.NoOfNewComments;
+            app.noOfNewConnectionsLabel.text=weeklyReport.NoOfNewConnections;
+            app.noOfTimesGamePlayedLabel.text=weeklyReport.NoOfTimesGamePlayed;
+              app.addChild(app.weeklyReportPanel);
+		    app.weeklyReportPanel.visible=true;
+		  
+		}
+			public function showme(fa:FlexEvent):void{
+				peoplelist.source	=	app.people_list;
+				tagslist.source		=	app.tags_list;
+				
+				//peoplelist = peoplelist.sort(
+				
+				waitingforupdate.addEventListener(TimerEvent.TIMER,readArrays);						
+			}
+			
+			
+			private function readArrays(t:TimerEvent):void{
+				if ( app.dataloaded	=	true ){	
+					app.dataloaded	=	false;
+					waitingforupdate.stop();
+					waitingforupdate.reset();
+					showme(new FlexEvent(FlexEvent.ADD));	
+				}
+			}
+			
+			
+			private function editTagButton():void{
+				if(btnEditTag.label== cancelM){
+					newTagInput.visible = false;
+					btnDeletetag.label= delTagM ;
+					btnEditTag.label= editTagM;
+					return;
+				}
+				//btnEditTag.visible = false;
+				//cmbTags.enabled = false;
+				newTagInput.visible = true;
+				btnDeletetag.label = updateM;
+				btnEditTag.label = cancelM;
+			}
+			
+			
+			/**************************************/
+			/** 	FUNCTIONS TO DELETE TAG 	 **/
+			/**************************************/
+			
+			private function confirm_tag():void{
+				if(btnDeletetag.label== updateM){
+					if(newTagInput.text=="") return;
+					//btnDeletetag.label = "Delete tag";
+					var variables:URLVariables = new URLVariables();
+					variables.action   		= 	"modifytag";
+					variables.tag  			= 	cmbTags.selectedItem.@id.toString();
+					variables.newtag	= newTagInput.text;
+					newTagInput.text = "";
+					app.adminreq.request 	= 	variables;		
+					app.adminreq.url		=	app.ServerPath + "GraphData/admin.php";
+					app.adminreq.addEventListener(ResultEvent.RESULT,adminresponse_tag);			
+					app.adminreq.send();				
+		 			CursorManager.setBusyCursor();					
+					return;
+				}
+				Alert.show(areYoSureDTM, alertM,Alert.YES | Alert.NO, this,tagListener, null, Alert.YES);
+			}
+			
+			/** event listener for the alert box, to delete tag
+					we send the tag id and action as deletetag  
+			*/
+			private function tagListener(eventObj:CloseEvent):void {      
+				if (eventObj.detail==Alert.YES) {
+					var variables:URLVariables = new URLVariables();
+					variables.action   		= 	"deletetag";
+					variables.tag  			= 	cmbTags.selectedItem.@id.toString();
+
+					app.adminreq.request 	= 	variables;		
+					app.adminreq.url		=	app.ServerPath + "GraphData/admin.php";
+					app.adminreq.addEventListener(ResultEvent.RESULT,adminresponse_tag);			
+					app.adminreq.send();				
+		 			CursorManager.setBusyCursor();					
+				}		
+				else if(eventObj.detail==Alert.NO) {
+					// do nothing	
+				}
+			}
+				
+			/** in almost all the cases, user gets deleted properly, but due to unforeseen reaons 
+					like, server down, or php file deleted,  it might throw an error
+			*/	
+			public function adminresponse_tag(r:ResultEvent):void{
+				try{
+	   				var responseMessage:String;
+	  				responseMessage = r.result.rsp.message;
+		   			if ( responseMessage == 'Success'){
+		   				Alert.show(v1001,successAlert);
+		   				app.dataloaded		=	false;
+		   				app.onAppCreationComplete();	
+		   				app.select_centre	=	true;
+						app.centre_id		=	app.Univ_LoginId;
+						waitingforupdate.start();			 
+		   			}
+		   			else{
+		   				Alert.show('Update failed','Try again');
+		   			}		   				
+		   		}
+	   			catch(e:Error){
+	   				Alert.show('Unable to update','Error');
+	   			}
+	   			CursorManager.removeBusyCursor();
+	   			app.adminreq.removeEventListener(ResultEvent.RESULT,adminresponse_tag);
+	   			return;
+			}	
+				
+				//functions to edit profile of other user
+				
+				private function confirm_editprofile():void{
+				Alert.show(areYoSureEPM, alertM,Alert.YES | Alert.NO, this,confirmEditProfileListener, null, Alert.YES);
+			   }
+			
+			public function confirmEditProfileListener(eventObj:CloseEvent):void {
+				var userid_profileedit:String = new String();
+				if (eventObj.detail==Alert.YES) {
+					userid_profileedit=cmb_editprofile.selectedItem.@id.toString();
+					app.id_selectedbyeadmin=userid_profileedit;
+					//Alert.show(userid_profileedit);
+			  	  	app.detailedprofileId	=	userid_profileedit;
+			  	  	app.adminOn = true;
+				  	app.currentState		=	'profilingdim';
+				  	app.tentube_profile.editprofile();
+				}
+				else if(eventObj.detail==Alert.NO) {
+					// do nothing	
+				}
+				
+				
+			}
+				
+				
+				/*
+				
+				private function userListener(eventObj:CloseEvent):void {      
+				if (eventObj.detail==Alert.YES) {
+					var variables:URLVariables = new URLVariables();
+					variables.action   		= 	"deleteuser";
+					variables.id  			= 	cmbPeople.selectedItem.@id.toString();
+					if ( variables.id == app.Univ_LoginId ){
+						Alert.show( "The selected user and login user is the same. Cannot remove user !", "Alert" );
+						return;
+					}
+					app.adminreq.request 	= 	variables;		
+					app.adminreq.url		=	app.ServerPath + "GraphData/admin.php";
+					app.adminreq.addEventListener(ResultEvent.RESULT,adminresponse_user);			
+					app.adminreq.send();				
+		 			CursorManager.setBusyCursor();					
+				}		
+				else if(eventObj.detail==Alert.NO) {
+					// do nothing	
+				}
+			}
+			
+			
+			*/
+			/**************************************/
+			/** 	FUNCTIONS TO DELETE USER	 **/
+			/**************************************/
+			
+			private function confirm_user():void{
+				Alert.show(areYoSureRUM, alertM,Alert.YES | Alert.NO, this,userListener, null, Alert.YES);
+			}
+			
+			/** event listener for the alert box, to delete user
+					we send the user id and action as deleteuser  
+			*/
+			private function userListener(eventObj:CloseEvent):void {      
+				if (eventObj.detail==Alert.YES) {
+					var variables:URLVariables = new URLVariables();
+					variables.action   		= 	"deleteuser";
+					variables.id  			= 	cmbPeople.selectedItem.@id.toString();
+					if ( variables.id == app.Univ_LoginId ){
+						Alert.show( theSelULM , alertM );
+						return;
+					}
+					app.adminreq.request 	= 	variables;		
+					app.adminreq.url		=	app.ServerPath + "GraphData/admin.php";
+					app.adminreq.addEventListener(ResultEvent.RESULT,adminresponse_user);			
+					app.adminreq.send();				
+		 			CursorManager.setBusyCursor();					
+				}		
+				else if(eventObj.detail==Alert.NO) {
+					// do nothing	
+				}
+			}
+			
+			
+			/** in almost all the cases, user gets deleted properly, but due to unforeseen reaons 
+					like, server down, or php file deleted,  it might throw an error
+			*/
+			public function adminresponse_user(r:ResultEvent):void{
+				try{
+	   				var responseMessage:String;
+	  				responseMessage = r.result.rsp.message;
+		   			if ( responseMessage == 'Success'){
+		   				Alert.show(v1001,successAlert);	 
+		   				app.onAppCreationComplete();
+		   				app.select_centre	=	true;
+						app.centre_id		=	app.Univ_LoginId;
+		   				app.dataloaded		=	false;
+						waitingforupdate.start();			
+		   			}
+		   			else{
+		   				Alert.show(v1002,tryAgainM);
+		   			}		   				
+		   		}
+	   			catch(e:Error){
+	   				Alert.show(v1003,errM);
+	   			}
+	   			CursorManager.removeBusyCursor();
+	   			app.adminreq.removeEventListener(ResultEvent.RESULT,adminresponse_user);
+	   			return;
+			}	
+			// documents uploading functions  --> upload panel functions
+			private function adminpanel_onBrowseUploadDocuments():void {
+		        fileref = new FileReference();
+				fileref.addEventListener(Event.SELECT, adminpanel_selectHandler);
+				fileref.addEventListener(Event.COMPLETE, adminpanel_completeHandler);
+				fileref.browse(docfilter); 
+	        }
+		private function adminpanel_selectHandler(event:Event):void {
+            try{
+            	var filesize:Number = event.target.size;
+            	if ( (filesize/1000000) > 10 ){		//  max size is 2 mb
+            		Alert.show(theMaxUTenM ,tooBigM);
+            		return;
+            	}
+            	
+	            var params:URLVariables = new URLVariables();
+                docname = fileref.name;
+	            var request:URLRequest  = new URLRequest();
+		        request.url				= app.ServerPath + '/GraphData/uploadDocs.php';;
+        		request.method 			= URLRequestMethod.POST;
+        		fileref.upload(request);
+    		}
+    		catch (error:Error){
+        		trace("Unable to upload file.");
+        		Alert.show("Error in uploading. Please contact the administrator",'Error !');
+   			}    
+        }
+	     private function adminpanel_completeHandler(event:Event):void {
+	     	   //    Alert.show(documents_list_for_upload,"Inside completehandler");
+        	       if(documents_list_for_upload.length==0)
+        	         {
+        	         	documents_list_for_upload=fileref.name.toString();
+        	         	documents_list_for_display=fileref.name.toString();
+        	         }
+        	        else
+        	        {
+        	      
+		            	documents_list_for_upload=documents_list_for_upload+"|"+fileref.name.toString();
+		            	documents_list_for_display=documents_list_for_display+"\n"+fileref.name.toString();            
+        	        }
+		             adminpanel_progressText.text=documents_list_for_display;
+				   	
+         }
+         private function adminpanel_uploadLinks():void{
+         	var variables:URLVariables = new URLVariables();
+         //	Alert.show(documents_list_for_upload,"Docs List");
+            variables.docLinks      =   documents_list_for_upload;
+		//	Alert.show(adminpanel_externalLinks.text,"External Links");
+			variables.externalLinks =   adminpanel_externalLinks.text;
+         	variables.videoId=docsUploadVideoId;
+         	update_docs_links_list.clearResult();
+         	update_docs_links_list.addEventListener(ResultEvent.RESULT,adminpanel_docsUploaded);
+  			update_docs_links_list.request = variables;									 
+			update_docs_links_list.send(); 
+			CursorManager.setBusyCursor();	
+           	
+         	
+         }
+         private function adminpanel_docsUploaded(r:ResultEvent):void{
+						
+						uploadDocsPanel.visible=false;
+						Alert.show('Updated in Database !!!','Success');
+						app.onAppCreationComplete();	                				 
+						CursorManager.removeBusyCursor();	
+			}
+			
+          private function generateReportFault():void{
+			trace("generateReportFault()");
+		}	
+		private function mailReportFault():void{
+			trace("mailReportFault()");
+		}
+		
+		/**************************************/
+			/** 	FUNCTIONS FOR NEWS THING 	 **/
+			/**************************************/
+		
+		/**
+        * It is here that functions for the News are added. please take note these are the function s which actually also happen to 
+        * affect the news thing
+        */ 
+		 public function newsadd(event:Event):void
+            {	
+            	newsadder = addnews(PopUpManager.createPopUp(Application.application.upperBox,addnews,false));
+            } 
+            public function loadconstants_show():void
+            {
+            
+			xmldata	=	constantsload.lastResult;
+			constantsload.clearResult();
+		    xmlnew = 	new XML(xmldata); 
+		    //trace (newxml);
+		    var NewsList:XMLList = xmlnew.item;
+		    yht = 30;
+		    for(var i:int = 0; i<NewsList.length(); i++)
+            {
+                
+                var varXML:XML = NewsList[i];
+                var titleText:String = varXML.title;
+                var styleFormat:TextFormat = new TextFormat("Times New Roman", 12.5, 0x000000);
+                title_tick = varXML.title ;
+                id_tick = varXML.id ;
+                var myTextField:Text = new Text();
+                
+                
+                var lbl:Label = new Label(); 
+                lbl.setStyle("font","Times New Roman");
+                lbl.setStyle("fontSize", 13);
+                lbl.text = titleText;
+                
+                
+               
+                Application.application.Panup.addChild(lbl);
+                lbl.y = yht + 30;
+                lbl.x = 5;
+                yht = lbl.y;
+                 
+                var newsItem:Updatingnews = new Updatingnews(varXML.id, varXML.title, varXML.desc, varXML.isactive);
+                Application.application.Panup.addChild(newsItem.box);
+                newsItem.box.y = yht + 20;
+                yht = newsItem.box.y;
+                newsItem.box.x = 5;
+		    	
+            }   
+            } 	
+            private function newsupdateonpanel(event:MouseEvent):void {
+              var btn1:Button = new Button();
+              btn1.label = "X";
+              btn1.x= 572; btn1.y= 10; btn1.height= 38; btn1.width= 36;
+              btn1.addEventListener(MouseEvent.CLICK, closepopup);
+              
+              var lbl1:Label = new Label();
+              lbl1.x= 38; lbl1.y= 17; lbl1.text = "Manage News"; lbl1.setStyle("fontSize", 21);
+              
+              Application.application.Panup  =  Canvas(PopUpManager.createPopUp(Application.application.upperBox, Canvas, false));
+              Application.application.Panup.width= 700;
+              Application.application.Panup.height= 700;
+              Application.application.Panup.x = 300;
+              Application.application.Panup.alpha = 1; 
+              Application.application.Panup.opaqueBackground = 0xfffff0;
+              
+              Application.application.Panup.addChild(btn1);
+              Application.application.Panup.addChild(lbl1);
+              constantsload.send();
+              
+             
+            }
+            private function loadconstantsFault():void{
+			trace("loadconstantsFault()");}
+			
+			private function closepopup(event:MouseEvent):void{
+				PopUpManager.removePopUp(Application.application.Panup);
+	
+			}	
+			
+			private function openFA():void {
+			var urlstr:String = app.ServerPath + app.graphData + "fetchagent.php";
+			var webPageURL:URLRequest = new URLRequest( urlstr );
+			navigateToURL(webPageURL, '_blank');
+		}
+			
+           /**************************************/
+			/** 	FUNCTIONS FOR NEWS THING 	 **/
+			/**************************************/ 
+            
+
+		]]>
+	</mx:Script>
+	<mx:FormItem label="{editM}" color="#A49494" fontWeight="bold" width="402.5" x="10" y="237" height="90">
+	    <mx:Text text="{selectUEPM}"/>
+	    <mx:ComboBox labelField="@name" dataProvider="{peoplelist}" id="cmb_editprofile" width="216"></mx:ComboBox>
+	    <mx:Button label="{edPM}" id="btn_editprofile" width="85" click="{confirm_editprofile()}"/>
+	   
+	</mx:FormItem>
+	<mx:TitleWindow width="100%" height="100%" layout="absolute" title="{relatedMaterialM}" id="uploadDocsPanel" visible="false" showCloseButton="true" close="uploadDocsPanel.visible=false;" >
+				  <mx:FormItem label="{relatedLinkM}" width="389" height="135" fontWeight="bold" color="#FAF6F6">
+					        <mx:Text width="253" text="{plzSNLM}" color="#FAF4F4"/>
+					        <mx:TextArea height="105" width="278" id="adminpanel_externalLinks"/>
+				   </mx:FormItem>
+				   <mx:FormItem label="{attachDocM}" width="388" height="190" color="#F8F3F3" x="1" y="143">
+					        <mx:Button label="{browseM}" height="23" width="113" click="adminpanel_onBrowseUploadDocuments()" />
+					        <mx:Label text="{alreadyAttachDocM}" width="261"/>
+					        <mx:Text width="256" id="adminpanel_progressText" height="190" color="#FDFAFA"/>
+					</mx:FormItem>
+				   <mx:Button x="181" y="350" label="{attachM}" click="adminpanel_uploadLinks()"/>
+				</mx:TitleWindow>
+	<mx:Button x="10" y="335" label="{weeklyRepM}" id="btnWeeklyReport" toolTip="{genPrevWeekARM}" click="generateWeeklyReport(); app.addChild(app.weeklyReportPanel);
+		    app.weeklyReportPanel.visible=true;"/>
+	<mx:Button x="261" y="335" label="{v1096}" id="FAAdmin" toolTip="{v1096}" click="openFA();"/>
+	<mx:Button x="200" y="335" label="{mailReportM}" visible="false" click="sendReportMails()" toolTip="{sendActReportM}"/>
+	<mx:Button x="129" y="335" label="{registerNewUserM}" id="adminNewRegister" toolTip="{registerNewUserM}" click="{app.currentState = 'registerpage'}" width="124"/>
+	<mx:HBox id="Newsadmin" borderStyle="solid" paddingTop="10" paddingBottom="10" 
+	          	paddingLeft="10" paddingRight="10" x="10" y="391" width="402.5" height="44">
+		<mx:Button label="{createNewsM}" click="newsadd(event);"/>
+		<mx:Button label="{EditNewsM}" click="newsupdateonpanel(event);"/>
+	</mx:HBox>
+</mx:TitleWindow>
+

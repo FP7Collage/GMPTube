@@ -1,0 +1,321 @@
+<?xml version="1.0"?>
+<Graph>
+
+<NumberofNodes value="3255"/>
+<NumberofEdges value="3332"/>
+
+<NodeTypes>
+	<NodeType name="People"/>
+	<NodeType name="Videos"/>
+	<NodeType name="Tags"/>	
+</NodeTypes>
+
+<EdgeTypes>
+	<EdgeType name="Has accessed" edgecolor="0xcc6633" validnodepairs="People-Videos"/>
+	<EdgeType name="Has seen" edgecolor="0xcc6633" validnodepairs="People-Videos"/>
+	<EdgeType name="Has uploaded" edgecolor="0xcccccc" validnodepairs="People-Videos"/>	
+	<EdgeType name="Has Tags" edgecolor="0xccff99" validnodepairs="Videos-Tags"/>
+	<EdgeType name="Similar to" edgecolor="0x3366cc" validnodepairs="People-People"/>
+</EdgeTypes>
+
+<Nodes>
+
+<Node id="angehrn.albert@insead.edu" name="Albert angehrn" nodetype="People" password="Albert" company="Insead" designation="Director" nationality="Swiss" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/people/albert.jpg" url="http://www.calt.insead.edu/?pagename=Albert%20A.%20Angehrn" interests="Gaming" description="Self-description"/>
+
+<Node id="pkmittal82@gmail.com" name="Pradeep mittal" nodetype="People" password="Pradeep" company="Insead" designation="Software engineer" nationality="French" picture=" http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/people/pradeep.jpg " url="http://www.calt.insead.edu/?pagename=Pradeep%20Kumar%20Mittal" interests="Gaming" description="Self-description"/>
+
+<Node id="pietri.jose@insead.edu" name="Jose pietri" nodetype="People" password="Jose" company="Insead" designation="Researcher" nationality="French" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/people/jose.jpg" url="http://www.calt.insead.edu/?pagename=Jos%E9%20Pietri" interests="Gaming" description="Self-description"/>
+
+<Node id="sereno.bertrand@insead.edu" name="Bertrand sereno" nodetype="People" password="Bertrand" company="Insead" designation="Research Fellow" nationality="French" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/people/bertrand.jpg" url="http://www.calt.insead.edu/?pagename=Bertrand%20Sereno" interests="Gaming" description="Self-description"/>
+
+<Node id="leck.nicholas@insead.edu" name="Nicholas leck" nodetype="People" password="Nicholas" company="Insead" designation="Research Associate" nationality="French" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/people/nicholas.jpg" url="http://www.calt.insead.edu/?pagename=Nicholas%20Leck" interests="Gaming" description="Self-description"/>
+
+<Node id="nay.jessica@insead.edu" name="Jessica nay" nodetype="People" password="Jessica " company="Insead" designation="Intern" nationality="French" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/people/jessica.jpg" url="http://www.calt.insead.edu/?pagename=Jessica%20Nay" interests="Gaming" description="Self-description"/>
+
+<Node id="maxwell.katrina@insead.edu" name="Katrina maxwell" nodetype="People" password="Katrina" company="Insead" designation="Research Fellow" nationality="French" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/people/katrina.jpg" url="http://www.calt.insead.edu/?pagename=Katrina%20Maxwell" interests="Gaming" description="Self-description"/>
+
+<Node id="nabeth.thierry@insead.edu" name="Thierry nabeth" nodetype="People" password="Thierry" company="Insead" designation="Research Fellow" nationality="French" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/people/thierry.jpg" url="http://www.calt.insead.edu/?pagename=Thierry%20Nabeth" interests="Gaming" description="Self-description"/>
+
+<Node id="babu.vijay@insead.edu" name="Vijay babu" nodetype="People" password="Vijay" company="Insead" designation="Intern" nationality="Indian" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/people/vijay.jpg" url="http://www.calt.insead.edu/?pagename=Vijay%20Kalangi%20Babu" interests="Gaming" description="Self-description"/>
+
+
+
+
+
+
+
+<Node id="Video8" name="TED : Jeff Han (2006) Ideas Worth Sharing" nodetype="Videos" comments="" tags="Know,Idea" rating="3" uploadedby="Bertrand sereno" category="Ideas" picture="http://img.youtube.com/vi/5JcSu7h-I40/default.jpg" URL="http://www.youtube.com/v/5JcSu7h-I40"/>
+
+<Node id="Video9" name="Business Education and Mentoring - Elevator Pitch" nodetype="Videos" comments="" tags="Likings,Business,Entrepreneur" rating="3" uploadedby="Nicholas leck" category="Ideas" picture="http://img.youtube.com/vi/a08mBH_n8TI/default.jpg" URL="http://www.youtube.com/v/a08mBH_n8TI"/>
+
+
+<Node id="Video18" name="UVME Pre-Launch Day" nodetype="Videos" comments="" tags="Content,Conception,Likings" rating="3" uploadedby="Nicholas leck" category="Ideas" picture="http://img.youtube.com/vi/kQL43F6ySBw/default.jpg" URL="http://www.youtube.com/v/kQL43F6ySBw"/>
+<Node id="Video19" name="Puppet magic" nodetype="Videos" comments="" tags="Idea,Adroit,Wit" rating="3" uploadedby="Jessica" category="Ideas" picture="http://img.youtube.com/vi/WdcIcIDruaE/default.jpg" URL="http://www.youtube.com/v/WdcIcIDruaE"/>
+
+
+<Node id="Video21" name="Business Entrepreneur Project" nodetype="Videos" comments="" tags="Ascend,Culture" rating="3" uploadedby="Thierry nabeth" category="Ideas" picture="http://img.youtube.com/vi/-F72LX8Ieno/default.jpg" URL="http://www.youtube.com/v/-F72LX8Ieno"/>
+
+
+<Node id="Tags14" name="Aspire" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags15" name="Aim" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags16" name="Know" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags17" name="Likings" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags18" name="Content" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags19" name="Devout" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags20" name="Learning" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags21" name="Knowledge" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags30" name="Innovation" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags31" name="Idea" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags32" name="Entrepreneur" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags33" name="Business" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags34" name="Adroit" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags35" name="Conception" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags36" name="Wit" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags37" name="Patronage" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags38" name="Ascend" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags39" name="Stanford" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags40" name="Kinetic" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+<Node id="Tags41" name="Culture" nodetype="Tags" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/tag_img.jpg"/>
+
+
+
+<Node id="Video22" name="Indian Innovators" nodetype="Videos" comments="" tags="Entrepreneur,Aim,Idea" rating="3" uploadedby="Vijay babu" category="Innovators" picture="http://img.youtube.com/vi/m_ho7xhgWV8/default.jpg" URL="http://www.youtube.com/v/m_ho7xhgWV8"/>
+<Node id="Video10" name="Why wont Entrepreneurs join your business" nodetype="Videos" comments="" tags="Knowledge,Content,Aspire" rating="5" uploadedby="Jessica" category="Ideas" picture="http://img.youtube.com/vi/V8iGl6BAcUs/default.jpg" URL="http://www.youtube.com/v/V8iGl6BAcUs"/>
+
+
+
+
+
+
+
+
+<Node id="Video13" name="Cover Letter Resume Job Search" nodetype="Videos" comments="" tags="Idea,Conception,Devout" rating="5" uploadedby="Vijay babu" category="Innovators" picture="http://img.youtube.com/vi/PgQ6aHg9B1Y/default.jpg" URL="http://www.youtube.com/v/PgQ6aHg9B1Y"/>
+
+<Node id="Video23" name="Nintendo-The Innovators" nodetype="Videos" comments="" tags="Business,Aspire,Content" rating="5" uploadedby="Vijay babu" category="Innovators" picture="http://img.youtube.com/vi/8r3ZActhUKg/default.jpg" URL="http://www.youtube.com/v/8r3ZActhUKg"/>
+
+<Node id="Video24" name="Innovators Who Changed Our World" nodetype="Videos" comments="" tags="Idea,Ascend,Culture" rating="3" uploadedby="Pradeep mittal" category="Innovators" picture="http://img.youtube.com/vi/s25VMjdljV0/default.jpg" URL="http://www.youtube.com/v/s25VMjdljV0"/>
+
+<Node id="Video11" name="Peter Samuelson - Film Producer and Social Entrepreneur" nodetype="Videos" comments="" tags="Aim,Patronage" rating="5" uploadedby="Katrina maxwell" category="Innovators" picture="http://img.youtube.com/vi/p9btnDO-gVI/default.jpg" URL="http://www.youtube.com/v/p9btnDO-gVI"/>
+
+
+
+
+
+<Node id="Video26" name="Idea of an Entrepreneur" nodetype="Videos" comments="" tags="Entrepreneur,Business,Likings" rating="4" uploadedby="Albert angehrn" category="Innovators" picture="http://img.youtube.com/vi/p966UloA_KU/default.jpg" URL="http://www.youtube.com/v/p966UloA_KU"/>
+
+<Node id="Video27" name="France Angels - WaveStorm" nodetype="Videos" comments="" tags="Business,Likings,Aspire" rating="1" uploadedby="Albert angehrn" category="Innovators" picture="http://img.youtube.com/vi/VRyY3xDZV3Q/default.jpg" URL="http://www.youtube.com/v/VRyY3xDZV3Q"/>
+
+
+
+
+
+
+
+
+<Node id="vallappan.arun@gmail.com" name="Arun vallappan" nodetype="People" password="arun" company="Insead-Calt" designation="Intern" nationality="Indian" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/people/default_people.jpg" url="http://www.insead.edu" interests="AI,Gaming" description="Gods &amp; Kings !"/>
+
+<Node id="Video25" name="Ashoka: Innovators for the Public" nodetype="Videos" comments="" tags="Adroit,Aspire" rating="1" uploadedby="Jose pietri" category="Innovators" picture="http://img.youtube.com/vi/teBdIMhTOT4/default.jpg" URL="http://www.youtube.com/v/teBdIMhTOT4"/><Node id="Video15" comments="" name="BMW (South Africa). Defining innovation" nodetype="Videos" tags="Stanford,Innovation" rating="4" uploadedby="Pradeep mittal" category="Innovation" picture="http://img.youtube.com/vi/a7Ny5BYc-Fs/default.jpg" URL="http://www.youtube.com/v/a7Ny5BYc-Fs"/><Node id="Video6" comments="" name="The Myths of Innovation" nodetype="Videos" tags="Aspire,Innovation,Knowledge" rating="2" uploadedby="Pradeep mittal" category="Innovation" picture="http://img.youtube.com/vi/m6gaj6huCp0/default.jpg" URL="http://www.youtube.com/v/m6gaj6huCp0"/>
+
+<Node id="Video20" name="My 'Grand' Idea" nodetype="Videos" comments="Jose pietri&gt;says&gt;creativity at its best !!&gt;c&gt;" tags="Idea,Knowledge" rating="1" uploadedby="Katrina maxwell" category="Ideas" picture="http://img.youtube.com/vi/GQDl_zoT05U/default.jpg" URL="http://www.youtube.com/v/GQDl_zoT05U"/>
+
+
+
+<Node id="pradeepmittal_2000@yahoo.com" name="Pradeep Mittal" nodetype="People" password="123" company="INSEAD" designation="Research Assoicate" nationality="Indian" picture="http://fw-wwwcalt2.insead.edu/prototyping/InnoTubeProject/Testing/GraphData/media/people/default_people.jpg" url="www.calt.insead.edu" interests="" description="software developer"/>
+
+
+
+
+
+
+<Node id="Video7" comments="Jessica nay&gt;says&gt;Bacto orbit--comment-2&gt;c&gt;Bertrand sereno&gt;says&gt;gud one..&gt;c&gt;" name="Back to Orbit-A Song About Innovation in Organizations" nodetype="Videos" tags="Devout,Culture" rating="4" uploadedby="Jose pietri" category="Innovation" picture="http://img.youtube.com/vi/JrlSHZ0anAM/default.jpg" URL="http://www.youtube.com/v/JrlSHZ0anAM"/><Node id="Video16" comments="Jessica nay&gt;says&gt;great&gt;c&gt;Jessica nay&gt;says&gt;good&gt;c&gt;Nicholas leck&gt;says&gt;i have been to this place.. awesome..&gt;c&gt;" name="mi adidas Innovation Center in Paris" nodetype="Videos" tags="Entrepreneur,Wit,Culture" rating="5" uploadedby="Jose pietri" category="Innovation" picture="http://img.youtube.com/vi/gQBFaVfBi9w/default.jpg" URL="http://www.youtube.com/v/gQBFaVfBi9w"/><Node id="Video14" comments="Jessica nay&gt;says&gt;good one&gt;c&gt;Jose pietri&gt;says&gt;Test comment-1&gt;c&gt;Pradeep mittal&gt;says&gt;one of the best..&gt;c&gt;" name="Tom Peters: Innovation is Actually Easy!" nodetype="Videos" tags="Kinetic,Business,Aim" rating="3" uploadedby="Nicholas leck" category="Innovation" picture="http://img.youtube.com/vi/8AGTpu_i8sc/default.jpg" URL="http://www.youtube.com/v/8AGTpu_i8sc"/><Node id="Video17" comments="Jessica nay&gt;says&gt;nice&gt;c&gt;Arun vallappan&gt;says&gt;good one&gt;c&gt;Nicholas leck&gt;says&gt;nice video.&gt;c&gt;" name="Innovation in Motion" nodetype="Videos" tags="Content,Aim,Know" rating="3" uploadedby="Bertrand sereno" category="Innovation" picture="http://img.youtube.com/vi/faQp593R51Y/default.jpg" URL="http://www.youtube.com/v/faQp593R51Y"/></Nodes>
+
+
+
+<Edges>
+
+
+
+
+
+
+
+
+<Edge id="Has seen1" name="Has seen" tooltip="has seen the Video:" fromID="pkmittal82@gmail.com" toID="Video20" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen2" name="Has seen" tooltip="has seen the Video:" fromID="pkmittal82@gmail.com" toID="Video7" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen3" name="Has seen" tooltip="has seen the Video:" fromID="pkmittal82@gmail.com" toID="Video5" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen4" name="Has seen" tooltip="has seen the Video:" fromID="pkmittal82@gmail.com" toID="Video8" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen5" name="Has seen" tooltip="has seen the Video:" fromID="pkmittal82@gmail.com" toID="Video12" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen6" name="Has seen" tooltip="has seen the Video:" fromID="pkmittal82@gmail.com" toID="Video17" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen69" name="Has seen" tooltip="has seen the Video:" fromID="pkmittal82@gmail.com" toID="Video10" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen11" name="Has seen" tooltip="has seen the Video:" fromID="angehrn.albert@insead.edu" toID="Video5" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen12" name="Has seen" tooltip="has seen the Video:" fromID="angehrn.albert@insead.edu" toID="Video6" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen13" name="Has seen" tooltip="has seen the Video:" fromID="angehrn.albert@insead.edu" toID="Video7" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen14" name="Has seen" tooltip="has seen the Video:" fromID="angehrn.albert@insead.edu" toID="Video10" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen15" name="Has seen" tooltip="has seen the Video:" fromID="angehrn.albert@insead.edu" toID="Video9" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen16" name="Has seen" tooltip="has seen the Video:" fromID="angehrn.albert@insead.edu" toID="Video8" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen17" name="Has seen" tooltip="has seen the Video:" fromID="angehrn.albert@insead.edu" toID="Video11" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen18" name="Has seen" tooltip="has seen the Video:" fromID="angehrn.albert@insead.edu" toID="Video12" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen19" name="Has seen" tooltip="has seen the Video:" fromID="angehrn.albert@insead.edu" toID="Video13" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen21" name="Has seen" tooltip="has seen the Video:" fromID="maxwell.katrina@insead.edu" toID="Video16" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen22" name="Has seen" tooltip="has seen the Video:" fromID="maxwell.katrina@insead.edu" toID="Video15" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen23" name="Has seen" tooltip="has seen the Video:" fromID="maxwell.katrina@insead.edu" toID="Video18" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen24" name="Has seen" tooltip="has seen the Video:" fromID="maxwell.katrina@insead.edu" toID="Video13" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen25" name="Has seen" tooltip="has seen the Video:" fromID="maxwell.katrina@insead.edu" toID="Video7" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen26" name="Has seen" tooltip="has seen the Video:" fromID="maxwell.katrina@insead.edu" toID="Video22" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen27" name="Has seen" tooltip="has seen the Video:" fromID="maxwell.katrina@insead.edu" toID="Video5" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen31" name="Has seen" tooltip="has seen the Video:" fromID="leck.nicholas@insead.edu" toID="Video15" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen32" name="Has seen" tooltip="has seen the Video:" fromID="leck.nicholas@insead.edu" toID="Video14" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen33" name="Has seen" tooltip="has seen the Video:" fromID="leck.nicholas@insead.edu" toID="Video17" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen34" name="Has seen" tooltip="has seen the Video:" fromID="leck.nicholas@insead.edu" toID="Video21" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen35" name="Has seen" tooltip="has seen the Video:" fromID="leck.nicholas@insead.edu" toID="Video13" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen36" name="Has seen" tooltip="has seen the Video:" fromID="leck.nicholas@insead.edu" toID="Video22" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen37" name="Has seen" tooltip="has seen the Video:" fromID="leck.nicholas@insead.edu" toID="Video5" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen38" name="Has seen" tooltip="has seen the Video:" fromID="leck.nicholas@insead.edu" toID="Video10" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen41" name="Has seen" tooltip="has seen the Video:" fromID="nabeth.thierry@insead.edu" toID="Video16" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen42" name="Has seen" tooltip="has seen the Video:" fromID="nabeth.thierry@insead.edu" toID="Video22" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen43" name="Has seen" tooltip="has seen the Video:" fromID="nabeth.thierry@insead.edu" toID="Video17" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen44" name="Has seen" tooltip="has seen the Video:" fromID="nabeth.thierry@insead.edu" toID="Video13" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen46" name="Has seen" tooltip="has seen the Video:" fromID="nabeth.thierry@insead.edu" toID="Video24" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen47" name="Has seen" tooltip="has seen the Video:" fromID="nabeth.thierry@insead.edu" toID="Video10" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen51" name="Has seen" tooltip="has seen the Video:" fromID="nay.jessica@insead.edu" toID="Video11" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen52" name="Has seen" tooltip="has seen the Video:" fromID="nay.jessica@insead.edu" toID="Video20" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen53" name="Has seen" tooltip="has seen the Video:" fromID="nay.jessica@insead.edu" toID="Video25" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen54" name="Has seen" tooltip="has seen the Video:" fromID="nay.jessica@insead.edu" toID="Video21" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen55" name="Has seen" tooltip="has seen the Video:" fromID="nay.jessica@insead.edu" toID="Video12" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen56" name="Has seen" tooltip="has seen the Video:" fromID="nay.jessica@insead.edu" toID="Video22" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen57" name="Has seen" tooltip="has seen the Video:" fromID="nay.jessica@insead.edu" toID="Video17" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen61" name="Has seen" tooltip="has seen the Video:" fromID="babu.vijay@insead.edu" toID="Video21" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen62" name="Has seen" tooltip="has seen the Video:" fromID="babu.vijay@insead.edu" toID="Video22" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen63" name="Has seen" tooltip="has seen the Video:" fromID="babu.vijay@insead.edu" toID="Video20" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen64" name="Has seen" tooltip="has seen the Video:" fromID="babu.vijay@insead.edu" toID="Video13" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen65" name="Has seen" tooltip="has seen the Video:" fromID="babu.vijay@insead.edu" toID="Video12" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen66" name="Has seen" tooltip="has seen the Video:" fromID="babu.vijay@insead.edu" toID="Video17" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen71" name="Has seen" tooltip="has seen the Video:" fromID="pietri.jose@insead.edu" toID="Video20" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen72" name="Has seen" tooltip="has seen the Video:" fromID="pietri.jose@insead.edu" toID="Video15" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen73" name="Has seen" tooltip="has seen the Video:" fromID="pietri.jose@insead.edu" toID="Video25" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen74" name="Has seen" tooltip="has seen the Video:" fromID="pietri.jose@insead.edu" toID="Video13" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen75" name="Has seen" tooltip="has seen the Video:" fromID="pietri.jose@insead.edu" toID="Video21" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen76" name="Has seen" tooltip="has seen the Video:" fromID="pietri.jose@insead.edu" toID="Video12" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen77" name="Has seen" tooltip="has seen the Video:" fromID="pietri.jose@insead.edu" toID="Video24" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen81" name="Has seen" tooltip="has seen the Video:" fromID="sereno.bertrand@insead.edu" toID="Video5" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen82" name="Has seen" tooltip="has seen the Video:" fromID="sereno.bertrand@insead.edu" toID="Video7" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen83" name="Has seen" tooltip="has seen the Video:" fromID="sereno.bertrand@insead.edu" toID="Video9" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen84" name="Has seen" tooltip="has seen the Video:" fromID="sereno.bertrand@insead.edu" toID="Video21" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen85" name="Has seen" tooltip="has seen the Video:" fromID="sereno.bertrand@insead.edu" toID="Video12" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen86" name="Has seen" tooltip="has seen the Video:" fromID="sereno.bertrand@insead.edu" toID="Video24" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen87" name="Has seen" tooltip="has seen the Video:" fromID="angehrn.albert@insead.edu" toID="Video26" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen88" name="Has seen" tooltip="has seen the Video:" fromID="sereno.bertrand@insead.edu" toID="Video26" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen89" name="Has seen" tooltip="has seen the Video:" fromID="angehrn.albert@insead.edu" toID="Video27" intensity="2" edgecolor="0xcc6633"/>
+<Edge id="Has seen90" name="Has seen" tooltip="has seen the Video:" fromID="pietri.jose@insead.edu" toID="Video27" intensity="2" edgecolor="0xcc6633"/>
+
+
+<Edge id="Has uploaded1" name="Has uploaded" tooltip="has uploaded the Video:" fromID="sereno.bertrand@insead.edu" toID="Video5" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded2" name="Has uploaded" tooltip="has uploaded the Video:" fromID="pkmittal82@gmail.com" toID="Video6" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded3" name="Has uploaded" tooltip="has uploaded the Video:" fromID="pietri.jose@insead.edu" toID="Video7" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded4" name="Has uploaded" tooltip="has uploaded the Video:" fromID="sereno.bertrand@insead.edu" toID="Video8" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded5" name="Has uploaded" tooltip="has uploaded the Video:" fromID="leck.nicholas@insead.edu" toID="Video9" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded6" name="Has uploaded" tooltip="has uploaded the Video:" fromID="nay.jessica@insead.edu" toID="Video10" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded7" name="Has uploaded" tooltip="has uploaded the Video:" fromID="maxwell.katrina@insead.edu" toID="Video11" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded8" name="Has uploaded" tooltip="has uploaded the Video:" fromID="nabeth.thierry@insead.edu" toID="Video12" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded9" name="Has uploaded" tooltip="has uploaded the Video:" fromID="babu.vijay@insead.edu" toID="Video13" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded10" name="Has uploaded" tooltip="has uploaded the Video:" fromID="leck.nicholas@insead.edu" toID="Video14" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded11" name="Has uploaded" tooltip="has uploaded the Video:" fromID="pkmittal82@gmail.com" toID="Video15" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded12" name="Has uploaded" tooltip="has uploaded the Video:" fromID="pietri.jose@insead.edu" toID="Video16" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded13" name="Has uploaded" tooltip="has uploaded the Video:" fromID="sereno.bertrand@insead.edu" toID="Video17" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded14" name="Has uploaded" tooltip="has uploaded the Video:" fromID="leck.nicholas@insead.edu" toID="Video18" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded15" name="Has uploaded" tooltip="has uploaded the Video:" fromID="nay.jessica@insead.edu" toID="Video19" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded16" name="Has uploaded" tooltip="has uploaded the Video:" fromID="maxwell.katrina@insead.edu" toID="Video20" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded17" name="Has uploaded" tooltip="has uploaded the Video:" fromID="nabeth.thierry@insead.edu" toID="Video21" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded18" name="Has uploaded" tooltip="has uploaded the Video:" fromID="babu.vijay@insead.edu" toID="Video22" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded19" name="Has uploaded" tooltip="has uploaded the Video:" fromID="babu.vijay@insead.edu" toID="Video23" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded20" name="Has uploaded" tooltip="has uploaded the Video:" fromID="pkmittal82@gmail.com" toID="Video24" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded21" name="Has uploaded" tooltip="has uploaded the Video:" fromID="pietri.jose@insead.edu" toID="Video25" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded22" name="Has uploaded" tooltip="has uploaded the Video:" fromID="angehrn.albert@insead.edu" toID="Video26" intensity="2" edgecolor="0xcccccc"/>
+<Edge id="Has uploaded23" name="Has uploaded" tooltip="has uploaded the Video:" fromID="angehrn.albert@insead.edu" toID="Video27" intensity="2" edgecolor="0xcccccc"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<Edge id="Has tags5" name="Has tags" tooltip="is tagged with Tag:" fromID="Video6" toID="Tags14" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags6" name="Has tags" tooltip="is tagged with Tag:" fromID="Video12" toID="Tags15" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags7" name="Has tags" tooltip="is tagged with Tag:" fromID="Video8" toID="Tags16" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags8" name="Has tags" tooltip="is tagged with Tag:" fromID="Video12" toID="Tags16" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags9" name="Has tags" tooltip="is tagged with Tag:" fromID="Video9" toID="Tags17" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags10" name="Has tags" tooltip="is tagged with Tag:" fromID="Video7" toID="Tags19" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags11" name="Has tags" tooltip="is tagged with Tag:" fromID="Video10" toID="Tags21" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags12" name="Has tags" tooltip="is tagged with Tag:" fromID="Video22" toID="Tags32" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags13" name="Has tags" tooltip="is tagged with Tag:" fromID="Video23" toID="Tags33" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags14" name="Has tags" tooltip="is tagged with Tag:" fromID="Video25" toID="Tags34" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags15" name="Has tags" tooltip="is tagged with Tag:" fromID="Video24" toID="Tags31" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags16" name="Has tags" tooltip="is tagged with Tag:" fromID="Video12" toID="Tags33" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags17" name="Has tags" tooltip="is tagged with Tag:" fromID="Video23" toID="Tags14" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags18" name="Has tags" tooltip="is tagged with Tag:" fromID="Video22" toID="Tags15" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags19" name="Has tags" tooltip="is tagged with Tag:" fromID="Video18" toID="Tags18" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags20" name="Has tags" tooltip="is tagged with Tag:" fromID="Video19" toID="Tags31" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags21" name="Has tags" tooltip="is tagged with Tag:" fromID="Video10" toID="Tags18" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags22" name="Has tags" tooltip="is tagged with Tag:" fromID="Video7" toID="Tags41" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags23" name="Has tags" tooltip="is tagged with Tag:" fromID="Video14" toID="Tags40" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags24" name="Has tags" tooltip="is tagged with Tag:" fromID="Video15" toID="Tags39" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags25" name="Has tags" tooltip="is tagged with Tag:" fromID="Video14" toID="Tags33" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags26" name="Has tags" tooltip="is tagged with Tag:" fromID="Video16" toID="Tags32" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags27" name="Has tags" tooltip="is tagged with Tag:" fromID="Video22" toID="Tags31" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags28" name="Has tags" tooltip="is tagged with Tag:" fromID="Video23" toID="Tags18" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags29" name="Has tags" tooltip="is tagged with Tag:" fromID="Video25" toID="Tags14" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags30" name="Has tags" tooltip="is tagged with Tag:" fromID="Video18" toID="Tags35" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags31" name="Has tags" tooltip="is tagged with Tag:" fromID="Video5" toID="Tags30" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags32" name="Has tags" tooltip="is tagged with Tag:" fromID="Video5" toID="Tags39" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags33" name="Has tags" tooltip="is tagged with Tag:" fromID="Video13" toID="Tags31" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags34" name="Has tags" tooltip="is tagged with Tag:" fromID="Video12" toID="Tags17" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags35" name="Has tags" tooltip="is tagged with Tag:" fromID="Video10" toID="Tags14" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags36" name="Has tags" tooltip="is tagged with Tag:" fromID="Video14" toID="Tags15" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags37" name="Has tags" tooltip="is tagged with Tag:" fromID="Video18" toID="Tags17" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags38" name="Has tags" tooltip="is tagged with Tag:" fromID="Video11" toID="Tags15" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags39" name="Has tags" tooltip="is tagged with Tag:" fromID="Video17" toID="Tags18" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags40" name="Has tags" tooltip="is tagged with Tag:" fromID="Video6" toID="Tags21" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags41" name="Has tags" tooltip="is tagged with Tag:" fromID="Video6" toID="Tags30" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags42" name="Has tags" tooltip="is tagged with Tag:" fromID="Video15" toID="Tags30" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags43" name="Has tags" tooltip="is tagged with Tag:" fromID="Video16" toID="Tags36" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags44" name="Has tags" tooltip="is tagged with Tag:" fromID="Video17" toID="Tags15" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags45" name="Has tags" tooltip="is tagged with Tag:" fromID="Video16" toID="Tags41" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags46" name="Has tags" tooltip="is tagged with Tag:" fromID="Video17" toID="Tags16" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags47" name="Has tags" tooltip="is tagged with Tag:" fromID="Video19" toID="Tags34" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags48" name="Has tags" tooltip="is tagged with Tag:" fromID="Video19" toID="Tags36" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags49" name="Has tags" tooltip="is tagged with Tag:" fromID="Video20" toID="Tags21" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags50" name="Has tags" tooltip="is tagged with Tag:" fromID="Video20" toID="Tags31" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags51" name="Has tags" tooltip="is tagged with Tag:" fromID="Video21" toID="Tags38" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags52" name="Has tags" tooltip="is tagged with Tag:" fromID="Video21" toID="Tags41" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags53" name="Has tags" tooltip="is tagged with Tag:" fromID="Video8" toID="Tags31" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags54" name="Has tags" tooltip="is tagged with Tag:" fromID="Video9" toID="Tags32" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags55" name="Has tags" tooltip="is tagged with Tag:" fromID="Video9" toID="Tags33" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags56" name="Has tags" tooltip="is tagged with Tag:" fromID="Video24" toID="Tags38" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags57" name="Has tags" tooltip="is tagged with Tag:" fromID="Video24" toID="Tags41" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags58" name="Has tags" tooltip="is tagged with Tag:" fromID="Video11" toID="Tags37" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags59" name="Has tags" tooltip="is tagged with Tag:" fromID="Video13" toID="Tags19" intensity="2" edgecolor="0xccff99"/>
+
+<Edge id="Has tags60" name="Has tags" tooltip="is tagged with Tag:" fromID="Video13" toID="Tags35" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags62" name="Has tags" tooltip="is tagged with Tag:" fromID="Video26" toID="Tags32" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags63" name="Has tags" tooltip="is tagged with Tag:" fromID="Video26" toID="Tags33" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags64" name="Has tags" tooltip="is tagged with Tag:" fromID="Video26" toID="Tags17" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags65" name="Has tags" tooltip="is tagged with Tag:" fromID="Video27" toID="Tags14" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags66" name="Has tags" tooltip="is tagged with Tag:" fromID="Video27" toID="Tags17" intensity="2" edgecolor="0xccff99"/>
+<Edge id="Has tags67" name="Has tags" tooltip="is tagged with Tag:" fromID="Video27" toID="Tags33" intensity="2" edgecolor="0xccff99"/>
+
+<Edge id="Has uploaded3247" name="Has uploaded" tooltip="has uploaded the Video:" fromID="nay.jessica@insead.edu" toID="TED : Jeff Han (2006) Ideas Worth Sharing3255" edgecolor="0xcccccc" intensity="2"/><Edge id="Tags16TED : Jeff Han (2006) Ideas Worth Sharing32553248" name="Has tags" tooltip="is tagged with Tag:" fromID="TED : Jeff Han (2006) Ideas Worth Sharing3255" toID="Tags16" edgecolor="0xccff99" intensity="2"/><Edge id="Tags31TED : Jeff Han (2006) Ideas Worth Sharing32553249" name="Has tags" tooltip="is tagged with Tag:" fromID="TED : Jeff Han (2006) Ideas Worth Sharing3255" toID="Tags31" edgecolor="0xccff99" intensity="2"/><Edge id="Has uploaded3247" name="Has uploaded" tooltip="has uploaded the Video:" fromID="nay.jessica@insead.edu" toID="Business Education and Mentoring - Elevator Pitch3255" edgecolor="0xcccccc" intensity="2"/><Edge id="Tags17Business Education and Mentoring - Elevator Pitch32553248" name="Has tags" tooltip="is tagged with Tag:" fromID="Business Education and Mentoring - Elevator Pitch3255" toID="Tags17" edgecolor="0xccff99" intensity="2"/><Edge id="Tags32Business Education and Mentoring - Elevator Pitch32553250" name="Has tags" tooltip="is tagged with Tag:" fromID="Business Education and Mentoring - Elevator Pitch3255" toID="Tags32" edgecolor="0xccff99" intensity="2"/><Edge id="Has uploaded3247" name="Has uploaded" tooltip="has uploaded the Video:" fromID="nay.jessica@insead.edu" toID="UVME Pre-Launch Day3255" edgecolor="0xcccccc" intensity="2"/><Edge id="Tags18UVME Pre-Launch Day32553248" name="Has tags" tooltip="is tagged with Tag:" fromID="UVME Pre-Launch Day3255" toID="Tags18" edgecolor="0xccff99" intensity="2"/><Edge id="Tags17UVME Pre-Launch Day32553250" name="Has tags" tooltip="is tagged with Tag:" fromID="UVME Pre-Launch Day3255" toID="Tags17" edgecolor="0xccff99" intensity="2"/><Edge id="Has uploaded3247" name="Has uploaded" tooltip="has uploaded the Video:" fromID="nay.jessica@insead.edu" toID="Puppet magic3255" edgecolor="0xcccccc" intensity="2"/><Edge id="Tags34Puppet magic32553249" name="Has tags" tooltip="is tagged with Tag:" fromID="Puppet magic3255" toID="Tags34" edgecolor="0xccff99" intensity="2"/><Edge id="Tags36Puppet magic32553250" name="Has tags" tooltip="is tagged with Tag:" fromID="Puppet magic3255" toID="Tags36" edgecolor="0xccff99" intensity="2"/><Edge id="Has uploaded3247" name="Has uploaded" tooltip="has uploaded the Video:" fromID="nay.jessica@insead.edu" toID="Business Entrepreneur Project3255" edgecolor="0xcccccc" intensity="2"/><Edge id="Tags38Business Entrepreneur Project32553248" name="Has tags" tooltip="is tagged with Tag:" fromID="Business Entrepreneur Project3255" toID="Tags38" edgecolor="0xccff99" intensity="2"/><Edge id="Has uploaded3247" name="Has uploaded" tooltip="has uploaded the Video:" fromID="nay.jessica@insead.edu" toID="Indian Innovators3255" edgecolor="0xcccccc" intensity="2"/><Edge id="Tags32Indian Innovators32553248" name="Has tags" tooltip="is tagged with Tag:" fromID="Indian Innovators3255" toID="Tags32" edgecolor="0xccff99" intensity="2"/><Edge id="Tags31Indian Innovators32553250" name="Has tags" tooltip="is tagged with Tag:" fromID="Indian Innovators3255" toID="Tags31" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/><Edge id="NaN" name="Has tags" tooltip="is tagged with Tag:" fromID="" toID="" edgecolor="0xccff99" intensity="2"/></Edges>
+
+</Graph>

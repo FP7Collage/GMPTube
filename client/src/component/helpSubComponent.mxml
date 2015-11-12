@@ -1,0 +1,73 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="20">
+	<!-- acts as itemrenderer for displaying search results of user in form_searchwindow 
+		 *	when someone clicks on the thumbnail, we start the video
+	-->
+
+<!--<mx:Script source="../Asfiles/as_variables.as" />	
+	<mx:Image click="PlayVideo()" toolTip="{Application.application.toolTip_playVideo}" source="{data.@picture.toString()}" x="10" width="100" height="80" verticalCenter="-3"/>
+-->
+	<mx:Text selectable="false" truncateToFit="true" text="{data.@name.toString()}" fontWeight="bold" width="100%" mouseOver="app.helpBoxId.videoImage.source=data.@picture.toString();" click="PlayVideo();" height="20"/>
+<!--	<mx:Text selectable="false" x="118" text="{data.@category.toString()}" fontWeight="bold" width="160" y="28" height="18"/>
+	<mx:Text selectable="false" x="206" text="{data.@timesseen.toString()}" fontWeight="bold" width="63" y="51" height="20"/>
+	<mx:Text selectable="false"  x="206" text="{data.@lastsseen.toString()}" fontWeight="bold" width="141" y="77" height="19"/>
+-->	
+	<mx:Script>
+        	<![CDATA[
+        		import mx.core.Application;
+        		import mx.managers.PopUpManager;
+        		import com.adobe.flex.extras.controls.springgraph.Item;
+        		
+        		public var app:Tentube=Tentube(Application.application); 
+        		
+        		private function PlayVideo():void{
+        			app.currentState= 'new_ui';
+        			app.Curr_Video	=	new XML( data );
+        			//app.comments_window.PutComments ( data.@id.toString(), data.@comments.toString() );
+					app.startLoading( data.@id.toString() );	
+        			var variables:URLVariables  = 	new URLVariables();
+				variables.videoId  			= 	this.data.@id; 				
+				app.comments_window.get_commentsxml.url = app.ServerPath + app.graphData + "getVideoComments.php";	  
+				app.comments_window.get_commentsxml.request = variables;
+				app.comments_window.get_commentsxml.send();
+        			app.commentspanel.title	=	data.@name.toString();
+				}
+        	]]>
+        </mx:Script>
+<!--	<mx:Label x="118" y="51" text="Times seen"/>
+	<mx:Label x="118" y="77" text="Last seen"/>
+-->        
+</mx:Canvas>

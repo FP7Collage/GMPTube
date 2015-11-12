@@ -1,0 +1,1075 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow title="{Application.application.gamepage_title}" xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="100%" height="100%" 
+	xmlns:fs="com.fs.*" 
+	creationComplete="init()" xmlns:ns1="component.*" fontWeight="bold" 
+	textDecoration="normal" verticalScrollPolicy="auto" horizontalScrollPolicy="auto" xmlns:ytplayer="com.ytplayer.*">
+		<mx:states>
+				
+					<mx:State name="gamestate">
+				<mx:RemoveChild target="{text1}"/>
+				<mx:RemoveChild target="{btnPlayanon}"/>
+				<mx:RemoveChild target="{btnPlayindi}"/>
+				<mx:RemoveChild target="{gradientcanvas1}"/>
+				<mx:AddChild position="lastChild">
+					<ns1:GradientCanvas startColor="#006600"  angle="90" endColor="#000000" verticalScrollPolicy="off" horizontalScrollPolicy="off" bottom="10" top="10" right="10" left="10">
+						<mx:Canvas verticalScrollPolicy="off" horizontalScrollPolicy="off" left="10" top="5" bottom="5" width="169">
+								<mx:Text selectable="false" y="0" text="000" width="93.75" color="#E86363" fontWeight="bold" fontSize="29" fontFamily="Georgia" id="txtScore" textAlign="center" height="40" horizontalCenter="-1"/>
+								<mx:Text y="37" text="{matchesM}" fontSize="18" color="#408080" width="147.5" fontWeight="bold" height="31" textAlign="center" x="11.5"/>
+								<mx:List dataProvider="{matchedwords}" y="66" width="149" height="171" id="tileMatched" selectable="false"  color="#408080" textAlign="left"  fontWeight="bold" x="10"></mx:List>
+								<mx:Text y="245" text="{tabooWordsM}" fontSize="23" color="#408080" width="155" fontWeight="bold" textAlign="center" height="29" x="4"/>
+								<mx:List dataProvider="{taboowords}" width="149" height="118" id="tileTaboo" selectable="false"  color="#800000" textAlign="left" fontWeight="bold" x="10" y="282"></mx:List>
+						</mx:Canvas>
+						<mx:Canvas verticalScrollPolicy="off" horizontalScrollPolicy="off" left="189.5" right="189.5" top="0" bottom="10">
+						
+							<mx:Box width="100%" height="100%" horizontalScrollPolicy="off" verticalScrollPolicy="off" horizontalAlign="center" verticalAlign="top">
+					
+								<mx:ViewStack id="gmplayerStack" selectedIndex="2" width="360" height="270">
+								
+									<mx:Box name="FMSGM" horizontalScrollPolicy="off" verticalScrollPolicy="off" width="100%" height="100%" horizontalAlign="center">
+										<fs:FSVideoDisplay width="100%" height="297" id="gameVidPlayer"
+										maintainAspectRatio="true" cornerRadius="10" horizontalCenter="-1"/>
+									</mx:Box>
+									
+									<mx:Box name="SWFGM" horizontalScrollPolicy="off" verticalScrollPolicy="off" width="100%" height="100%" horizontalAlign="center">
+										<mx:SWFLoader autoLoad="true" width="100%" height="100%" maintainAspectRatio="true" />
+									</mx:Box>
+									
+									<mx:Box name="YTBGM" width="100%" height="100%" horizontalScrollPolicy="off" verticalScrollPolicy="off" horizontalAlign="center"  backgroundColor="BLACK">
+										<ytplayer:YTPlayer id="ytpGameMain" height="100%" width="100%" monitorPlayback="true" maintainAspectRatio="false"/>
+									</mx:Box>
+							
+								</mx:ViewStack>
+								
+							</mx:Box>
+							
+							
+							<mx:TextInput enabled="true" y="334" color="#000000" width="457" id="userGuess" backgroundColor="#EFFAD8" height="57" fontSize="30" horizontalCenter="0"/>
+							
+							<!--<mx:Text selectable="false" visible="true" styleName="playheadTimeLabel" text="{formatPositionToolTip(vPlayer.playheadTime)}-{formatPositionToolTip(vPlayer.totalTime)}" height="15" id="playheadtext" verticalCenter="0" left="70" width="64"/>-->
+							<mx:ViewStack selectedIndex="{gmplayerStack.selectedIndex}" x="10" y="308" width="81" height="18">
+							<mx:Box>
+								<mx:Text id="gameplayheadtext" x="10" y="308" text="{formatPositionToolTip(gameVidPlayer.playheadTime)}-{formatPositionToolTip(gameVidPlayer.totalTime)}" color="#F0F0F0" fontWeight="bold" selectable="false" visible="false" styleName="playheadTimeLabel"/>
+							</mx:Box>
+							<mx:Box>
+								<mx:Text id="yt_gameplayheadtext" text="{formatPositionToolTip(ytpGameMain.currentTime)}-{formatPositionToolTip(ytpGameMain.duration)}" color="WHITE" width="100%" fontWeight="bold" selectable="false" visible="false" styleName="playheadTimeLabel" valueCommit="{VideoOver(null)}"/>
+							</mx:Box>
+							</mx:ViewStack>
+						</mx:Canvas>
+						<mx:Canvas verticalScrollPolicy="off" horizontalScrollPolicy="off" top="5" bottom="5" right="10" width="175">
+							<mx:List dataProvider="{typedwords}" y="38" width="155" height="258" id="tileTyped" selectable="false"  color="#000000" textAlign="left" fontWeight="bold" enabled="true" x="10"></mx:List>
+							<mx:Text y="10" text="Typed" fontSize="18" color="#408080" width="147.5" fontWeight="bold" height="31" textAlign="center" x="10"/>
+							<mx:Button click="videoPass()" toolTip="{passVideoM}" y="330" id="btnPass" themeColor="#FFFFFF" borderColor="#FFFFFF" color="#91D2FF" cornerRadius="15" height="36" fillColors="[#91D2FF, #91D2FF]" fontSize="16" fontWeight="bold" fontFamily="Verdana" width="84" icon="@Embed(source='media/recur.png')" x="45.5" label="{passM}" labelPlacement="top" fillAlphas="[1.0, 1.0]"/>
+							<mx:Label visible="true" y="304" text="{oppPassM}" id="txtPass" fontWeight="bold" color="#ff0000" fontSize="13" height="18" width="156.5" textAlign="center" x="8.5"/>
+							<mx:Button x="45.5" y="374" label="{quitM}" height="36" width="84" id="btnQuit" labelPlacement="top" click="confirmQuitGame()" fontFamily="Verdana" fontSize="16" fontWeight="bold" color="#91D2FF" cornerRadius="15" borderColor="#FFFFFF" themeColor="#FFFFFF" fillAlphas="[1.0, 1.0]" fillColors="[#91D2FF, #91D2FF]" icon="@Embed(source='media/messagebox_critical.png')"/>
+						</mx:Canvas>
+					</ns1:GradientCanvas>
+				</mx:AddChild> 
+				<mx:SetStyle name="fontWeight" value="normal"/>
+			</mx:State>
+		</mx:states>
+		
+
+     <!-- all main messages are sent through this httpservice. -->   	
+	 <mx:HTTPService id="connectgame" fault="connectgameFault();" useProxy="false"  url="{app.ServerPath + 'GraphData/gameaction.php'}" 
+	 	method="POST" resultFormat="xml">		 		   
+	 </mx:HTTPService>
+	 
+	 <!-- many of the messages sent by client do not need any reply. these are sent throu this 
+	 	noreply:HTTPService . -->
+	  <mx:HTTPService id="noreply" useProxy="false" url="{app.ServerPath + 'GraphData/gameaction.php'}" 
+	 	method="POST" >		 		   
+	 </mx:HTTPService>
+	 
+	<mx:Script source="Asfiles/as_constants.as" />  
+	   
+	<mx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.rpc.events.ResultEvent;
+			import mx.controls.Alert;
+			import mx.core.Application;
+			import mx.events.VideoEvent;
+			import mx.events.CloseEvent;
+			import mx.managers.CursorManager;
+			import com.adobe.flex.extras.controls.springgraph.Item;
+			import mx.managers.PopUpManager;
+			
+			[Bindable]public var app:Tentube=Tentube(Application.application); 
+			
+			public var loader:Loader;
+			public var databaseloadingtimer:Timer	=	new Timer(8000,1);
+			public var routineTimer:Timer	=	new Timer(5000,1);
+			public var waitingforupdate:Timer	=	new Timer(1000,0);
+			private var delay:Number = 10000;
+						
+ 			public var game_video_id:String	=	new String();		
+			public var gamestatus:String	=	new String('WAITING');
+    		public var videoid:String		=	new String();
+    		
+    /**  for loading youtube videos in gameVidPlayer:Videodisplay **/
+    //		public var GameYouTubeloader:Loader;
+    		
+    		/**  the taboo words, words types by user and matched words are stored in these arrays.
+    			these are binded to corresponding arrays. **/
+    		[Bindable] public var taboowords:Array 		= new Array();
+			[Bindable] public var typedwords:Array		= new Array();
+			[Bindable] public var matchedwords:Array 	= new Array();
+			
+			/**  this is a list of people arranged in the descending order of gamescore .
+				and is binded to playerslist:List which uses topscorerbox as itemrenderer to
+				show list of players and their score
+			**/
+			[Bindable] public var topscorers:Array 	= new Array();
+			
+			public var videobool:Boolean = true;
+	      	public var alert:Alert;
+			
+			/* [Bindable] public var gamepage_title:String = "InnoGame"; */			
+		//	[Bindable] public var gameDescription:String = "The TenCompeGame is a two-player game. Each time you play you are &#xa;randomly paired with another player whose identity you don't know. &#xa;You can't communicate with your partner, and the only thing you have in &#xa;common with them is that you both watch the same video. &#xa;The goal is to guess what your partner is typing.&#xa;&#xa;You can match as many words as you want. For each match you&#xa;get 50 points &#xa;&#xa;Each time you type a word or phrase, you must press enter on &#xa;your keyboard to submit it to the game. &#xa;&#xa;Some videos have taboo words, which you can't use; nor &#xa;can you use any plural, singular, or word related to a taboo word. &#xa;If you feel that a video is too boring or does nt fit into your radar &#xa;you can ask to pass by clicking the pass button on the lower left corner.&#xa;But you lose 20 points for that !!&#xa;&#xa;Clicking the button will generate a message on your partner's screen,&#xa;letting them know that you want to pass. &#xa;You cannot pass on a video until both you and your partner have&#xa;hit the pass button.";
+				
+					
+      /**  called on the 1st time, user enters this page, just some initializations
+					and event listeners
+				**/
+			public function init():void{
+				playgamestatus.visible 	= false;		
+				gamestatus 		= 	'WAITING';
+				
+				// Setting up the listner for rouTineTick and game_controller when connectgame request is completed
+				routineTimer.addEventListener(TimerEvent.TIMER_COMPLETE,routineTick);
+				connectgame.addEventListener(ResultEvent.RESULT,game_controller);
+				
+				currentState	=	'';
+				topscorers	=	app.people_list;
+				topscorers	=	topscorers.sortOn("@grandscore",Array.DESCENDING | Array.NUMERIC);
+				
+				waitingforupdate.addEventListener(TimerEvent.TIMER,readArrays);
+				
+				// may comment the database loading						
+				databaseloadingtimer.addEventListener(TimerEvent.TIMER_COMPLETE,load_database);				
+			}
+			
+			
+			
+/**  FROM the moment the user clicks start, till the game ends, and user is pushed
+				out of the page, routineTimer:Timer runs, it ticks every 5 seconds, and we send request
+				to server at that time. we send the player id, and action as ROUTINE
+				server response is caught in game_controller(r:result Event).
+				there we take necessary actions.
+			**/
+			private function routineTick(t:TimerEvent):void{
+				routineTimer.stop();
+				routineTimer.reset();
+				connectgame.clearResult(); 	
+				var variables:URLVariables = new URLVariables();
+				variables.userid  	= app.Univ_LoginId;
+				variables.action  	= 'ROUTINE';				  
+				connectgame.request = variables;					
+				connectgame.send();				
+				return;
+			}
+			
+				private function load_database(t:TimerEvent):void
+				{
+					databaseloadingtimer.stop();
+					app.onAppCreationComplete();
+				}
+				
+	/**  this is the event listener for the ROUTINE request.
+			 	the gamestatus:String can take the following values
+			 		1.	WAITING
+			 		2. 	START
+			 		3.	PLAYING
+			 		4.	PASS
+			 		5.	ANOTHERGAME
+			 		6.	PROFILEYES
+			 		7.	ENDSESSION
+			 For the game, both the client side and server side takes decisions. 
+			 its not like, client side recieves explicit commands, it gets the status of
+			 other user, points, and some more variables. Based on that, the client side
+			 consults the current game status and takes decisions.
+			 
+			 not all the variables the client recieves are used all the time.
+			 based on the value of loc_message:String, we use some variables.
+			  
+		 **/
+		 
+    	/* gamestatus  -- WAIT / PLAYING / PASS / ANOTHERGAME / PROFILEYES / ENDSESSION  */			
+				  	
+    	public function game_controller(r:ResultEvent):void{
+    		try{
+				var response:XML				=	new XML(r.result);
+				var loc_message:String 			= 	new String(response..message) ;
+				var loc_videoid:String 			= 	new String(response..videoid) ;
+				var loc_taboo:String 			= 	new String(response..taboo) ;
+				var loc_sessionscore:String 	= 	new String(response..sessionscore) ;
+				var loc_opponentstatus:String  	= 	new String(response..opponentstatus) ;
+				var loc_object:String 			= 	new String(response..object) ;
+    		}
+    		catch(e:Error){
+    			routineTimer.start();
+    			return;
+    		}
+    			
+			switch(loc_message){
+				case 'QUITGAME':
+					switch(gmplayerStack.selectedIndex) {
+			    		case 0:
+			    			if ( gameVidPlayer.playing )
+								gameVidPlayer.stop();
+							routineTimer.stop();
+							break;
+						case 1:
+							break;
+						case 2:
+							ytpGameMain.stopVideo();
+							ytpGameMain.clearVideo();
+							break;
+					}
+				
+				gamestatus 			= 	'ENDSESSION';
+				alert = Alert.show(yourOppQGM,alertM);
+				setTimeout(hideAlert, delay);
+				
+				// Loading the main page
+				appmainpage();
+				// Loading the database
+				databaseloadingtimer.start();
+				
+				break;
+		
+				case 'WAITING':				// depending on gamestatus the response changes
+					if ( gamestatus	== 'WAITING' ){
+						// do nothing
+					}
+					else if ( gamestatus == 'PASS' ) {
+						alert = Alert.show(searchDFPVM,videoPassedM);
+						setTimeout(hideAlert, delay);
+						if ( gameVidPlayer.playing )
+							gameVidPlayer.stop();
+						if(ytpGameMain.playerState == YTPlayer.PLAYING)
+							ytpGameMain.stopVideo();
+						// the other user has agreed for a pass, and VA is finding a new video.
+						// so, stop the current video, change gamestatus to Wait, and
+						// inform the user abt the pass agreed thing.
+					}
+					else if ( gamestatus == 'ANOTHERGAME' ){
+						alert = Alert.show(videoAgentTFM,waitM);	
+						setTimeout(hideAlert, delay);
+						//Alert.show('Video agent trying to find new video','Wait');
+					}
+					gamestatus 		= 'WAITING';
+					routineTimer.start();
+				break;
+					
+				case 'START':	// video id, taboo words, session score
+					// start the game . info available in 
+					// 	loc_videoid	, loc_taboo	,loc_sessionscore
+				//	routineTimer.stop();
+				//	routineTimer.reset();	
+				
+				
+					app.goingtoPlay();
+					
+					currentState	=	'gamestate';
+					
+					taboowords 		=	new Array();
+					typedwords		= 	new Array();
+					matchedwords 	= 	new Array();
+					btnPass.enabled	=	true;
+					txtPass.visible	=	false;
+					
+					// do we need to add the video over for ytpGameMain ?? 
+					gameVidPlayer.addEventListener(VideoEvent.PLAYHEAD_UPDATE,VideoOver);
+					
+					userGuess.addEventListener(KeyboardEvent.KEY_DOWN, guessHandler );
+					
+					if ( gamestatus	== 'WAITING' )
+					{
+			     	//Alert.show('Here is a video','New video');		//start the new video
+				    }		
+					else if ( gamestatus	== 'PASS' ){ 
+						alert = Alert.show(videoPassedM,videoPassedM);
+						btnPass.enabled	=	true;	
+						setTimeout(hideAlert, delay);	
+						if ( gameVidPlayer.playing )
+							gameVidPlayer.stop();
+						if(ytpGameMain.playerState == YTPlayer.PLAYING)
+							ytpGameMain.stopVideo();
+					}
+					else if ( gamestatus == 'ANOTHERGAME' ) {
+						alert = Alert.show(nextVideoM,'Message');
+						btnPass.enabled	=	true;
+						setTimeout(hideAlert, delay);
+						// the other player has also agreed
+						// for a pass, and new video, new points, new taboo words has been sent.
+						// so, inform the user , update ui, start video. 			
+					}
+									
+					txtScore.text		= 	loc_sessionscore;		
+					
+	               /// Load the video 				
+					game_video_id		=	loc_videoid;
+					
+				//	startLoading(game_video_id);
+				      setTimeout(startLoading, 3000, game_video_id);  // change it to game_video_id
+									
+					taboowords 			= 	loc_taboo.split(','); 		
+					gamestatus	 		=	'PLAYING';	
+					routineTimer.start();
+					CursorManager.removeBusyCursor();	
+			
+				break;
+										
+				case 'PLAY':			
+					/* check if opponennts status is pass.. if yes inform the user, 
+						he also passes, send a request,
+						update the score n matched words list(from loc_object )*/
+					txtScore.text		=	loc_sessionscore;		
+					if ( loc_opponentstatus == 'PASS')
+					{   if(txtPass.visible==false)
+						{	
+							Alert.show(oppPVWYM, alertM,Alert.YES | Alert.NO, this,confirmPassListener, null, Alert.YES);
+
+							// Alert.show("Opponet has Passed the Video.If you also Want to Pass the Video Please Click the Pass Button","Message");
+						}
+						txtPass.visible	=	true;
+					}
+					matchedwords				=	loc_object.split(','); 	
+					tileMatched.dataProvider	=	matchedwords;
+					/* if ( loc_object != '' ){
+						matchedwords		=	loc_object.split(','); 	
+						tileMatched.rowCount=	int(matchedwords.length);
+					} */
+					routineTimer.start();
+					break;     
+        				
+				case 'ANOTHERGAME':
+					if ( loc_opponentstatus == 'ENDSESSION'){
+						//var alert:Alert;
+						alert = Alert.show(noGNPM,yRNSMC1);
+						setTimeout(hideAlert, delay);
+						
+						var Svariables:URLVariables = new URLVariables();
+						Svariables.userid  	= 	app.Univ_LoginId;
+						Svariables.action  	= 	'VIDEOOVER';	
+						Svariables.decision = 	'ENDSESSION';		
+						noreply.request		=	Svariables;	
+						noreply.send();	
+						routineTimer.stop();
+						routineTimer.reset();
+						
+						appmainpage();
+						
+						databaseloadingtimer.start();
+						
+						return;
+					}
+					routineTimer.start();
+					
+					/*  if gamestatus is also ANOTHERGAME, then wait. send routine after 2 secomds
+					as the other user has not made any decision. if he has taken any message, 
+					the status wud hav changed to wait or start or profileinvite/ endsession.. 
+					*/
+					break;
+					
+				case 'PROFILEYES':
+					if ( loc_opponentstatus == 'ENDSESSION'){
+						Alert.show(yourOppHWSM,yRNSMC1);
+						var Kvariables:URLVariables = new URLVariables();
+						Kvariables.userid  	= 	app.Univ_LoginId;
+						Kvariables.action  	= 	'VIDEOOVER';	
+						Kvariables.decision = 	'ENDSESSION';		
+						noreply.request		=	Kvariables;	
+						noreply.send();	
+						routineTimer.stop();
+						routineTimer.reset();
+						appmainpage();
+						databaseloadingtimer.start();
+						return;
+					}
+					routineTimer.start();	
+				
+					break;
+						
+				case 'PROFILEINVITE':
+				Alert.show(yourOppMWPM, alertM,Alert.YES | Alert.NO, this,profileinviteListener, null, Alert.YES);
+				//	if ( gamestatus	== 'ANOTHERGAME' )
+				//	routineTimer.start();	
+				//	if ( gamestatus	== 'PROFILEYES' )
+				//		routineTimer.start();		
+					
+					/*  if the gamestatus is PROFILEYES, 
+					then.. wait.. ( the other player has not responded yet for his video over query )
+					bcoz,, if he had responded, the status would have changed to SHOWPROFILE OR ENDSESSION
+					
+					if game status is anothergame, 
+					then tell the user, that other player doesnt want to play, wanna see profile? */
+				
+					break;
+					
+				case 'SHOWPROFILE':
+					var variables:URLVariables = new URLVariables();
+					variables.userid  	= 	app.Univ_LoginId;
+					variables.action  	= 	'VIDEOOVER';	
+					variables.decision  = 	'ENDSESSION';		
+					noreply.request		=	variables;	
+					noreply.send();		
+					routineTimer.stop();
+					routineTimer.reset();
+					//appmainpage();
+					
+					//new code 1
+					databaseloadingtimer.start();   //to load the database
+					showProfile(loc_object);		// loc_object has the id of opponent 
+					break;
+				 
+				 case 'DENIED':
+					Alert.show(unableFPTAM,yRNSMC1);	
+					//setTimeout(hideAlert, delay);
+					routineTimer.stop();
+					routineTimer.reset();
+					appmainpage();
+					break;
+				}
+				
+			}
+
+				
+				
+					
+							
+/** 
+     what is the paramter passed?			 
+ 
+  **/
+
+			public function startgame(strid:String):void{
+				
+				//Alert.show("Under Development");
+				//Alert.show("Sending Request. Please wait...",strid);
+					
+				var variables:URLVariables = new URLVariables();
+				CursorManager.setBusyCursor();	
+				connectgame.clearResult(); 	
+				app.userplaying		  =	true;	
+				gamestatus 			  = 'WAITING';
+				variables.userid  	  = app.Univ_LoginId;
+				variables.secondplayer = strid;
+				variables.action  	  = 'PLAY';	
+				variables.count		  =	1;		  
+				connectgame.request   = variables;				
+				connectgame.send();	
+				playgamestatus.visible 	= true;
+				app.lblgame.text= connPlayerM;
+				app.lblgame.text="";
+				app.playCanvas.visible=false;		
+				alert = Alert.show(sendPlzWM,messgM);	
+				setTimeout(hideAlert, delay);
+
+				return;
+				
+				 
+			}
+			private function hideAlert():void {
+                PopUpManager.removePopUp(alert);
+            }
+
+
+/*      This function is called to initiiate the anonymous game
+        Action - PLAY 
+	
+*/	
+		public function initiate_anon_game():void{
+				//var alert:Alert;
+				var variables:URLVariables = new URLVariables();
+				CursorManager.setBusyCursor();	
+				connectgame.clearResult(); 	
+				app.userplaying		  =	true;	
+				gamestatus 			  = 'WAITING';
+				variables.userid  	  = app.Univ_LoginId;
+				variables.action  	  = 'PLAY';	
+				variables.count		  =	0;		  
+				connectgame.request   = variables;				
+				connectgame.send();	
+				alert =  Alert.show(sendPlzWM,messgM);	
+				setTimeout(hideAlert, delay);
+				return;
+			}
+	
+			
+			private function startdemo():void{				
+				  app.currentState='gamemoduledemo'; 
+		 			//userGuess.addEventListener(KeyboardEvent.KEY_DOWN, guessHandlerDemo );
+		 			//app.guessesList.text =  'Your Guesses \n';
+		 			//app.userGuess.text = '';		 					
+													
+			}
+		
+			private function connectgameFault():void{
+				trace("connectgameFault()");
+			}
+	
+			/**  called at the end of the game.	**/
+			private function appmainpage():void{
+				currentState			=	'';
+				app.currentState		=	'new_ui';
+				app.userplaying			=	false;
+				playgamestatus.visible	=	false;
+				app.togglebuttonbar1.enabled= 	true;
+				app.minuteTimer.stop();
+				app.minuteTimer.reset();
+				app.minuteTimer.start();
+				CursorManager.removeBusyCursor();	
+			}
+
+		
+				
+			/**  this event and its Alert is triggered for the player who says 
+					ANOTHERGAME, but the opponent says PROFILEYES.
+					so, the 1st player gets an alert saying
+					DO U WANT TO SEE THE PROFILE OF YOUR OPPONENT ?		
+					if yes, we change game status to PROFILEYES, and send the same
+						message to server, 
+					else we send change game status to ENDSESSION, and send the same
+						message to server,
+			**/
+			private function profileinviteListener(eventObj:CloseEvent):void {
+				var variables:URLVariables = new URLVariables();
+				if (eventObj.detail== Alert.YES) {			
+					variables.userid  	= 	app.Univ_LoginId;
+					variables.action  	= 	'VIDEOOVER';	
+					variables.decision  = 	'PROFILEYES';	
+					gamestatus			= 	'PROFILEYES';	
+					noreply.request		=	variables;	
+					noreply.send();	
+					routineTimer.start();				
+				}			
+				else if(eventObj.detail== Alert.NO) {
+					variables.userid  	= 	app.Univ_LoginId;
+					variables.action  	= 	'VIDEOOVER';	
+					variables.decision  = 	'ENDSESSION';		
+					gamestatus			= 	'ENDSESSION';	
+					noreply.request		=	variables;	
+					noreply.send();		
+					routineTimer.stop();
+					routineTimer.reset();
+					appmainpage();
+				}
+					
+				
+			}
+			
+			
+			
+		
+         
+         
+         	
+		/** 	FUNCTIONS CODED BELOW ARE SUPPLEMENTARY
+				1. 	user types a word
+				2.  user passes a video
+				3.	video gets over
+		 **/	
+		
+		
+		
+		/**  triggered when the user clicks Enter in userGuess:Textinput 
+				if the keycode stands for ENTER key and test value is not ""
+				we, strip of the spaces, check if the word is already typed or a taboo word
+				and if not, send this new word to server
+	
+		**/
+		
+		private function guessHandler(event:KeyboardEvent):void {
+			if ( (event.keyCode != 13) || ( userGuess.text == '') )		// 13 is the key code for enter 
+            	return;		
+            var newword:String = userGuess.text;
+            // strip white spaces
+            var patt:RegExp = 	new RegExp(' ','ig');  
+        	newword			=	newword.replace(patt,''); 
+        	
+            userGuess.text = '';
+            newword = newword.toUpperCase();
+    		if ( taboowords.indexOf(newword) != -1 ){
+            	alert = Alert.show(youTDWM,tabooWordsM);
+            	setTimeout(hideAlert, delay);
+            	return ;
+            }
+            if ( typedwords.indexOf(newword) != -1 ){
+            	alert = Alert.show(alreadyTM,alreadyTM);
+            	setTimeout(hideAlert, delay);
+            	return ;
+            }
+            
+            typedwords.push(newword);
+            tileTyped.dataProvider	=	typedwords;
+	
+			var variables:URLVariables 	= new URLVariables();
+			variables.userid  	= app.Univ_LoginId;
+			variables.action  	= "NEWWORD";	
+			variables.word		= newword;
+			variables.time  	= gameVidPlayer.playheadTime;
+			noreply.request 	= variables;
+			noreply.send();
+       	}
+       	
+       	
+       	
+       	/**  user passes a video. 
+       			1. we disable the PASS button
+       			2. change the status to PASS
+       			3. send message to server
+       	**/
+       	
+       	private function videoPass():void{
+       		
+			btnPass.enabled		=	false;
+			//btnPass.enabled		=	true;
+			gamestatus 			=  'PASS';
+
+			var variables:URLVariables 	= new URLVariables();
+			variables.userid  	= app.Univ_LoginId;
+			variables.action  	= "PASS";	
+			variables.time  	= gameVidPlayer.playheadTime;	
+			noreply.request 	= variables;
+			noreply.send();
+			
+			return;
+		}
+		
+		private function confirmQuitGame():void{
+			Alert.show(wouldQGM, alertM,Alert.YES | Alert.NO, this,confirmQuitGameListener, null, Alert.YES);
+			
+		}
+		
+		private function confirmQuitGameListener(eventObj:CloseEvent):void{
+			
+			if (eventObj.detail==Alert.YES) {
+				var variables:URLVariables = new URLVariables();
+				
+				
+				variables.userid  	= 	app.Univ_LoginId;
+				variables.action  	= 	"QUITGAME";	
+				noreply.request		=	variables;	
+				noreply.send();		
+		        gamestatus 			= 	'ENDSESSION';
+			    if ( gameVidPlayer.playing )
+			    {
+							gameVidPlayer.stop();	
+			    }
+			    if(ytpGameMain.playerState == YTPlayer.PLAYING)
+					ytpGameMain.stopVideo();
+			   	
+				routineTimer.stop();
+				routineTimer.reset();
+				//Alert.show(txtScore.text,"This Session Score");
+				appmainpage();
+				databaseloadingtimer.start();
+			}
+
+			
+    }// end of function confirmQuitGameListener
+		/** the video over event is triggered here, we ask the player,
+				if he wants to play another game, if yes,
+					then change status to ANOTHERGAME and send the same
+				if no, ask the user if he wants to see the profile of his opponent
+					if yes, change status to PROFILEYES and send the same
+					if no,  change status to ENDSESSION and send the same
+					
+		**/
+
+		private function VideoOver(v:VideoEvent):void{
+			var done:Boolean = false;
+			var tot:Number	= 0;
+			var head:Number	= 0;
+			switch(gmplayerStack.selectedIndex) {
+				case 0:
+					var t_info:Object ;	
+					tot 	= gameVidPlayer.totalTime;
+					head 	= gameVidPlayer.playheadTime; 
+					if ( (tot>0 ) && (head>0 ) && ( (tot-head) <2 ) ){
+						routineTimer.stop();
+						routineTimer.reset();
+						gameVidPlayer.removeEventListener(VideoEvent.PLAYHEAD_UPDATE,VideoOver);
+						done = true;
+					}
+					break;
+				case 1:
+					break;
+				case 2:
+					tot = ytpGameMain.duration/1000;  // latest changes for ytp player to calculate time in seconds
+					head = ytpGameMain.currentTime/1000;
+					if(tot>0 && head>0 && (tot-head)<5) {
+						done = true;
+					} 
+					break;
+			}
+
+			if(done && this.videobool) {
+				done= false;
+				this.videobool = false;
+
+				routineTimer.stop();
+				routineTimer.reset();
+				Alert.show(wouldPAGaM, alertM,Alert.YES | Alert.NO, this,anotherGameListener, null, Alert.YES);		
+				
+				
+				
+				
+				taboowords 		= new Array();
+				typedwords		= new Array();
+				matchedwords	= new Array();
+				btnPass.enabled	= true;
+				txtPass.visible	= false;
+			}
+			return;
+		}
+		
+		
+		 private function anotherGameListener(eventObj:CloseEvent):void {      
+			var variables:URLVariables = new URLVariables();
+			
+			if (eventObj.detail==Alert.YES) {	
+				this.videobool = true;
+				variables.userid  	= 	app.Univ_LoginId;
+				variables.action  	= 	"VIDEOOVER";	
+				variables.decision  = 	"ANOTHERGAME";	
+				gamestatus 			= 	'ANOTHERGAME';		
+				noreply.request		=	variables;	
+				noreply.send();					 
+				routineTimer.start();
+			}		
+			else if(eventObj.detail==Alert.NO) {
+				this.videobool = true;	
+				Alert.show(wouldYLSOPM, alertM,Alert.YES | Alert.NO, this,profileViewListener, null, Alert.YES);		
+			}
+		}
+         
+		
+		private function profileViewListener(eventObj:CloseEvent):void {  
+			var variables:URLVariables 	= new URLVariables();			
+			/* var item:Item			=	app.fullGraph.find( app.Univ_LoginId );
+			item.data.@grandscore =int(item.data.@grandscore) + int(txtScore.text); */
+			if (eventObj.detail==Alert.YES) {
+					
+				variables.userid  	= 	app.Univ_LoginId;
+				variables.action  	= 	"VIDEOOVER";	
+				variables.decision  = 	"PROFILEYES";	
+				gamestatus 			= 	'PROFILEYES';
+				noreply.request		=	variables;	
+				noreply.send();
+				routineTimer.start();	
+				//var alert:Alert;
+				alert = Alert.show(waitFOASP,messgM);	
+				setTimeout(hideAlert, delay);
+								   
+			}		
+			else if(eventObj.detail==Alert.NO) {	
+				variables.userid  	= 	app.Univ_LoginId;		
+				variables.action  	= 	"VIDEOOVER";	
+				variables.decision  = 	"ENDSESSION";									
+				gamestatus 			= 	'ENDSESSION';	
+				noreply.request		=	variables;	
+				noreply.send();	
+				routineTimer.stop();
+				routineTimer.reset();
+				Alert.show(txtScore.text,thisSessScM);
+				appmainpage();
+				databaseloadingtimer.start();
+			}		
+			return;
+		}
+		
+		
+		
+		
+		/** function is called, when client recieves SHOWPROFILE message from server 
+				and opponent id
+				reload the network and then go to profile page, so, that the new score of 
+		 		opponent can be displayed.		
+		 			readArrays() function is also for that purpose.
+		*/
+		
+		private function showProfile(oppid:String):void{
+			 if ( gameVidPlayer.playing )
+			    {
+							gameVidPlayer.stop();	
+			    }
+			    if(ytpGameMain.playerState == YTPlayer.PLAYING)
+					ytpGameMain.stopVideo();
+					
+					
+					
+			//to Qit the video player, this is the code		
+	 	
+	 		var item:Item			=	app.fullGraph.find( oppid );
+			item.data.@grandscore =int(item.data.@grandscore) + int(txtScore.text);
+	 			app.minuteTimer.stop();
+				app.minuteTimer.reset();
+	  		app.minuteTimer.start();
+			CursorManager.removeBusyCursor();	
+			app.userplaying					=	false;
+			app.togglebuttonbar1.enabled	= 	true;
+					var t_info:Object = new Object();
+	      				t_info.action		= "updatelog";	
+	      				t_info.actiontype 	= 'GameProfileView';
+	      				t_info.takenby 		=  app.Univ_LoginId1 ;  
+	      				t_info.takenon 		= oppid;
+	      				app.send_log_msg( t_info );	     							
+			
+			app.dataloaded					=	false;
+			opponentid						=	oppid;
+   			//app.onAppCreationComplete();	
+   			//It has been commented to make the game faster
+   			app.select_centre				=	true;
+			app.centre_id					=	oppid;
+			waitingforupdate.start();
+			playgamestatus.visible	=	false;
+			app.currentState		=	'new_ui';
+			currentState			=	'';
+			Alert.show(txtScore.text,"This Session Score");
+		}
+		
+		public var opponentid:String		=	new String();
+	
+		
+		
+		private function readArrays(t:TimerEvent):void{
+			if ( app.dataloaded	=	true ){	
+				app.dataloaded	=	false;
+				waitingforupdate.stop();
+				waitingforupdate.reset();
+				app.detailedprofileId	=	opponentid;
+				app.currentState		=	'profilingdim';	
+			}
+		}
+			
+			
+			
+	/** we get the id of video, find the url, if it is a FMS one, its easy, 
+					else, we use the GameYouTubeloader:Loader to load the video url
+		
+		 Make sure that gmplayerstack is loaded correctly to play the video
+			*/
+			
+			public function startLoading (id:String):void
+			{	
+ 				videoid = id;
+ 				try {
+					var item:Item = app.fullGraph.find(videoid);	
+					var videourl:String = item.data.@url.toString();
+				
+					  if ( item.data.@source.toString() == 'FMS'){
+							gmplayerStack.selectedIndex = 0;
+						} else if(item.data.@source.toString() == 'YTB') {
+							gmplayerStack.selectedIndex = 2;
+					   }
+				// play the video	   
+				playVideo(videourl);
+				
+ 				} catch(e:Error) {
+ 					//var alert:Alert;
+ 					alert = Alert.show(thereHasPVM,yRNSMC1);
+ 					setTimeout(hideAlert, delay);
+ 					return;
+ 				}
+				/*
+				var req:URLRequest 	= new URLRequest ( videourl );
+				GameYouTubeloader 	= new Loader();
+				GameYouTubeloader.contentLoaderInfo.addEventListener(Event.INIT, handlerLoaderInit);		
+				GameYouTubeloader.unload(); 
+				GameYouTubeloader.load(req);
+				*/
+			}
+			
+			
+			
+	/**  if unable to play the video, try again, game_video_id contains the id of the
+					video recieved.
+			*/	
+			private function playVideo(url:String):void
+			{
+				try{
+					switch(gmplayerStack.selectedIndex) {
+						case 0:
+						      
+						     if(url.indexOf("youtube")<0) {
+								var my_arrayfilename:Array=url.split("/");
+								var mediafilename:String=my_arrayfilename[my_arrayfilename.length - 1];
+								
+								if(mediafilename.indexOf(".")<0) {
+									url="http://" + app.ServerNameConstant + "/" + app.VideoPath + "/" + mediafilename + ".flv";
+								}else{
+									url="http://" + app.ServerNameConstant + "/" + app.VideoPath + "/" + mediafilename ;
+								}
+								
+							}
+					
+						
+							gameVidPlayer.source 	= 	url;
+							gameVidPlayer.play();
+							break;
+						case 1:
+							break;
+						case 2:
+						    // make sure you are getting the currect url to play the video
+							ytpGameMain.loadVideoById(url.split('/v/')[1]);
+							ytpGameMain.playVideo();
+					}
+					playgamestatus.visible 	= 	false;
+					CursorManager.removeBusyCursor();
+				}
+				catch(e:Error){
+					//var alert:Alert;
+					alert = Alert.show("Can not load the video",loadingVideoM);
+					setTimeout(hideAlert, delay);
+					//  Lets not try to play the video if it fails playing for the first time.
+				/*	routineTimer.stop();
+					routineTimer.reset();
+					routineTimer.start();
+					startLoading(game_video_id);		
+					CursorManager.removeBusyCursor();
+				*/			
+				}										
+				return;
+			}  
+			
+
+		
+			public function initiategame():void{
+				app.onlineUsersListgame.dataProvider=new ArrayCollection(app.onlineUsers);
+    			app.playCanvas.visible=true;
+			}
+			
+			public function loadGameState():void{
+					currentState 			= 	'gamestate';
+			}
+			
+			
+	
+// Function to test the game state.. (play the video directly )			
+			public function displayGameState():void{
+				
+					currentState 			= 	'gamestate';
+				
+				//startLoading("Video1");
+					//setTimeout(loadGameState, 1000);
+					setTimeout(startLoading, 3000, "Video25");					
+			
+			}
+
+
+			/** for playhead time and total time display in bottom left of gamevideoplayer */
+			private function formatPositionToolTip(value:int):String{
+				var result:String = (value % 60).toString();
+	        	if (result.length == 1){
+	            	result = Math.floor(value / 60).toString() + ":0" + result;
+	        	} 
+	        	else {
+	            	result = Math.floor(value / 60).toString() + ":" + result;
+	        	}
+	        	return result;
+			}
+			
+
+
+		private function confirmPassListener(eventObj:CloseEvent):void{
+				if (eventObj.detail==Alert.YES) {
+					this.videoPass();
+				}
+				if (eventObj.detail==Alert.NO){
+				//DO NOTHING
+					this.btnPass.enabled = true;
+				}
+			}
+			
+
+
+/*		private function handlerLoaderInit (event:Event):void	
+			{
+				try{
+					var urlVars:URLVariables = new URLVariables ();
+					urlVars.decode (GameYouTubeloader.contentLoaderInfo.url.split("?")[1]);
+					var flvURL:String = constructFLVURL (urlVars.video_id, urlVars.t);
+					playVideo (flvURL);
+				}
+				catch(e:Error){
+					//var alert:Alert;
+					alert = Alert.show(tryAgLVideoM,loadingVideoM);
+					setTimeout(hideAlert, delay);
+					startLoading(game_video_id);		
+					//Alert.show('Unable to play the video. Contact the administrator: ' + e.name,'Error !');
+					// do nothing
+				}
+			}
+  */
+  
+  /*			
+			private function constructFLVURL (video_id:String, t:String):String
+			{
+				var str:String = "http://www.youtube.com/get_video.php?";
+				str += "video_id=" + video_id;
+				str += "&t=" + t;
+				return str;
+			}
+  */			
+				
+		
+		
+		]]>
+	</mx:Script>
+	
+	
+		
+	
+	<ns1:GradientCanvas verticalScrollPolicy="off" offsetX="80" offsetY="60" startColor="0x666666" angle="360" endColor="0x000000" horizontalScrollPolicy="off" id="gradientcanvas1" left="10" right="10" bottom="10" top="10">
+		<mx:Text x="10" y="13" text="{Application.application.gameDescription}" width="405" height="356" color="#C4C4C4" fontWeight="normal" id="text1"/>
+		<mx:Button x="10" y="374" label="{anonIM}" id="btnPlayanon" click="{initiate_anon_game();}" width="137"/>
+		<mx:Button x="152" y="374" visible="false" label="{indvIM}" id="btnPlayindi" click="{initiategame();}" width="89"/>
+		<!--
+		{app.individual_invite}
+		-->
+<!--		<mx:Button x="395" y="374" label="Test Game"  click="{displayGameState();}" width="61"/>
+	-->
+		<mx:Button x="267" y="374" label="{startDemoM}" id="btnDemo" click="startdemo()"/>
+		
+		<mx:List itemRenderer="component.topscorerbox" selectable="false" dataProvider="{topscorers}" id="playerslist" x="495" y="40" width="328" height="326" borderStyle="none"></mx:List>
+
+		<mx:Text x="561" y="10" text="{topScoreSM}" color="#B4B4B4"/>
+		<mx:Text visible="false" id="playgamestatus" x="300" y="376" text="{tryFindPwM}" color="#A88FBD" width="226"/>
+	</ns1:GradientCanvas>
+	
+</mx:TitleWindow>
+
+

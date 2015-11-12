@@ -1,0 +1,263 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:local="*" xmlns:mx="http://www.adobe.com/2006/mxml" width="426" 
+	 horizontalScrollPolicy="off" verticalScrollPolicy="off" height="300">
+
+
+<mx:HTTPService id="learnWebService" fault="learnWebFault(event);" showBusyCursor="true">
+	</mx:HTTPService>
+
+
+	<mx:TextInput creationComplete="vSearch.addEventListener(KeyboardEvent.KEY_DOWN,keyHandler);" id="vSearch" tabEnabled="true" tabIndex="1" x="10" y="10"/>
+	<mx:Button y="10" x="178" toolTip="{typeKeySM}" label="{searchM}" click="{prepareSearch()}" 
+		tabEnabled="true" tabIndex="2"  width="129"/>				
+		
+	<mx:Text selectable="false" text="{searchCrM}" id="searchStatus" visible="true" 
+		width="266" height="20" color="#000000" y="37" x="10" fontWeight="bold"/>
+	
+	<mx:DataGrid horizontalScrollPolicy="off" verticalScrollPolicy="auto" variableRowHeight="true" id="dgVideos" dataProvider="{app.searchResults}"
+	  showHeaders="false" color="#000000" height="241" bottom="5" visible="true" top="59" left="5" right="5">
+			<mx:columns>
+				<mx:DataGridColumn itemRenderer="component.searchBox"/>											
+			</mx:columns>			
+	</mx:DataGrid>
+	
+	<!-- user can enter a keyword and search -->
+		
+	<mx:Script source="Asfiles/as_constants.as" />
+		
+		<mx:Script>
+			<![CDATA[
+				import mx.core.UIComponent;
+				import mx.core.Application;
+				import mx.managers.CursorManager;
+
+
+
+				import mx.rpc.events.FaultEvent;
+				import mx.controls.Alert;
+				//import mx.core.UIComponent;
+				//import mx.core.Application;
+				//import mx.managers.CursorManager;
+				 import mx.managers.PopUpManager;	 
+				import flash.display.DisplayObject;
+				import flash.events.MouseEvent;
+				import flash.events.TimerEvent;
+				import flash.net.URLRequest;
+				import flash.net.URLVariables;
+				import flash.net.navigateToURL;
+				import flash.utils.Timer;
+		
+		import mx.collections.ArrayCollection;
+		import mx.controls.Label;
+		import mx.controls.LinkButton;
+		import mx.core.Application;
+		import mx.core.UIComponent;
+		import mx.events.FlexEvent;
+		import mx.rpc.events.ResultEvent;
+		import mx.utils.ObjectUtil;
+
+
+
+				[Bindable] public var app:Tentube=Tentube(Application.application); 
+				
+				private var lWR:LearnWebResults;
+
+ 		
+          [Bindable] public var LearnWebResult:Object = new Object;		
+				
+				{
+					
+					Security.allowDomain('http://repository.it.fmi.uni-sofia.bg:8080/');
+					Security.allowDomain('http://gaco.fmi.uni-sofia.bg:8080/');
+					
+				}
+				
+				
+				
+				private function keyHandler(event:KeyboardEvent):void {
+	           	 	if ( (event.keyCode != 13) || ( vSearch.text == '') )		// 13 is the key code for enter 
+	            		return;	
+	            	prepareSearch();	
+	       		}
+	       	
+	       	
+				/** we get the list of videos, just scan through its name and tag and return the
+						results
+					component.searchBox acts as the itemrenderer for datagrid row.	
+				*/
+				
+				public function prepareSearch():void{
+					if ( vSearch.text ==''){
+						searchStatus.text = noKeyFM;
+						searchStatus.visible = true;
+						return;
+					}
+					CursorManager.setBusyCursor();
+					
+					var results:XMLList	=	new XMLList();
+					var pattern:RegExp 	= 	new RegExp(vSearch.text,'i');
+					
+					for each ( var viddata:XML in app.videos_list ) {
+						var name:String	=	viddata.@name.toString();
+						var tags:String	=	viddata.@tags.toString();
+						if  ( (name.search(pattern) != -1) ||  (tags.search(pattern) != -1) ){
+							results	=	results + viddata;
+						}
+					}
+					
+					var sortedResults:XMLList	=	new XMLList();
+					
+					for each (var viddata5:XML in results){
+						var rating5:Number=viddata5.@grandrating.toString().charCodeAt(0) - 48;
+						if(rating5==5){
+							sortedResults=sortedResults+viddata5;
+							//results=results-viddata5;
+						}
+					}
+					for each (var viddata4:XML in results){
+						var rating4:Number=viddata4.@grandrating.toString().charCodeAt(0) - 48;
+						if(rating4 >= 4 && rating4 < 5){
+							sortedResults=sortedResults+viddata4;
+							//results=results-viddata4;
+						}
+					}
+					for each (var viddata3:XML in results){
+						var rating3:Number=viddata3.@grandrating.toString().charCodeAt(0) - 48;
+						if(rating3 >= 3 && rating3 < 4){
+							sortedResults=sortedResults+viddata3;
+							//results=results-viddata3;
+						}
+					}
+					for each (var viddata2:XML in results){
+						var rating2:Number=viddata2.@grandrating.toString().charCodeAt(0) - 48;
+						if(rating2 >= 2 && rating2 < 3){
+							sortedResults=sortedResults+viddata2;
+							//results=results-viddata2;
+						}
+					}
+					for each (var viddata1:XML in results){
+						var rating1:Number=viddata1.@grandrating.toString().charCodeAt(0) - 48;
+						if(rating1 >= 1 && rating1 < 2){
+							sortedResults=sortedResults+viddata1;
+							//results=results-viddata1;
+						}
+					}
+					for each (var viddata0:XML in results){
+						var rating0:Number=viddata0.@grandrating.toString().charCodeAt(0) - 48;
+						if(rating0 >= 0 && rating0 < 1){
+							sortedResults=sortedResults+viddata0;
+							//results=results-viddata1;
+						}
+					}
+					
+					
+					
+					app.searchResults = sortedResults;
+					//app.searchResults=app.searchResults+results;
+					//app.searchResults = results;   //not required part of earlier code
+					CursorManager.removeBusyCursor();
+					// the new popup search
+					
+					if(app.tubeShortName== "tentube" )
+					prepareSearchpopup();
+					return;
+				
+				
+				}
+					
+				public function prepareSearchpopup():void{
+						// call the learnweb service
+						var LearnWebServer:String;
+						var searchKeyWord :String;
+					
+						searchKeyWord = vSearch.text;
+					//	LearnWebServer ="http://repository.it.fmi.uni-sofia.bg:8080/";		
+						LearnWebServer = "http://gaco.fmi.uni-sofia.bg:8080/";				
+						learnWebService.url	= 	LearnWebServer+ "FedoraKRSM/fedora/search/terms="+ searchKeyWord +"&maxResults=0";
+						learnWebService.useProxy =	false;
+					     learnWebService.resultFormat =	'e4x';
+					    learnWebService.method	=   'GET';		
+						learnWebService.addEventListener(ResultEvent.RESULT,learnWeb_ProcessResults);
+						learnWebService.send();
+												
+
+					
+					return;
+				}	
+
+				public function learnWeb_ProcessResults(r:ResultEvent):void{
+				try{
+					//var LearnWebXML :XML;
+			   		LearnWebResult	=	learnWebService.lastResult;
+			   		app.LearnWebXML = new XML(LearnWebResult);
+			   		var i:int =0;
+			
+				for each(var node:XML in app.LearnWebXML.descendants("resource"))
+				{
+					
+					if(node.canonical.dc.type=="Video")
+					{
+					i=1;
+					}
+				}
+				if(i==1)
+			   			showLearnWeb(app.LearnWebXML);
+			   	//	trace(LearnWebXML);
+			   	   //Alert.show(LearnWebXML.toXMLString());
+			   					   		
+			   		
+			 	}
+			 	catch(e:Error){
+			 		trace('Errors in LearnWeb XML Results','Error !');
+			 	}
+			 	
+			 	return;
+		}
+	
+	public function learnWebFault(f:FaultEvent):void{
+		trace("LearnWeb Fault"+ f.message);
+		Alert.show("LearnWeb Service Failed");
+	}
+					
+	public function showLearnWeb(lwResults:XML):void{
+				                
+                lWR = new LearnWebResults();			
+			   	PopUpManager.addPopUp(lWR, this, false);
+			  // 	 PopUpManager.centerPopUp(lWR);
+			
+		}
+	
+			]]>
+		</mx:Script>
+
+</mx:Canvas>

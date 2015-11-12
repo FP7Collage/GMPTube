@@ -1,0 +1,674 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+	  	scaleX="1" scaleY="1"
+		alpha="1.0" themeColor="haloGreen"
+	 	mouseUp="setCurrentItem();"	
+	 	rollOver="doZoom(event)" 		rollOut="doZoom(event)"
+	 	width= "{app.canvas_width}" 
+	 	height= "{app.canvas_height}"
+	 	backgroundAlpha="1" 
+	 	xmlns:ns1="com.adobe.flex.extras.controls.springgraph.*" horizontalScrollPolicy="off"
+	 	verticalScrollPolicy="off" >	
+	<mx:Image verticalAlign="middle" horizontalAlign="center" creationComplete="createListener();" 
+		height="{app.image_height}" width="{app.image_width}" 
+		source="{data.data.@picture}" id="nodeImage" 
+		y="{app.image_y}" horizontalCenter="0" contextMenu="{cm}" visible="{showNode &amp;&amp; isNotTag}" />
+		
+	<mx:Image source="@Embed('/media/control_play_blue.png')" contextMenu="{cm}" visible="{isVideo &amp;&amp; showNode}" id="videoSpecific" height="{app.but_height*2}" width="{app.but_width*2}" y="{app.but_y*4}" x="50" horizontalCenter="3"/>	
+	
+	
+	<mx:Image source="media/favorites.png" contextMenu="{cm}" id="PopUpOptions" visible="{showbutton &amp;&amp; showNode}" height="{app.but_height}"
+		width="{app.but_width}" y="{app.but_y}" x="68"
+			horizontalCenter="5" />	
+					
+<!--	<mx:Button label="" id="PopUpOptions" visible="{showbutton}" height="{app.but_height}" 
+		width="{app.but_width}" y="{app.but_y}" x="68"
+			cornerRadius="0" fillColors="#FF0000" horizontalCenter="5" borderColor="#FF0000"/>		-->							  
+    
+    <mx:Label fontSize="{app.fontSize}" color="#FFFFFF" id="nodeLabel" 
+    	y="{app.text_y}" width="{app.text_width}" x="3"
+    	height="{app.text_height}" 
+    	text="{data.data.@name}" selectable="false" textAlign="center" visible="{showNode}"/>	
+   	
+	<mx:Glow id="glowImage" duration="1000" 
+        alphaFrom="1.0" alphaTo="0.1" 
+        blurXFrom="0.0" blurXTo="50.0" 
+        blurYFrom="0.0" blurYTo="50.0" 
+        color="0x00FF00"/>
+
+    <mx:Zoom id="zoomAll" zoomWidthTo="{app.zoom_width_to}" 
+    	zoomHeightTo="{app.zoom_width_to}" 
+    	zoomWidthFrom="1" zoomHeightFrom="1" />
+
+
+<mx:Script source="Asfiles/as_constants.as" />
+
+	<!-- this acts as the item renderer for all nodes in Springgraph. so, all the items 
+		 have a picture, label + properties specific for their nodetype
+	 -->
+				
+	<mx:Script>
+		<![CDATA[
+			import component.ConnectToGroupMembers;
+			
+			import com.adobe.flex.extras.controls.springgraph.Graph;
+			import com.adobe.flex.extras.controls.springgraph.Item;
+			import mx.core.Application;
+			import mx.controls.Alert;
+			import mx.controls.Menu;
+			import mx.events.MenuEvent;
+	       	import mx.managers.PopUpManager;
+	       	import mx.core.UIComponent;
+	       	import mx.collections.ArrayCollection;
+	       	
+	       	import flash.events.FocusEvent;
+			import flash.events.MouseEvent;
+			import flash.events.TimerEvent;
+			import flash.utils.Timer;
+			import flash.utils.getTimer;
+				    
+	        public var SelectedItem:XML=new XML();
+	        public var nodeXML:XML=new XML();
+	        private var lastMouseDownTime: int = -999999;    
+        	[Bindable]private var isVideo:Boolean = false;          		
+			[Bindable] private var isNotTag:Boolean = true;
+	   		[Bindable]public var app:Tentube=Tentube(Application.application);
+	   		
+	   		/**  for the pop up which appears on right click**/
+	  	    [Bindable]private var cm:ContextMenu;
+	  	    
+	  	    /**  the value of showbutton:Boolean is binded to the visibility of PopUpOptions:Button 
+	  	    	 we make it true when all neighbours are visible
+	  	    **/
+	        [Bindable]public var showbutton:Boolean=false;
+	        public var currentitem:Item = new Item();
+	        [Bindable]public var showNode:Boolean=true;
+	       
+	        
+	        /**  function called when user clicks on the item.	we set the clicked node
+	        	 as current node, which will give a greenish glow to it
+	        	 and a pale yellow glow to all its immediate neighbours.
+	        	 
+	        	 the setCurrentItem() function in main file, reads the string from 
+	        	 new_current_id:String and sets that as current item. 
+	        **/  
+	           
+	        public function setCurrentItem():void{
+	        	app.new_current_id=this.document.data.id;
+	        	app.setCurrentItem(new TimerEvent(TimerEvent.TIMER_COMPLETE));
+	        	
+	        	// called when you want to readd the context menu item, specially for admin nodes.
+	        	createListener();
+	        }
+   
+   
+			/**  when the nodes are made smaller, we can switch ON/OFF the zoom effect
+				 idea suggested by Angelo marco Luccini :) 
+			**/
+			
+		 	public function doZoom(event:MouseEvent):void {
+				if (zoomAll.isPlaying) {
+					zoomAll.reverse();
+				}
+				else {
+					zoomAll.play([event.target], event.type == MouseEvent.ROLL_OUT ? true : false);
+				}
+			} 
+		
+
+		 	/**  Ok, this function called on creationcomplete event	
+		 	  	 1.	this sets the tooltips for all nodes and 
+		 	  	 	general node functions ( Expand, Stop displaying, Focus )
+		 	  	 	
+		 	  	 2.	for videos it sets the context menu with ( View info, Play video )
+		 	  	 
+		 	  	 3. for people nodes it sets the context menu with ( Short profile, Detailed profile,
+		 	  	 	add social network link )	  	  
+		 	  	 
+		 	**/
+		 	
+		 	
+	   		public function createListener():void {
+				var popupitems:Array= new Array(); 
+				var nodedata:XML=this.data.data;
+	   		 	switch( nodedata.@nodetype.toString() ){
+	   		 		
+	   		 		case 'Ideas':
+	   		 		this.toolTip 					= 'Idea: ' + ( nodedata.@name.toString() );
+	   		 			var cminfo:ContextMenuItem 		= new ContextMenuItem(viewInfoM, true); 
+	            		cminfo.separatorBefore   	= false;	
+		             	cminfo.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, profilehandler);  
+		                popupitems.push(cminfo);
+		                break;
+		            
+		            case 'Evaluation':
+		            
+	   		 		this.toolTip 					= 'Evaluation: ' + ( nodedata.@name.toString() );
+	   		 			var cmEvalInfo:ContextMenuItem 		= new ContextMenuItem(viewInfoM, true); 
+	            		cmEvalInfo.separatorBefore   	= false;	
+		             	cmEvalInfo.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, profilehandler);  
+		                popupitems.push(cmEvalInfo);
+		                break;
+		             	
+		             		   		 			   		 		
+	            	case 'Tags':
+	            		this.toolTip 					= 'Tag: ' + ( nodedata.@name.toString() );
+		  // 		 		isNotTag = false;
+		//   		 		this.nodeLabel.setStyle('fontSize',app.fontSize*1.3);
+	            		this.videoSpecific.visible = false;
+	            		
+	            		// introduced to reduce the size of the tag nodes	            		
+	            		this.nodeImage.width = 20;
+	            		this.nodeImage.height = 20;
+	            		this.width = 25;
+	            		this.height = 25 ;
+	            		//this.nodeLabel.y = 27;
+	            	//	var taglink:ContextMenuItem 		= 	new ContextMenuItem("Add \"Relates To\" link", true);
+	            		var taglink:ContextMenuItem 		= 	new ContextMenuItem(addRelatesToM, true);
+		             		taglink.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, taglinkhandler);
+		             	//	cmlink.separatorBefore   		= false;
+		             		popupitems.push(taglink);
+	            		break;
+	            	case 'Videos':
+	            		this.toolTip 					= 'Video: ' + ( nodedata.@name.toString() );
+	            		var cminfo:ContextMenuItem 		= new ContextMenuItem(viewInfoM, true); 
+	            		var cmplayvideo:ContextMenuItem = new ContextMenuItem(playVideoM, true); 	
+	            		cmplayvideo.separatorBefore   	= false;	
+		             	cminfo.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, profilehandler);  
+		             	cmplayvideo.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, playvideo);  
+		             	popupitems.push(cminfo);
+		             	popupitems.push(cmplayvideo);
+		             	isVideo=true;
+		             	this.videoSpecific.visible=true;
+  		          //   	this.nodeImage.height=20;
+		           //  	this.nodeImage.width=20; 
+// 		             	this.nodeImage.drawRoundRect(0,0,50,50,25,0xFF0000);
+	            		break;
+	            	case 'People':
+	            		this.toolTip 					= nodedata.@name.toString();
+	            		// added to reduce the node size of people
+	            		//this.nodeImage.width = 25;
+	            		//this.width = 40;
+	            		//this.height = 40;
+	            		           		
+	            			
+	            		
+		   		 		 
+		   		 		var cmshortprofile:ContextMenuItem 	= 	new ContextMenuItem(shortProfileM, true);
+		   		 		cmshortprofile.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, profilehandler);  
+		   		 		popupitems.push(cmshortprofile);
+		   		 		this.videoSpecific.visible = false;
+		   		 		var cmdetaprofile:ContextMenuItem 	= 	new ContextMenuItem(detailedProfileM, true); 
+		   		 		cmdetaprofile.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, profilehandler);  
+		   		 		popupitems.push(cmdetaprofile);
+		   		 		cmdetaprofile.separatorBefore		=	false;
+		   		 		if (( nodedata.@id.toString() == app.Univ_LoginId ) || ( app.adminMode == true) ) {
+		   		 		var cmlink:ContextMenuItem 		= 	new ContextMenuItem(addSNPAM, true);
+		   		 		
+		             		cmlink.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, linkhandler);
+		             		
+		             		// the links could be added when it is either logged in user node.. or it is in admin mode
+		             		var cmGroupLink:ContextMenuItem 		= 	new ContextMenuItem(addSNPGM, true);		   		 			
+		             		cmGroupLink.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, addMultipleLinkHandler);
+		             		
+		             			             		
+		             		cmGroupLink.separatorBefore  = false;
+		             		popupitems.push(cmlink);
+		             		popupitems.push(cmGroupLink);
+		   		 		}	
+	            		break;
+	            }
+				
+				var cmexpand:ContextMenuItem 	= 	new ContextMenuItem(expandM, true);
+				var cmexpandN:ContextMenuItem 	= 	new ContextMenuItem(expandNM, true);
+				cmexpandN.separatorBefore = false;
+				
+	            var cmDisplayALLRel:ContextMenuItem   	=   new ContextMenuItem(dispAllRM, true);
+	            var cmfocus:ContextMenuItem   	=   new ContextMenuItem(focusM, true);
+	            var cmstop:ContextMenuItem   	=   new ContextMenuItem(stopDispM, true);	
+	            
+	            cmstop.separatorBefore   = false;
+	            cmfocus.separatorBefore  = false;
+	             
+	            cmexpand.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, expandhandler);
+	            cmexpandN.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, expandNHandler);
+	            cmDisplayALLRel.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, displayALLRelationship);
+	            cmfocus.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, focushandler);
+	            cmstop.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, stophandler);
+	            
+	            
+				popupitems.push(cmexpand);
+				popupitems.push(cmexpandN);
+				popupitems.push(cmDisplayALLRel);
+				popupitems.push(cmfocus);
+				popupitems.push(cmstop);
+				 
+				cm = new ContextMenu();
+				cm.hideBuiltInItems();
+				cm.customItems = popupitems;
+				 
+				app.Node_Id_Uid[this.data.id]=this;	
+				this.addEventListener(MouseEvent.CLICK,Enddraw);
+				//this.addEventListener(MouseEvent.CLICK,tagEnddraw);
+	   			return;
+			}
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+			public var Src_Node_Type:String=new String();
+			
+			
+			/**  event listener for expand **/
+	        private function expandhandler(evt:ContextMenuEvent):void {
+				var nodedata:XML=this.data.data;
+				currentitem = app.myGraph.find(nodedata.@id);
+				app.opennodes(currentitem);
+	        }
+	         private function expandNHandler(evt:ContextMenuEvent):void {
+				var nodedata:XML=this.data.data;
+				currentitem = app.myGraph.find(nodedata.@id);
+				app.showExpandPopUp(currentitem);
+	        } 
+	        
+	   				
+					
+          private function addMultipleLinkHandler(evt:ContextMenuEvent):void {
+				var nodedata:XML=this.data.data;
+				currentitem = app.myGraph.find(nodedata.@id);
+			    app.connectToAllPopUp(currentitem);							
+				
+			} 
+  
+	        
+	        
+	        
+	        /**  To display all the relationships among the existing nodes **/   
+	        private function displayALLRelationship(evt:ContextMenuEvent):void {
+				var nodedata:XML=this.data.data;
+				currentitem = app.myGraph.find(nodedata.@id);
+				
+				//Loop through the neighbours of each nodes
+				// if the neighbour node existing in the current network and if the relationship 
+				//does not exist in currrent network then display that relationship
+				 app.displayAllRelationShips(currentitem);
+				 
+				
+				//app.opennodes(currentitem);
+				
+				
+	        }
+			
+			/**  event listener for stop displaying **/
+			private function stophandler(evt:ContextMenuEvent):void{
+				var nodedata:XML=this.data.data;
+				currentitem = app.myGraph.find(nodedata.@id);
+				app.deletenodes(currentitem);
+	        } 
+		     
+		 
+		 	/**  event listener for focus **/
+			private function focushandler(evt:ContextMenuEvent):void {
+				var nodedata:XML=this.data.data;
+				currentitem = app.myGraph.find(nodedata.@id);
+				app.new_current_id = nodedata.@id;
+				app.focusnode(currentitem);	
+	        } 
+		   
+		   
+		   
+		   
+		    /** event listener for adding social network link 
+		    	
+		    	and set some variables which will be needed when the user clicks on some destination node
+		    		 1. linkname
+		    		 2. node type of source node ( which is always "tag" in our case
+		    		 3. SrcItem contains all information about source node
+		    		 4. Valid_DestNodes contains the list of node types, which serve can be destination nodes 
+		    		 	for that particluar source node type and linktype
+		    		 		eg. for Social network link ( or relates to link ) , both the source 
+		    		 			and destination node type must be tags
+		    		 			
+		    		 5. set boolLinkDraw to true, which we check when any other node is clicked,
+		    		 	the variable is used to diffrentiate between a node click and node click
+		    		 	when drawing an edge, both needs to be handled differently		    		 			
+		    */
+		    
+		    private function taglinkhandler(evt:ContextMenuEvent):void {
+				var nodedata:XML	=	this.data.data;
+          		Src_Node_Type		=	nodedata.@nodetype;
+          		app.SrcUID			=	this;
+   	 			app.SrcItem			=	nodedata;
+   	 			app.boolLinkDraw	=	true;	
+   		 		app.linkname		=	'Relates To';
+   		 		
+   		 		var linktypes:Array=app.LinkTypeArray; 
+   		 		for each ( var type:XML in linktypes ){
+   		 			if ( type.@name == 'Relates To') {
+   		 				var edgecolor:String	=	new String(type.@edgecolor);
+						var edcolor:uint		=	new uint();
+						edcolor 				= 	(uint(edgecolor));			
+						app.linecolor 			= 	edcolor;
+						
+						
+						
+   		 				break;
+   		 			}
+   		 		}
+   		 		
+				var temp_array:Array	= 	new Array();
+				temp_array				=	app.ValidNodePairsArray['Relates To'];
+				app.Valid_DestNodes		=	new Array();
+				for(var i:int=1;i<temp_array.length;i=i+2){
+					if ( temp_array[i]== Src_Node_Type ) 
+						app.Valid_DestNodes.push(temp_array[i+1]);
+				}
+				
+				return;
+			} 
+			
+		   
+		   
+		   
+		   
+		   
+		    /** event listener for adding social network link 
+		    	a user can start a link only from him and edit only their intensity
+		    	
+		    	we set some variables needed for drawing the link:
+		    		line color, intensity, source node
+		    	
+		    	and set some variables which will be needed when the user clicks on some destination node
+		    		 1. linkname
+		    		 2. node type of source node ( which is always "People" in our case
+		    		 3. SrcItem contains all information about source node
+		    		 4. Valid_DestNodes contains the list of node types, which serve can be destination nodes 
+		    		 	for that particluar source node type and linktype
+		    		 		eg. for Social network link ( or Knows link ) , both the source 
+		    		 			and destination node type must be People
+		    		 			
+		    		 5. set boolLinkDraw to true, which we check when any other node is clicked,
+		    		 	the variable is used to diffrentiate between a node click and node click
+		    		 	when drawing an edge, both needs to be handled differently		    		 			
+		    */
+		    
+		    private function linkhandler(evt:ContextMenuEvent):void {
+				var nodedata:XML	=	this.data.data;
+          		Src_Node_Type		=	nodedata.@nodetype;
+          		app.SrcUID			=	this;
+   	 			app.SrcItem			=	nodedata;
+   	 			app.boolLinkDraw	=	true;	
+   		 		app.linkname		=	'Knows';
+   		 		
+   		 		var linktypes:Array=app.LinkTypeArray; 
+   		 		for each ( var type:XML in linktypes ){
+   		 			if ( type.@name == 'Knows') {
+   		 				var edgecolor:String	=	new String(type.@edgecolor);
+						var edcolor:uint		=	new uint();
+						edcolor 				= 	(uint(edgecolor));			
+						app.linecolor 			= 	edcolor;
+						
+						
+						
+   		 				break;
+   		 			}
+   		 		}
+   		 		
+				var temp_array:Array	= 	new Array();
+				temp_array				=	app.ValidNodePairsArray['Knows'];
+				app.Valid_DestNodes		=	new Array();
+				for(var i:int=1;i<temp_array.length;i=i+2){
+					if ( temp_array[i]== Src_Node_Type ) 
+						app.Valid_DestNodes.push(temp_array[i+1]);
+				}
+				
+				return;
+			} 
+			
+
+
+						
+
+			/** handler for all types of profiles
+					short profile		(People)
+					detailed profile	(People)
+					view info			(Videos) 
+					
+				if evt.target.caption is 'Detailed Profile', 
+					set the detailedprofileId:String to node id, and change the state
+				else,
+					create appropriate profile box, 
+					for video node , 	it is box_videoprofile
+					for people node, 	it is box_peopleprofile
+					
+					1. push the id into Vbox_Ids:Array, it contains the list of id's, the profiles 
+						of which are displayed currently
+					2. push the reference into Vbox_Refs:Array, it contains the list of references, 
+						of all profile boxes, currently displayed
+				
+				both the arrays ( 	Vbox_Ids, Vbox_Refs ) are just to keep track of the profiles already 
+				open, so, that we dont open them again.
+			*/	 
+			
+			public function profilehandler(evt:ContextMenuEvent):void {
+				var nodedata:XML=this.data.data;
+ 		  		
+ 		  		if ( evt.target.caption == detailedProfileM ) {
+		  			app.detailedprofileId	=	(nodedata.@id).toString();
+		  			app.currentState		=	'profilingdim';	
+		  			return;	
+		  		} 
+		  		
+		  		if ( app.Vbox_Ids.indexOf( (nodedata.@id).toString() ) != (-1) )
+					return;
+				
+				var ids:Array	=	app.Vbox_Ids;
+				var refs:Array	=	app.Vbox_Refs;
+				
+				app.Vbox_Ids.push( (nodedata.@id).toString() );
+		  		switch ( nodedata.@nodetype.toString()){
+		  			case 'People':
+		  				var pplProfile: IFlexDisplayObject = new box_peopleprofile();
+
+		  	 			app.currentState		=	'ProfileView';						
+		 				pplProfile.myRef        =   pplProfile; 
+		 				pplProfile.nodeid       =   (nodedata.@id).toString();
+						pplProfile.titlename    =	(nodedata.@name).toString();	
+		   	 			pplProfile.jobtitle 	=	(nodedata.@title).toString();		
+		   	 			pplProfile.picture		=	(nodedata.@picture).toString();			
+		   	 			pplProfile.company		=	(nodedata.@company).toString();
+						pplProfile.Url			=	(nodedata.@url).toString();		
+						pplProfile.location		=	(nodedata.@location).toString();	
+						pplProfile.shortdesc	=	(nodedata.@profile).toString();	
+						pplProfile.nationality	=	(nodedata.@nationality).toString();	
+						
+						app.Vbox_Refs.push( pplProfile ); 
+		   	 			app.profilebox.addChild(pplProfile); 
+		   	 		
+		  				break;
+		  			case 'Videos':
+		  				var vidinfo:IFlexDisplayObject = new box_videoprofile();
+	   		 			app.currentState		=	'ProfileView';	
+	   		 			
+	   		 			vidinfo.myRef			=	vidinfo;
+	   		 			vidinfo.nodeid 			=	nodedata.@id.toString();  	
+	   		 			vidinfo.videoname 		= 	nodedata.@name.toString();	
+	   		 			vidinfo.category 		= 	nodedata.@category.toString();	
+	   		 			vidinfo.submittedby 	= 	nodedata.@submittedby.toString();	
+	   		 			vidinfo.picture			=	nodedata.@picture.toString();	
+	   		 			vidinfo.Url				=	nodedata.@url.toString();	
+	   		 			vidinfo.timesseen		=	nodedata.@timesseen.toString();	
+	   		 			vidinfo.authors			=	nodedata.@authors.toString();	
+	   		 			vidinfo.tags			=	nodedata.@tags.toString();	
+	   		 			
+	   		 			app.Vbox_Refs.push(vidinfo);
+	   		 			app.profilebox.addChild(vidinfo);
+		  				break;		  			
+		  				
+		  		    case 'Ideas':
+		  				var ideainfo:IFlexDisplayObject = new box_ideaprofile();
+	   		 			app.currentState		=	'IdeaView';	
+	   		 			
+	   		 			ideainfo.myRef			=	ideainfo;
+	   		 			ideainfo.nodeid 			=	nodedata.@id.toString();  	
+	   		 			ideainfo.ideaname 		= 	nodedata.@name.toString();
+	   		 			ideainfo.description	= 	nodedata.@description.toString();
+	   		 			
+	   		 			app.Vbox_Refs.push(ideainfo);
+	   		 			app.ideabox.addChild(ideainfo);
+		  				break;
+		  				
+		  			case 'Evaluation':
+		  				var evalinfo:IFlexDisplayObject = new box_evalprofile();
+	   		 			app.currentState		=	'EvalView';	
+	   		 			
+	   		 			
+	   		 			evalinfo.myRef			=	evalinfo;
+	   		 			evalinfo.nodeid 			=	nodedata.@id.toString();  	
+	   		 			evalinfo.evalname 		= 	nodedata.@name.toString();
+	   		 			evalinfo.evalType 		= 	nodedata.@evaltype.toString();
+	   		 			evalinfo.eovalue 		= 	nodedata.@eovalue.toString();
+	   		 			
+	   		 			app.Vbox_Refs.push(evalinfo);
+	   		 			app.evalbox.addChild(evalinfo);
+	   		 			
+		  				break;		  			
+		  					  			
+		  		
+		  				
+		  		}
+  	      		return;
+            } 	
+	
+			
+			/**  go to new_ui state and play the video 
+				 whenever we change the state from network visualization ( either spring_view or 
+				 profileview ) , we check if any profiles are displayed
+				 remove all the profiles which are open, and then move to new state
+				 
+				 IMPORTANT : dont know why we should do this ! probably we can change it !
+				 
+				 when we play a video, we also display the comments in comments_window
+			**/
+			
+			private function playvideo(evt:ContextMenuEvent):void{
+				app.panel2.title = this.data.data.@name.toString() ;  					
+   				if ( app.currentState == 'ProfileView' ){
+					app.profilebox.removeAllChildren();	
+						
+					app.Vbox_Refs = new Array();
+					app.Vbox_Ids = new Array();
+				}	
+				if ( app.SearchWindowOpen ){
+					PopUpManager.removePopUp(app.searchwin);
+					app.SearchWindowOpen = false;
+				}
+				// for the select relationships
+				if ( app.SelrelWindowOpen ){
+					PopUpManager.removePopUp(app.selrelwin);
+					app.SelrelWindowOpen = false;
+				}
+				
+				app.Curr_Video 		= this.data.data;
+				app.currentState 	= 'new_ui';
+				app.startLoading( this.data.id );
+				//app.comments_window.PutComments ( this.data.id,this.data.data.@comments);	
+				
+				var variables:URLVariables  = 	new URLVariables();
+				variables.videoId  			= 	this.data.data.@id; 				
+				app.comments_window.get_commentsxml.url = app.ServerPath + app.graphData + "getVideoComments.php";	  
+				app.comments_window.get_commentsxml.request = variables;
+				app.comments_window.get_commentsxml.send();
+				//app.comments_window.PutComments ( this.data.data.@comments);
+				app.commentspanel.title	=	this.data.data.@name.toString();
+				return;
+			}
+	
+	
+			
+			
+			
+			/**  function triggered on a left click on any node
+				 1. check if a link is being drawn, if YES, then check, if the destination nodes
+				 	is valid, if, YES, then save it, else alert the user
+				 
+				 2. if a link is not being drawn, then its just a causal click on the nodes,
+				 3. it could also be a double click !!
+			**/
+				
+			public function Enddraw(e:MouseEvent):void{
+				if ( app.boolLinkDraw==true){	//Link Drawing is ON
+	   		 		 app.DestItem=e.currentTarget.document.data.data;
+	   		 		 var nodetype:String=new String;
+	   		 		 nodetype=e.currentTarget.document.data.data.@nodetype;
+	   		 		 
+	   		 		 if ( app.Valid_DestNodes.indexOf(nodetype)!= -1 ){
+	   		 		 	if ( app.SrcItem.@id.toString() == e.currentTarget.data.id.toString() )
+	   		 		 		app.EndEdgeDraw( new MouseEvent(MouseEvent.CLICK) );
+	   		 		 	if(app.SrcItem.@nodetype=='People')
+	   		 		 	{
+	   		 		 	app.Finish_Draw();
+	   		 		 	}
+	   		 		 	else
+	   		 		 	app.tagFinish_Draw();
+	   		 		 	app.Valid_DestNodes=null;
+	   		 		 }
+					 else{ 	
+					 	Alert.show(canNotLBTM, errM);
+						app.EndEdgeDraw( new MouseEvent(MouseEvent.CLICK) );
+						return;
+					 } 	 	
+	   		 	}
+	   		 	else{
+	   		 		/** when the time difference between mouse click is less than 300 ms, it is 
+						considered as a double click
+						and we change the state
+					 **/ 
+	   		 		var now: int = getTimer();
+	   				if((now - lastMouseDownTime) < 300) {
+	   					app.godDoubleClick( Item( this.data ) );
+	    				return;
+	   				}
+	   				lastMouseDownTime = now;
+	    		 }	  		 	
+	   		 }
+   		 
+
+               	
+		]]>
+	</mx:Script> 
+</mx:Canvas>
+

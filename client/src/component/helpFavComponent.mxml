@@ -1,0 +1,124 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"  height="20" width="86">
+	<!-- acts as itemrenderer for displaying search results of user in form_searchwindow 
+		 *	when someone clicks on the thumbnail, we start the video
+	-->
+
+<!--<mx:Script source="../Asfiles/as_variables.as" />	
+	<mx:Image click="PlayVideo()" toolTip="{Application.application.toolTip_playVideo}" source="{data.@picture.toString()}" x="10" width="100" height="80" verticalCenter="-3"/>
+-->
+<!--	<mx:Text selectable="false" x="118" text="{data.@category.toString()}" fontWeight="bold" width="160" y="28" height="18"/>
+	<mx:Text selectable="false" x="206" text="{data.@timesseen.toString()}" fontWeight="bold" width="63" y="51" height="20"/>
+	<mx:Text selectable="false"  x="206" text="{data.@lastsseen.toString()}" fontWeight="bold" width="141" y="77" height="19"/>
+-->	
+
+<mx:Script source=".././Asfiles/as_constants.as" />
+	<mx:Script>
+        	<![CDATA[
+        		import mx.core.Application;
+        		import mx.managers.PopUpManager;
+        		import com.adobe.flex.extras.controls.springgraph.Item;
+        		import mx.controls.Alert;
+        		[Bindable]
+        		public var app:Tentube=Tentube(Application.application); 
+        		[Bindable]
+        		public var boolfavvid:Boolean = false;
+        		
+        		public var favoritestr:String = "Favorite";
+        		
+        		
+				private function boolfav():void{
+					var profileId:String	=	Application.application.Univ_LoginId1;
+				var item:Item			=	app.fullGraph.find( profileId );
+				var theuser:XML				=	new XML(item.data);
+				
+				var list:String		=	theuser.@myfavorite.toString();
+		   		var vididarray:Array 	= 	list.split(',');  
+		   		var vidnamearray:Array = new Array(); 
+		   		
+		   		for each(var vidid:String in vididarray)
+		   		{
+		   		if(vidid == data.@id.toString())
+		   		{boolfavvid = true;}
+		   		break;
+		   		}
+				boolfavvid = false;
+				}
+				
+				private function boolfav1(abc:Object):String{
+					var profileId:String	=	Application.application.Univ_LoginId1;
+				var item:Item			=	app.fullGraph.find( profileId );
+				var theuser:XML				=	new XML(item.data);
+				
+				var list:String		=	theuser.@myfavorite.toString();
+		   		var vididarray:Array 	= 	list.split(',');  
+		   		var vidnamearray:Array = new Array(); 
+		   		
+		   		for each(var vidid:String in vididarray)
+		   		{
+		   		if(vidid == abc.@id.toString())
+		   		{
+		   		return this.favoritestr;
+	
+		   		}}
+				return null;
+				
+				
+				}
+				
+				private function favconstantsFault():void{
+			trace("favconstantsFault()");}
+			private function suceess_addresponse():void{
+			Alert.show(sucAFM, successAlert)
+			}
+        	]]>
+        </mx:Script>
+     <mx:HTTPService id="getfavoriteService" url="{app.ServerPath + 'GraphData/myfavorite.php'}" useProxy="false" fault="{favconstantsFault();}" result="suceess_addresponse();"
+			method="POST" showBusyCursor="true" >
+				<mx:request xmlns="">
+					<login>{app.Univ_LoginId1}</login>
+					<videoid>{data.@id.toString()}</videoid>
+					
+				</mx:request>
+		</mx:HTTPService>   
+	<!--<mx:Label x="10" y="2"  click="getfavoriteService.send();" id="radbtn" text="{boolfav1(data)}"/>
+-->	
+		<mx:LinkButton icon="@Embed(source='../media/delete.png')" click="getfavoriteService.send();" toolTip="{clickRemoveFM}"  width="18" height="18" color="#818080"  textAlign="center" fontWeight="bold" fontSize="11" id="lbldelete1" />
+		
+<!--	<mx:Label x="118" y="51" text="Times seen"/>
+	<mx:Label x="118" y="77" text="Last seen"/>
+-->        
+</mx:Canvas>

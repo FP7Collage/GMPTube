@@ -1,0 +1,183 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel  xmlns:mx="http://www.adobe.com/2006/mxml" width="800" height="650"  backgroundColor="Black" backgroundAlpha="0.9" title="{theNewsM}">
+	<mx:HTTPService  id="newsconstants"  url="{app.ServerPath + 'GraphData/newsdesc.php'}" result="newsconstants_showresponse();" fault="{loadconstantsFault();}" useProxy="false" method="POST" resultFormat="e4x">		   
+	   			</mx:HTTPService>
+	<mx:Canvas  width="100%" height="100%"  backgroundColor="blue" backgroundAlpha="1.0" >
+		<mx:UIComponent id="tickerHolder" width="530" height="300" x="0" y="44" />
+    	<mx:Button label=" X" click="closetick(event)" x="465" y="5" width="38" height="31"/>
+    
+  <mx:Script source=".././Asfiles/as_constants.as" /> 	 
+    		<mx:Script>
+        <![CDATA[
+        	import mx.controls.ComboBox;
+        	import mx.containers.HBox;
+        	import mx.containers.Box;
+            import com.NewsActionscript.Displaytext;
+            import com.NewsActionscript.Displaytextview;
+            import com.NewsActionscript.Updatingnews;
+            import flash.display.*;
+            import flash.events.*;
+            import flash.net.*;
+            import flash.text.TextField;
+            import flash.text.TextFieldAutoSize;
+            import flash.text.TextFormat;
+            import flash.utils.*;
+            import mx.rpc.events.ResultEvent;
+			import mx.rpc.http.mxml.HTTPService;
+            
+            import mx.containers.ControlBar;
+    		import mx.containers.Panel;
+    		import mx.containers.Canvas;
+    		import mx.containers.VBox;
+    		import mx.controls.Button;
+    		import mx.controls.Label;
+   			import mx.controls.Spacer;
+    		import mx.core.*;
+    		import mx.managers.PopUpManager;
+			import mx.controls.Alert;
+	
+            private var ticker:Displaytext;
+            [Bindable]
+            public var combo:ComboBox = new ComboBox;
+            [Bindable]
+            private var NewdispList:XMLList = new XMLList;
+			[Bindable]
+            private	var arr:Array = new Array;
+             
+            [Bindable]public var app:Tentube=Tentube(Application.application);
+             
+            private function loadconstantsFault():void{
+			trace("loadconstantsFault()");}
+			
+			private var newxml:XML  = 	new XML();
+			private var xmlnew:XML  = 	new XML();
+            
+            [Bindable]
+            private var framepersecond:Number;
+            [Bindable]
+            private var pixelsperframe:Number;
+            [Bindable]
+            private var spacing:Number;
+            [Bindable]
+            private var fontsize:Number;
+            
+            
+            [Bindable]
+            private var textColour:uint;
+            [Bindable]
+            private var fontbold:Boolean;
+            [Bindable]
+            
+            private var fontitalic:Boolean;
+            [Bindable]
+            private var backgroundColour:uint;
+            [Bindable] public var xmldata:Object = new Object;
+       		[Bindable] public var xmldata_constants:Object = new Object;
+       		
+            
+            /**
+            * create event kicks off application
+            */ 
+            public function onCreated(event:MouseEvent):void
+            {	
+                framepersecond = 21;
+                pixelsperframe = 1;
+                spacing = 40;
+                fontsize = 20
+                textColour = 0xfff000;
+                fontbold = true;
+                fontitalic = false;
+                backgroundColour = app.colorreturn() ;
+               newsconstants.send();    
+            }
+            /**
+            * stage is ready instatiate a FlashTickbeeer
+            * e4x does not show the data , so always use the watchexpression while using the debugger
+            */
+             public function newsconstants_showresponse():void
+            {
+				xmldata_constants	=	newsconstants.lastResult;
+				newsconstants.clearResult();
+				newxml = 	new XML(xmldata_constants); 
+		    	trace (newxml);
+		    	ticker = new Displaytext();
+            	tickerHolder.addChildAt(ticker, 0);
+            	ticker.buildTickerView(getConfigXML());
+		    
+            }
+            
+            /**
+            * @retrun configXML:XML
+            * 
+            * create's and returns config xml 
+            */ 
+            private function getConfigXML():XML
+            {
+                
+                var configXML:XML = newxml;  
+                return configXML;
+            }
+            
+            /**
+            * updates the flashticker to the current
+            * settings. Destructs current instance
+            * builds a new one and passes in the 
+            * new config xml
+            */
+            private function updateFlashTicker():void
+            {
+                tickerHolder.removeChildAt(0);
+                ticker = new Displaytext();
+                tickerHolder.addChildAt(ticker, 0);
+                ticker.buildTickerView(getConfigXML());
+
+            }
+            /**
+            * These are the controls for the add news and delete items thing
+            */
+            public function closetick(event:MouseEvent):void {
+				
+				tickerHolder.removeChildAt(0);
+				PopUpManager.removePopUp(this);
+			}
+			public function sendnews():void {
+				newsconstants.send();
+			}
+        ]]>
+    		</mx:Script>
+    	<mx:Label text="{newsHM}" width="205" fontSize="17" fontWeight="bold" x="0" y="5"/>
+	</mx:Canvas>
+</mx:Panel>	

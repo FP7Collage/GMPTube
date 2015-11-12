@@ -1,0 +1,458 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%"
+	   verticalScrollPolicy="auto" horizontalScrollPolicy="off" backgroundColor="#FFFFFF" 
+	   backgroundAlpha="1.0" creationComplete="initnew()"  	   
+	   xmlns:component="component.ScrapsBox">
+	   
+	   <!-- this panel displays the scraps for the user. user can also post a new scrap.
+	   		we save the scrap in server and reload the page. so that new scraps are displayed
+	   	-->
+	
+	   
+		<mx:states>
+			<mx:State name="postscrap">
+				<mx:RemoveChild target="{linkbutton1}"/>
+				<mx:SetProperty name="height" value="421"/>
+				<mx:AddChild position="lastChild">
+					<mx:Button label="{saveM}" width="90" fontWeight="bold" color="#B5DEAE" click="newScrapSubmit();//init();" 
+						x="83" y="77" tabEnabled="true" tabIndex="202"/>
+				</mx:AddChild>
+				<!--<mx:AddChild position="lastChild">
+						<mx:Text color="#000000" text="{commentM}" width="85" selectable="false"  x="10" y="11" fontWeight="bold"/>
+				</mx:AddChild>-->
+				<mx:AddChild position="lastChild">
+						<mx:TextArea  color="#000000" selectable="true" editable="true" id="txt_comm_userScrap" width="311"   x="83" y="10" height="59" tabEnabled="true" tabIndex="201"/>
+				</mx:AddChild>
+				<mx:AddChild position="lastChild">
+					<mx:Button label="{discardM}" width="90" fontWeight="bold" color="#F3B8B8" click="txt_comm_userScrap.text='';currentState='';" 
+						x="192" y="77" tabIndex="203" tabEnabled="true"/>
+				</mx:AddChild>
+				<mx:SetStyle target="{UserScrapsVbox}" name="top" value="107"/>
+			</mx:State>
+			
+		</mx:states>
+	
+		
+		<mx:Button x="10" y="10" label="{postComM}" width="188" color="#989894" id="linkbutton1" click="postscrapxml();" icon="@Embed(source='media/comment.png')"/>
+		<mx:VBox  id="UserScrapsVbox" verticalGap="1" borderStyle="solid" borderThickness="1" borderColor="#FFFFFF" 
+		 	 top ="65" left="10" right="0" verticalScrollPolicy="auto" horizontalScrollPolicy="off"  verticalScrollBarStyleName="scrollBar2" bottom="0">
+		</mx:VBox>
+			
+		<mx:HTTPService id="add_scraps" result="showScrapResponse();" fault="addScrapFault();" useProxy="false" method="POST"
+          showBusyCursor="true" >
+		</mx:HTTPService> 
+        
+        <!--
+        <mx:HTTPService id="get_comments" result="getComments();" fault="getCommentFault();" useProxy="false" method="POST" resultFormat="e4x"
+			showBusyCursor="true" >
+		</mx:HTTPService>
+		-->
+		
+		<!-- a new http service for getting scraps in xml format
+		-->
+		<mx:HTTPService id="get_scrapsxml" result="getScrapsxml();" fault="getScrapFault();" useProxy="false" method="POST" resultFormat="e4x"
+			showBusyCursor="true" >
+		</mx:HTTPService>
+		
+		<mx:Script source="Asfiles/as_constants.as" />
+		<mx:Script>
+			<![CDATA[
+				import mx.controls.Text;
+				import com.adobe.flex.extras.controls.springgraph.Item;
+				import component.ScrapsBox;				
+				import mx.core.Application;
+				import mx.core.IFlexDisplayObject;
+				import mx.managers.PopUpManager;
+				import mx.controls.Alert;
+				import mx.rpc.events.ResultEvent;
+				import mx.managers.CursorManager;
+							
+				[Bindable]public var app:Tentube	=	Tentube(Application.application); 
+				[Bindable]public var curuserid:String		=	new String(); 
+					
+				public var waitingforupdate:Timer	=	new Timer(1000,0);
+				public var lastupdated:String		=	new String(); 
+				public var changeState:Boolean      = false;
+				public var xmlscraps:XML ;
+				//public var lastdeleted:String		=	new String(); 
+				
+		/*
+				private function init():void{
+					waitingforupdate.addEventListener(TimerEvent.TIMER,readId);		
+				}
+		*/
+				private function initnew():void{
+					
+					//if(lastupdated=='') return;
+					//var item:Item	=	app.fullGraph.find( lastupdated );
+					//app.commentspanel.title	=	item.data.@name.toString()
+
+						var variables:URLVariables  = 	new URLVariables();
+				variables.userid  			= 	app.detailedprofileId; 				
+				get_scrapsxml.url = app.ServerPath + app.graphData + "getScraps.php";	  
+				get_scrapsxml.request = variables;
+				get_scrapsxml.send();
+						//PutComments( item.data.@comments.toString() )// but PutCommentsxml :(
+
+						//PutComments( item.data.@comments.toString() )// but PutCommentsxml :(
+						
+						
+
+				}
+				
+			/*
+				private function postcommen():void{
+					if  ( app.playingvideo == null || app.playingvideo.data == null )
+						return; 
+					var curid:String	=	app.playingvideo.data.@id.toString();
+						
+					var variables:URLVariables  = 	new URLVariables();
+					variables.videoId  			= 	curid;	
+					get_comments.url            = 	app.ServerPath + app.graphData + "getComments.php";	  
+					get_comments.request 		= 	variables;
+					get_comments.send();
+					changeState=true;
+		
+				/*	var comments:String	=	app.playingvideo.data.@comments.toString();
+							
+					PutComments(  comments )
+					currentState='postcomment';
+				*/
+				 //}
+				 
+				 //xml php return
+				 private function postscrapxml():void{
+					//if  ( app.playingvideo == null || app.playingvideo.data == null )
+					//	return; 
+					//var curid:String	=	app.playingvideo.data.@id.toString();
+					
+					
+					
+					if (! app.isLoggedIn()){
+ 			      			app.forceLogin();
+ 			      			return;
+ 						}
+			
+
+						
+					var variables:URLVariables  = 	new URLVariables();
+					variables.userid  			= 	app.detailedprofileId;	
+					get_scrapsxml.url            = 	app.ServerPath + app.graphData + "getScraps.php";	  
+					get_scrapsxml.request 		= 	variables;
+					get_scrapsxml.send();
+					changeState=true;
+		
+				/*	var comments:String	=	app.playingvideo.data.@comments.toString();
+							
+					PutComments(  comments )
+					currentState='postcomment';
+				*/
+				 }
+				 //xml php return
+				 public function getScrapsxml():void{
+				var scraps:Object=new Object;
+				scraps=get_scrapsxml.lastResult;
+				 get_scrapsxml.clearResult();
+				xmlscraps=new XML(scraps);
+				    PutScrapsxml(  xmlscraps );
+				    if(changeState==true)
+				    {
+				   	      currentState='postscrap';
+				   	      changeState=false;
+				   	}     
+				}
+				 
+				 
+				 
+			
+			/*
+			
+				public function getComments():void{
+				var comments:String="";
+				comments=get_comments.lastResult.toString();
+				 get_comments.clearResult();
+			
+				    PutComments(  comments );
+				    if(changeState==true)
+				    {
+				   	      currentState='postcomment';
+				   	      changeState=false;
+				   	}     
+				}
+				
+				*/
+				/**  1. Triggered by the timer event of waitingforupdate.
+					 2. the timer starts, when the client gets "Success" message from the server for 
+					 	comment update. it checks for app.dataloaded to be true ( which is set to 
+					 	true when the new network data is loaded completely.
+					 3. when it is true, we take the comments from video node information ( video id
+					 	is stored in lastupdated:String ) ans show them in boxes.
+				**/
+				
+		
+		/*
+				private function readId(t:TimerEvent):void{
+					if ( app.dataloaded	=	true ){
+						waitingforupdate.stop();
+						waitingforupdate.reset();	
+						app.dataloaded	=	false;
+						var item:Item	=	app.fullGraph.find( lastupdated );
+						//PutComments( item.id, item.data.@comments.toString() )
+						app.commentspanel.title	=	item.data.@name.toString()
+						PutComments( item.data.@comments.toString() )
+					}
+				}
+			
+			*/	
+				/**  Triggered when the user clicks Save button . 
+					 if the scrap area is empty, we return.
+					 else, we encapsulate the user name and Scrap in a format and
+					 send it to server.
+					 
+					 format of a single comment : usrname + '>says>' + usrcomm +  '>c>'
+					 
+					 The add_Scraps:httpservice sends the Scrap text and user name to sever.
+				**/
+				
+				private function newScrapSubmit():void{
+					var usrname:String = app.Univ_LoginItem.id ;
+					var usrcomm:String = txt_comm_userScrap.text;
+					
+					if ( usrcomm=='' )
+						return;
+		/*			if ((usrcomm.indexOf("<")!=-1)||(usrcomm.indexOf(">")!=-1)||(usrcomm.indexOf("&")!=-1)||(usrcomm.indexOf("\"")!=-1)||(usrcomm.indexOf("\'")!=-1)){
+						Alert.show( splChrM + " \" \' < > & " + notAllowM);
+						//txt_comm_userComment.text = '';
+						//newCommentSubmit();
+						return; 
+					}
+					
+		*/			
+					CursorManager.setBusyCursor();	
+					//var newscrap:String = new String();	
+					//newscrap = usrname + '>says>' + usrcomm +  '>c>';
+					//app.playingvideo.data.@comments = app.playingvideo.data.@comments + newcomment;
+					var variables:URLVariables  = 	new URLVariables();
+					variables.action  			= 	"addscraps";	
+					variables.nodeid  			= 	app.detailedprofileId;
+					variables.scraps  		= 	usrcomm;	
+					variables.authorId          =   app.Univ_LoginId1;
+					//variables.individualComment =   usrcomm;				
+					add_scraps.url 			= 	app.ServerPath + app.graphData + "change.php";	  
+					add_scraps.request 		= 	variables;
+					//lastupdated					=	app.playingvideo.data.@id.toString();	
+					add_scraps.send();
+					//var t_info:Object 	= new Object();
+	      			//t_info.action		= "updatelog";
+	      			//t_info.actiontype 	= 'Commented';
+	      			//t_info.takenby 		= app.Univ_LoginId1;
+	      			//t_info.takenon 		= app.Curr_Video.@id.toString();
+	      			//app.send_log_msg( t_info );
+				}
+				
+				
+				/**  If the comment update is a success, we call the onAppCreationComplete() function
+					 in As_root.as.  we reload the network.
+					 dataloaded is a boolean,global variable. it is set to true 
+					 at the end of Loadvideos() function.
+					 
+					 waitingforupdate:Timer checks for this variable(dataloaded) to be set to true
+					 and then reloads the comment tab to see the new comments
+					 
+					 lastupdated:String will contain the id of the video which was commented .
+					 		its used to reload the window with the new comments added. 
+					 **/
+					 
+				private function showScrapResponse(): void {
+					try{
+						var rspMessage:String;
+			      		rspMessage = add_scraps.lastResult.rsp.message;
+				 		if ( rspMessage == "Success" ) {
+							txt_comm_userScrap.text	= '';
+						//	app.dataloaded				=	false;
+						//	waitingforupdate.start();
+						//	app.onAppCreationComplete();
+						
+						currentState='';
+						//var curid:String	=	app.playingvideo.data.@id.toString();
+						
+					var variables:URLVariables  = 	new URLVariables();
+					variables.userid 			= 	app.detailedprofileId;	
+						get_scrapsxml.url            = 	app.ServerPath + app.graphData + "getScraps.php";	  
+					get_scrapsxml.request 		= 	variables;
+					get_scrapsxml.send();
+					//getComments();
+						}
+						else{
+							Alert.show(comNotAddSM, errM);
+						}
+					}
+					catch(e:Error){
+						Alert.show(comNotAddSM,errM);
+						trace ( e.message );
+						// take care
+					}
+					CursorManager.removeBusyCursor();	
+				}
+			
+				
+				/** inputs: video id, complete comments set
+							the function will parse through the string, isolate indivdual
+							comments, user names, creates a ScrapsBox
+							and displayes them accordingly
+				**/
+					
+				//public function PutComments(videoid:String,t_UserComments:String):void{	
+				
+/*
+				public function PutComments( t_UserComments:String ):void{
+					CursorManager.setBusyCursor();	
+					//curvideoid		=	videoid;
+					//var item:Item	=	app.fullGraph.find( videoid );
+					//app.commentspanel.title	=	item.data.@name.toString();
+					
+					UserCommentsVbox.removeAllChildren();
+		   			var AllcommentArr:Array = t_UserComments.split(/>c>/);
+		   			for ( var cnt:Number=0; cnt< AllcommentArr.length; cnt++) 
+		   			{
+		   				var indiv_comment:String = AllcommentArr[cnt];
+		   				if ( indiv_comment != '')
+		   				{
+		   					var parts:Array= indiv_comment.split(/>says>/);
+		   					var comment_box:CommentsBox= new CommentsBox();	 					
+		   					comment_box.usrname 	= parts[0];
+							comment_box.usrcomment 	= parts[1];
+							comment_box.displayname = getUserName(comment_box.usrname);
+													
+							 
+							var t_user:Item 		= app.fullGraph.find(parts[0]);
+				   			comment_box.imageURL 	= t_user.data.@picture.toString();
+				   			UserCommentsVbox.addChild( comment_box );
+		   				}  			
+			   		}
+			   		currentState='';
+			   		//init();
+			   		app.putLinks();
+			   		CursorManager.removeBusyCursor();
+			   		return;
+				}
+		*/		
+				public function PutScrapsxml( t_UserScraps:XML):void{
+					CursorManager.setBusyCursor();	
+					//curvideoid		=	videoid;
+					//var item:Item	=	app.fullGraph.find( videoid );
+					//app.commentspanel.title	=	item.data.@name.toString();
+					
+					UserScrapsVbox.removeAllChildren();
+		   			//var AllcommentArr:Array = t_UserComments.split(/>c>/);
+		   			for each (var node: XML in t_UserScraps.descendants("scrap")) {
+		   				//var indiv_comment:String = AllcommentArr[cnt];
+		   				//if ( indiv_comment != '')
+		   				//{
+		   					//var parts:Array= indiv_comment.split(/>says>/);
+		   					var scrap_box:ScrapsBox= new ScrapsBox();		   							
+		   					scrap_box.usrname 	= node.descendants("authorid");
+		   					scrap_box.displayname = getUserName(scrap_box.usrname);
+							scrap_box.usrscrap 	= node.descendants("scraptext");
+							
+							var userscrap1:Text =  new Text();
+							userscrap1.text = node.descendants("scraptext");
+							//scrap_box.height = userscrap1.height + 40;
+							scrap_box.scrapid	= node.descendants("sid");
+							//cid=comment_box.commentid;
+							
+							var htx:Number = 0;
+							var textstring:Array= userscrap1.text.split("\r");
+							for each(var abc:String in textstring)
+							{htx = htx +16;
+							if(abc.length > 50)
+							{if((abc.length/50)<10)
+							{
+							htx = htx + 16*(abc.length/50);
+							}
+							else if(10<(abc.length/50)<25)
+							{
+							htx = htx + 19*(abc.length/50);
+							}
+							else
+							htx = htx + 22*(abc.length/50);
+							}
+							}
+							scrap_box.height = htx + 70;
+							scrap_box.datetime	= node.descendants("datetime");
+							scrap_box.videoid		= node.descendants("userid");
+							var t_user:Item 		= app.fullGraph.find(node.descendants("authorid"));
+				   			scrap_box.imageURL 	= t_user.data.@picture.toString();
+				   			
+				   			scrap_box.displayheader = scrap_box.displayname + ": " + scrap_box.datetime;
+				   			UserScrapsVbox.addChild( scrap_box );
+				   			//UserScrapsVbox.addChild(userscrap1);
+		   				//}  			
+			   		}
+			   		currentState='';
+			   		//app.putLinks();
+			   		CursorManager.removeBusyCursor();
+			   		return;
+				}
+				
+				private function addScrapFault():void{
+					trace("addScrapFault()");					
+				} 
+		
+		        private function getScrapFault():void{
+		        	trace("getScrapFault()");
+		        }
+		        
+		  private function getUserName(userId :String):String{
+  			var userName: String;
+  			
+  			userName = "";
+  			
+  			
+  			for each ( var ppl:XML in Application.application.people_list ){
+  				if ( ppl.@id.toString().toLowerCase() == userId.toLowerCase() ){
+  					userName =  ppl.@name.toString();
+  				}
+  			}
+  			  			 
+  			return userName ;
+  		}
+	
+			    
+			]]>
+		</mx:Script>
+	
+</mx:Canvas>	
+
+
+

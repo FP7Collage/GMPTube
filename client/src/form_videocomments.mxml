@@ -1,0 +1,466 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%"
+	   verticalScrollPolicy="auto" horizontalScrollPolicy="off" backgroundColor="#FFFFFF" 
+	   backgroundAlpha="1.0" creationComplete="initnew()"  	   
+	   xmlns:component="component.CommentsBox">
+	   
+	   <!-- this panel displays the comments for the video. user can also post a new comment.
+	   		we save the comment in server and reload the page. so that new comments are displayed
+	   	-->
+	   
+		<mx:states>
+			<mx:State name="postcomment">
+				<mx:RemoveChild target="{linkbutton1}"/>
+				<mx:SetProperty name="height" value="421"/>
+				<mx:AddChild position="lastChild">
+					<mx:Button label="{saveM}" width="90" fontWeight="bold" color="#B5DEAE" click="newCommentSubmit();//init();" 
+						x="126" y="77" tabEnabled="true" tabIndex="202"/>
+				</mx:AddChild>
+				<mx:AddChild position="lastChild">
+						<mx:Text color="#000000" text="{commentM}" width="85" selectable="false"  x="10" y="11" fontWeight="bold"/>
+				</mx:AddChild>
+				<mx:AddChild position="lastChild">
+						<mx:TextArea  color="#000000" selectable="true" editable="true" id="txt_comm_userComment" width="291"   x="103" y="10" height="59" tabEnabled="true" tabIndex="201"/>
+				</mx:AddChild>
+				<mx:SetProperty target="{UserCommentsVbox}" name="height" value="220"/>
+				<mx:AddChild position="lastChild">
+					<mx:Button label="{discardM}" width="90" fontWeight="bold" color="#F3B8B8" click="txt_comm_userComment.text='';currentState='';" 
+						x="228" y="77" tabIndex="203" tabEnabled="true"/>
+				</mx:AddChild>
+				<mx:SetProperty target="{UserCommentsVbox}" name="y" value="107"/>
+			</mx:State>
+			
+		</mx:states>
+	
+		
+		<mx:Button x="10" y="10" label="{postComM}" width="183" color="#989894" id="linkbutton1" click="postcommenxml();" icon="@Embed(source='media/comment.png')"/>
+		<mx:VBox id="UserCommentsVbox" verticalGap="1" borderStyle="solid" borderThickness="1" borderColor="#FFFFFF" 
+		 	left="10" right="0" height="260" verticalScrollPolicy="auto" horizontalScrollPolicy="off"  verticalScrollBarStyleName="scrollBar2" bottom="0">
+		</mx:VBox>
+			
+		<mx:HTTPService id="add_comments" result="showCommentResponse();" fault="addCommentFault();" useProxy="false" method="POST"
+          showBusyCursor="true" >
+		</mx:HTTPService> 
+        
+        <!--
+        <mx:HTTPService id="get_comments" result="getComments();" fault="getCommentFault();" useProxy="false" method="POST" resultFormat="e4x"
+			showBusyCursor="true" >
+		</mx:HTTPService>
+		-->
+		
+		<!-- a new http service for getting comments in xml format
+		-->
+		<mx:HTTPService id="get_commentsxml" result="getCommentsxml();" fault="getCommentFault();" useProxy="false" method="POST" resultFormat="e4x"
+			showBusyCursor="true" >
+		</mx:HTTPService>
+		
+		<mx:Script source="Asfiles/as_constants.as" />
+		
+		<mx:Script>
+			<![CDATA[
+				import com.adobe.flex.extras.controls.springgraph.Item;
+				import component.CommentsBox;				
+				import mx.core.Application;
+				import mx.core.IFlexDisplayObject;
+				import mx.managers.PopUpManager;
+				import mx.controls.Alert;
+				import mx.rpc.events.ResultEvent;
+				import mx.managers.CursorManager;
+							
+				[Bindable]public var app:Tentube	=	Tentube(Application.application); 
+				[Bindable]public var curvideoid:String		=	new String(); 
+					
+				public var waitingforupdate:Timer	=	new Timer(1000,0);
+				public var lastupdated:String		=	new String(); 
+				public var changeState:Boolean      = false;
+				public var xmlcomments:XML ;
+				//public var lastdeleted:String		=	new String(); 
+				
+		/*
+				private function init():void{
+					waitingforupdate.addEventListener(TimerEvent.TIMER,readId);		
+				}
+		*/
+				private function initnew():void{
+					
+					if(lastupdated==''){
+						linkbutton1.visible=false;  // post comment button
+						return;
+						
+					} 
+					linkbutton1.visible=true;  // post comment button
+					
+					 
+					
+					
+					var item:Item	=	app.fullGraph.find( lastupdated );
+					app.commentspanel.title	=	item.data.@name.toString()
+
+						var variables:URLVariables  = 	new URLVariables();
+				variables.videoId  			= 	item.data.@id.toString(); 				
+				get_commentsxml.url = app.ServerPath + app.graphData + "getVideoComments.php";	  
+				get_commentsxml.request = variables;
+				get_commentsxml.send();
+						//PutComments( item.data.@comments.toString() )// but PutCommentsxml :(
+
+						//PutComments( item.data.@comments.toString() )// but PutCommentsxml :(
+						
+						
+
+				}
+				
+			/*
+				private function postcommen():void{
+					if  ( app.playingvideo == null || app.playingvideo.data == null )
+						return; 
+					var curid:String	=	app.playingvideo.data.@id.toString();
+						
+					var variables:URLVariables  = 	new URLVariables();
+					variables.videoId  			= 	curid;	
+					get_comments.url            = 	app.ServerPath + app.graphData + "getComments.php";	  
+					get_comments.request 		= 	variables;
+					get_comments.send();
+					changeState=true;
+		
+				/*	var comments:String	=	app.playingvideo.data.@comments.toString();
+							
+					PutComments(  comments )
+					currentState='postcomment';
+				*/
+				 //}
+				 
+				 //xml php return
+				 private function postcommenxml():void{
+					if  ( app.playingvideo == null || app.playingvideo.data == null )
+						return; 
+						
+						if (! app.isLoggedIn()){
+ 			      			app.forceLogin();
+ 			      			return;
+ 			  			}  
+						
+					var curid:String	=	app.playingvideo.data.@id.toString();
+						
+					var variables:URLVariables  = 	new URLVariables();
+					variables.videoId  			= 	curid;	
+					get_commentsxml.url            = 	app.ServerPath + app.graphData + "getVideoComments.php";	  
+					get_commentsxml.request 		= 	variables;
+					get_commentsxml.send();
+					changeState=true;
+		
+				/*	var comments:String	=	app.playingvideo.data.@comments.toString();
+							
+					PutComments(  comments )
+					currentState='postcomment';
+				*/
+				 }
+				 //xml php return
+				 public function getCommentsxml():void{
+				 	linkbutton1.visible=true;  // post comment
+				 	
+				var comments:Object=new Object;
+				comments=get_commentsxml.lastResult;
+				 get_commentsxml.clearResult();
+				xmlcomments=new XML(comments);
+				    PutCommentsxml(  xmlcomments );
+				    if(changeState==true)
+				    {
+				   	      currentState='postcomment';
+				   	      changeState=false;
+				   	}     
+				}
+				 
+				 
+				 
+			
+			/*
+			
+				public function getComments():void{
+				var comments:String="";
+				comments=get_comments.lastResult.toString();
+				 get_comments.clearResult();
+			
+				    PutComments(  comments );
+				    if(changeState==true)
+				    {
+				   	      currentState='postcomment';
+				   	      changeState=false;
+				   	}     
+				}
+				
+				*/
+				/**  1. Triggered by the timer event of waitingforupdate.
+					 2. the timer starts, when the client gets "Success" message from the server for 
+					 	comment update. it checks for app.dataloaded to be true ( which is set to 
+					 	true when the new network data is loaded completely.
+					 3. when it is true, we take the comments from video node information ( video id
+					 	is stored in lastupdated:String ) ans show them in boxes.
+				**/
+				
+		
+		/*
+				private function readId(t:TimerEvent):void{
+					if ( app.dataloaded	=	true ){
+						waitingforupdate.stop();
+						waitingforupdate.reset();	
+						app.dataloaded	=	false;
+						var item:Item	=	app.fullGraph.find( lastupdated );
+						//PutComments( item.id, item.data.@comments.toString() )
+						app.commentspanel.title	=	item.data.@name.toString()
+						PutComments( item.data.@comments.toString() )
+					}
+				}
+			
+			*/	
+				/**  Triggered when the user clicks Save button . 
+					 if the comment area is empty, we return.
+					 else, we encapsulate the user name and comment in a format and
+					 send it to server.
+					 
+					 format of a single comment : usrname + '>says>' + usrcomm +  '>c>'
+					 
+					 The add_comments:httpservice sends the comment text and user name to sever.
+				**/
+				
+				private function newCommentSubmit():void{
+					var usrname:String = app.Univ_LoginItem.id ;
+					var usrcomm:String = txt_comm_userComment.text;
+					
+					if ( usrcomm=='' )
+						return;
+		/*			if ((usrcomm.indexOf("<")!=-1)||(usrcomm.indexOf(">")!=-1)||(usrcomm.indexOf("&")!=-1)||(usrcomm.indexOf("\"")!=-1)||(usrcomm.indexOf("\'")!=-1)){
+						Alert.show( splChrM + " \" \' < > & " + notAllowM);
+						//txt_comm_userComment.text = '';
+						//newCommentSubmit();
+						return; 
+					}
+		*/			
+					CursorManager.setBusyCursor();	
+					var newcomment:String = new String();	
+					newcomment = usrname + '>says>' + usrcomm +  '>c>';
+					app.playingvideo.data.@comments = app.playingvideo.data.@comments + newcomment;
+					var variables:URLVariables  = 	new URLVariables();
+					variables.action  			= 	"addcomments";	
+					variables.nodeid  			= 	app.playingvideo.data.@id.toString();
+					variables.comments  		= 	newcomment;	
+					variables.authorId          =   app.Univ_LoginId1;
+					variables.individualComment =   usrcomm;				
+					add_comments.url 			= 	app.ServerPath + app.graphData + "change.php";	  
+					add_comments.request 		= 	variables;
+					lastupdated					=	app.playingvideo.data.@id.toString();	
+					add_comments.send();
+					var t_info:Object 	= new Object();
+	      			t_info.action		= "updatelog";
+	      			t_info.actiontype 	= 'Commented';
+	      			t_info.takenby 		= app.Univ_LoginId1;
+	      			t_info.takenon 		= app.Curr_Video.@id.toString();
+	      			app.send_log_msg( t_info );
+				}
+				
+				
+				/**  If the comment update is a success, we call the onAppCreationComplete() function
+					 in As_root.as.  we reload the network.
+					 dataloaded is a boolean,global variable. it is set to true 
+					 at the end of Loadvideos() function.
+					 
+					 waitingforupdate:Timer checks for this variable(dataloaded) to be set to true
+					 and then reloads the comment tab to see the new comments
+					 
+					 lastupdated:String will contain the id of the video which was commented .
+					 		its used to reload the window with the new comments added. 
+					 **/
+					 
+				private function showCommentResponse(): void {
+					try{
+						var rspMessage:String;
+			      		rspMessage = add_comments.lastResult.rsp.message;
+				 		if ( rspMessage == "Success" ) {
+							txt_comm_userComment.text	= '';
+						//	app.dataloaded				=	false;
+						//	waitingforupdate.start();
+						//	app.onAppCreationComplete();
+						
+						currentState='';
+						var curid:String	=	app.playingvideo.data.@id.toString();
+						
+					var variables:URLVariables  = 	new URLVariables();
+					variables.videoId  			= 	curid;	
+						get_commentsxml.url            = 	app.ServerPath + app.graphData + "getVideoComments.php";	  
+					get_commentsxml.request 		= 	variables;
+					get_commentsxml.send();
+					//getComments();
+						}
+						else{
+							Alert.show(comNotAddSM,errM);
+						}
+					}
+					catch(e:Error){
+						Alert.show(comNotAddSM , errM);
+						trace ( e.message );
+						// take care
+					}
+					CursorManager.removeBusyCursor();	
+				}
+			
+				
+				/** inputs: video id, complete comments set
+							the function will parse through the string, isolate indivdual
+							comments, user names, creates a CommentsBox
+							and displayes them accordingly
+				**/
+					
+				//public function PutComments(videoid:String,t_UserComments:String):void{	
+				
+/*
+				public function PutComments( t_UserComments:String ):void{
+					CursorManager.setBusyCursor();	
+					//curvideoid		=	videoid;
+					//var item:Item	=	app.fullGraph.find( videoid );
+					//app.commentspanel.title	=	item.data.@name.toString();
+					
+					UserCommentsVbox.removeAllChildren();
+		   			var AllcommentArr:Array = t_UserComments.split(/>c>/);
+		   			for ( var cnt:Number=0; cnt< AllcommentArr.length; cnt++) 
+		   			{
+		   				var indiv_comment:String = AllcommentArr[cnt];
+		   				if ( indiv_comment != '')
+		   				{
+		   					var parts:Array= indiv_comment.split(/>says>/);
+		   					var comment_box:CommentsBox= new CommentsBox();	 					
+		   					comment_box.usrname 	= parts[0];
+							comment_box.usrcomment 	= parts[1];
+							comment_box.displayname = getUserName(comment_box.usrname);
+													
+							 
+							var t_user:Item 		= app.fullGraph.find(parts[0]);
+				   			comment_box.imageURL 	= t_user.data.@picture.toString();
+				   			UserCommentsVbox.addChild( comment_box );
+		   				}  			
+			   		}
+			   		currentState='';
+			   		//init();
+			   		app.putLinks();
+			   		CursorManager.removeBusyCursor();
+			   		return;
+				}
+		*/		
+				public function PutCommentsxml( t_UserComments:XML):void{
+					CursorManager.setBusyCursor();	
+					//curvideoid		=	videoid;
+					//var item:Item	=	app.fullGraph.find( videoid );
+					//app.commentspanel.title	=	item.data.@name.toString();
+					
+					UserCommentsVbox.removeAllChildren();
+		   			//var AllcommentArr:Array = t_UserComments.split(/>c>/);
+		   			for each (var node: XML in t_UserComments.descendants("comment")) {
+		   				//var indiv_comment:String = AllcommentArr[cnt];
+		   				//if ( indiv_comment != '')
+		   				//{
+		   					//var parts:Array= indiv_comment.split(/>says>/);
+		   					var comment_box:CommentsBox= new CommentsBox();		   							
+		   					comment_box.usrname 	= node.descendants("authorid");
+		   					comment_box.displayname = getUserName(comment_box.usrname);
+							comment_box.usrcomment 	= node.descendants("commenttext");
+							
+							comment_box.commentid	= node.descendants("cid");
+							//cid=comment_box.commentid;
+							var userscrap2:Text =  new Text();
+							userscrap2.text = node.descendants("commenttext");
+							
+							var htx:Number = 0;
+							var textstring:Array= userscrap2.text.split("\r");
+							for each(var abc:String in textstring)
+							{htx = htx +16;
+							if(abc.length > 50)
+							{if((abc.length/50)<10)
+							{
+							htx = htx + 16*(abc.length/50);
+							}
+							else if(10<(abc.length/50)<25)
+							{
+							htx = htx + 19*(abc.length/50);
+							}
+							else
+							htx = htx + 22*(abc.length/50);
+							}
+							}
+							
+							comment_box.height = htx + 70;
+							
+							
+							comment_box.datetime	= node.descendants("datetime");
+							comment_box.videoid		= node.descendants("videoid");
+							var t_user:Item 		= app.fullGraph.find(node.descendants("authorid"));
+				   			comment_box.imageURL 	= t_user.data.@picture.toString();
+				   			
+				   			comment_box.displayheader = comment_box.displayname + ": " + comment_box.datetime;
+				   			UserCommentsVbox.addChild( comment_box );
+		   				//}  			
+			   		}
+			   		currentState='';
+			   		app.putLinks();
+			   		CursorManager.removeBusyCursor();
+			   		return;
+				}
+				
+				private function addCommentFault():void{
+					trace("addCommentFault()");					
+				} 
+		
+		        private function getCommentFault():void{
+		        	trace("getCommentFault()");
+		        }
+		        
+		  private function getUserName(userId :String):String{
+  			var userName: String;
+  			
+  			userName = "";
+  			
+  			
+  			for each ( var ppl:XML in Application.application.people_list ){
+  				if ( ppl.@id.toString().toLowerCase() == userId.toLowerCase() ){
+  					userName =  ppl.@name.toString();
+  				}
+  			}
+  			  			 
+  			return userName ;
+  		}
+	
+			    
+			]]>
+		</mx:Script>
+	
+</mx:Canvas>	
+
+
+

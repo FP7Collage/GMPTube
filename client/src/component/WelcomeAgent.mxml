@@ -1,0 +1,209 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+-->
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" alpha="0.8"
+	backgroundColor="white" horizontalScrollPolicy="off" verticalGap="0">
+
+<mx:Script source=".././Asfiles/as_constants.as" />
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.collections.ArrayCollection;
+			import mx.rpc.events.ResultEvent;
+			import mx.core.Application;
+			[Bindable] private var app:Tentube=Tentube(Application.application);
+			
+			[Bindable] private var newUsers:ArrayCollection;
+			[Bindable] private var newVideos:ArrayCollection;
+			[Bindable] private var newActions:ArrayCollection;
+			
+			public function refreshDetails():void {
+				viewLatestService.send();
+			}
+			
+			private function latestResultFault():void {
+				trace("latestResultFault()");				
+			}
+			
+			private function latestResult(event:ResultEvent):void {
+			
+			/*	
+		   		var t_info:Object 	= new Object();
+	      		t_info.action		= "updatelog";
+	      		t_info.actiontype 	= 'Login';
+	      		t_info.takenby 		=  app.Univ_LoginId1 ;
+	      		t_info.takenon 		= app.tubeShortName;
+	      		app.send_log_msg( t_info );
+	      		
+	      	*/	
+	      		
+	      		var countNewMembers = 0;
+	      		var countNewVideos = 0;
+	      		
+				if(event.result.rsp.status == 'false') {
+					trace('Error:', event.result.rsp.message);
+					return;
+				}
+				if(event.result.rsp.users != null)
+					newUsers = event.result.rsp.users.user as ArrayCollection;
+				else
+					newUsers = new ArrayCollection();
+				
+				if(newUsers == null) {
+					newUsers = new ArrayCollection();
+					newUsers.addItem(event.result.rsp.users.user as Object);					
+					}
+				
+				if(event.result.rsp.videos != null)
+					newVideos = event.result.rsp.videos.video as ArrayCollection;
+				else
+					newVideos = new ArrayCollection();
+				
+				if(newVideos == null) {
+					newVideos = new ArrayCollection();
+					newVideos.addItem(event.result.rsp.videos.video as Object);
+				}
+				
+				if(event.result.rsp.acts != null)
+					newActions = event.result.rsp.acts.act as ArrayCollection;
+				else
+					newActions = new ArrayCollection();
+				if(newActions == null) {
+					newActions = new ArrayCollection();
+					newActions.addItem(event.result.rsp.acts.act as Object);
+				}
+			
+			  welcomeMessage = "New";
+			  countNewMembers =	newUsers.length;
+			  countNewVideos = newVideos.length;
+			  welcomeMessage = welcomeMessage + "(" + countNewVideos + "," + countNewMembers + ")";
+			  
+			   if ((countNewMembers==0) && (countNewVideos ==0) ){
+			          	app.welBtn.visible = false;
+			          }else{
+			          	app.welBtn.visible = true;
+			      //    	app.welBtn.toolTip =  "New(" + countNewVideos + " Videos" + "," + countNewMembers + " Users)";
+			          	app.welBtn.toolTip =  countNewVideos + " New Videos have been posted. " + countNewMembers + " New Members joined the community.";
+			          }
+			         
+			  app.welBtn.label = welcomeMessage;
+			  
+		    			
+			}
+			
+			public function close(event:MouseEvent):void {
+				app.agentWindow.visible = false;
+				app.agentWindow.height = 0;
+			}
+			
+			public function open(event:MouseEvent):void {
+				app.agentWindow.height = 250;
+				app.agentWindow.visible = true;
+			}
+			
+			/*
+			private function close(event:MouseEvent):void {
+				app.agentWindow.x = 10;
+				app.agentWindow.y = 50;
+				app.agentWindow.width = app.appSpacer2.width;
+				app.agentWindow.height = closeBtn.height;
+				titleSpacer.width = 0;
+				closeBtn.label = '>';
+				closeBtn.toolTip = 'Show Welcome Agent';
+				//app.welcAgent.setStyle('backgroundColor', 'grey');
+			}
+			
+			private function open(event:MouseEvent):void {
+				app.agentWindow.x = 53;
+				app.agentWindow.y = 134;
+				app.agentWindow.width = 500;
+				app.agentWindow.height = 250;
+				titleSpacer.width = 200;
+				closeBtn.label = 'X';
+				closeBtn.toolTip = 'Hide Welcome Agent';
+				//app.welcAgent.setStyle('backgroundColor', 'white');
+			}
+			*/
+		]]>
+	</mx:Script>
+	
+	<mx:HBox width="100%">
+		<mx:TabBar dataProvider="{vlStack}"/>
+		<mx:Spacer id="titleSpacer" width="100%" visible="false" height="{closeBtn.height}"/>
+		<mx:Button id="closeBtn" label="X" width="{closeBtn.height}" toolTip="{hidWATM}"
+			click="close(event)"/>
+	</mx:HBox>
+
+	<mx:ViewStack id="vlStack" width="100%" height="100%">
+		<mx:HBox label="{latUM}" width="100%" height="100%">
+			<mx:VBox width="40%" height="100%" verticalAlign="middle" horizontalAlign="center">
+				<mx:Image id="userImage" width="100%" height="100%"/>
+			</mx:VBox>
+			<mx:DataGrid height="100%" width="60%" dataProvider="{newUsers}" showHeaders="false">
+				<mx:columns>
+					<mx:DataGridColumn headerText="User Name" itemRenderer="component.WAuser">
+					</mx:DataGridColumn>
+				</mx:columns>
+			</mx:DataGrid>
+		</mx:HBox>
+		<mx:HBox label="{newVideosM}" width="100%" height="100%">
+			<mx:VBox width="40%" height="100%" verticalAlign="middle" horizontalAlign="center">
+				<mx:Image id="vidImage" width="100%" height="100%"/>
+			</mx:VBox>
+			<mx:DataGrid height="100%" width="60%" dataProvider="{newVideos}" showHeaders="false">
+				<mx:columns>
+					<mx:DataGridColumn headerText="Video Name" itemRenderer="component.WAvideo">
+					</mx:DataGridColumn>
+				</mx:columns>
+			</mx:DataGrid>
+		</mx:HBox>
+		<mx:HBox label="{newAM}" width="100%" height="100%">
+			<mx:DataGrid height="100%" width="100%" dataProvider="{newActions}">
+				<mx:columns>
+					<mx:DataGridColumn headerText="{actionM}" dataField="action"/>
+					<mx:DataGridColumn headerText="{takenByM}" dataField="name"/>
+					<mx:DataGridColumn headerText="{onAtM}" dataField="dt"/>
+				</mx:columns>
+			</mx:DataGrid>
+		</mx:HBox>
+	</mx:ViewStack>
+	
+	<mx:HTTPService id="viewLatestService" url="{app.ServerPath + 'GraphData/viewLatest.php'}"
+		method="POST" fault="latestResultFault();" result="latestResult(event)">
+		<mx:request>
+			<loginId>{app.Univ_LoginId1}</loginId>
+		</mx:request>
+	</mx:HTTPService>
+	
+</mx:VBox>

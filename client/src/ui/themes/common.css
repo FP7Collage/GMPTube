@@ -1,0 +1,25 @@
+/* CSS file */
+
+/**Naming of the styles:
+* If using the same name of a flex component, do not put a 'dot' in front
+* of the style name. If you want a specific style name that can be used
+* for any component by setting the component's styleName property, then
+* a 'dot' will need to be appended i nthe start of the style's name.
+*/
+
+Ratings{
+	horizontalGap:3;
+	paddingTop:3;
+	paddingLeft:6;
+}
+
+RatingItem{
+	borderAlpha:0;
+    fillEnabled:true;
+	fillColors:#333333,#CCCCCC;
+	fillSelectedColors:#FF6600,#FFFFCC;
+	fillAlphas:1,1;
+	fillRatios:0,255;
+	fillAngle:90;
+			
+}

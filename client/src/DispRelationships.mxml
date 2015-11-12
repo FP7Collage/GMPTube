@@ -1,0 +1,477 @@
+<!--
+
+/*
+	 * Copyright (c) 2015, CEDEP France,
+ 	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
+         * All rights reserved.
+	 * Redistribution and use in source and binary forms, with or without modification, 
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  * Redistributions of source code must retain the above copyright notice, 
+	 *    this list of conditions and the following disclaimer. 
+	 *  * Redistributions in binary form must reproduce the above copyright notice, 
+	 *    this list of conditions and the following disclaimer in the documentation
+	 *    and/or other materials provided with the distribution. 
+	 *  * Neither the name of the COLLAGE Group nor the names of its 
+	 *    contributors may be used to endorse or promote products derived from this 
+	 *    software without specific prior written permission. 
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+	 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	 * DISCLAIMED. IN NO EVENT SHALL CONSORTIUM BOARD COLLAGE Group BE LIABLE FOR ANY
+	 * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	 * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+	 * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+	 * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+--><?xml version="1.0" encoding="utf-8"?>
+<mx:Module  xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:inputs="net.srirangan.inputs.*" layout="absolute"
+	creationComplete="generate_allusers();" width="100%" height="100%" >
+	
+	<mx:XML xmlns="" id="allvidnodes" >
+		<Node state='unchecked' name="Videos" label="Videos">
+			<Node state='checked' id="videos" name="All Videos" label="All Videos">
+			
+				<Node state='checked' id="CDLabel" name="{app.videoCategory_CDLabel}" >
+			
+			
+				</Node>
+				<Node state='checked' id="CDOppLabel" name="{app.videoCategory_CDOppLabel}" >
+			
+		
+				</Node>	
+				<Node state='checked' id="CDExpertsLabel" name="{app.videoCategory_CDExpertsLabel}" >
+			
+			
+				</Node>
+			
+			
+		</Node>	
+		<Node state='checked' id="user" name="All Users" label="All Users">
+		</Node>	
+		<Node state='unchecked' id="ckKnows" name="Knows" label="Knows">
+		</Node>	
+		
+		<Node state='unchecked' id="ckHassubmitted" name="Has submitted" label="Has submitted">
+		</Node>	
+		<Node state='unchecked' id="ckHasseen" name="Has seen" label="Has seen">
+		</Node>	
+		<Node state='unchecked' id="ckHastags" name="Has tags" label="Has tags">
+		</Node>	
+		<Node state='unchecked' id="ckIsConnectedTo" name="Is ConnectedTo" label="Is ConnectedTo">
+		</Node>	
+		<Node state='unchecked' id="ckRelatesTo" name="Relates To" label="Relates To">
+		</Node>	
+		<Node state='unchecked' id="ckHasInterest" name="Has Interest" label="Has Interest">
+		</Node>	
+		
+	
+	</Node>
+		</mx:XML>
+		<mx:XML xmlns="" id="userstructure" >
+	<Node state='unchecked' id="home" name="Userlist" >
+		<Node state='unchecked' id="user" name="All Users" >
+		</Node>	
+		
+	</Node>
+		</mx:XML>
+	
+	<!--<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" height="100%" width="100%" backgroundColor="white">-->
+		
+		
+	
+		<mx:HBox height="100%" width="100%" >
+			<inputs:CheckBoxTree autoLayout="true" width="100%" height="100%" close="Closethispop2();" labelField="@name" title="Select Nodes " id="vidcheck" enabled="true">		
+			</inputs:CheckBoxTree>
+			
+			
+			<!--<mx:Text text="display CheckBox view for:" color="white"/>
+			--><!--<mx:ComboBox dataProvider="[All Videos,Knows]" rowCount="2" id="showparticularnodetype"  width="150"></mx:ComboBox> 	
+			--><!--<mx:Button label="Back To Graph View"  click="app.currentState='spring_view'" id="gotospring_viewbutton2"  width="150"/>
+-->		
+		</mx:HBox>	
+
+
+		<mx:Script>
+		<![CDATA[
+			import mx.containers.HBox;	
+			import com.byteencoder.Base64;
+      		import mx.graphics.codec.JPEGEncoder;
+      		import mx.controls.Button;
+      		
+      		import mx.events.*;
+			import mx.events.ItemClickEvent;    
+            import mx.core.Application;
+			import mx.managers.CursorManager;
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.ItemClickEvent;
+			import mx.rpc.events.ResultEvent;
+			import flash.net.FileReference;
+			import mx.managers.PopUpManager;
+			import mx.collections.ListCollectionView;
+			import mx.collections.XMLListCollection;
+			
+			import com.adobe.flex.extras.controls.springgraph.Item;
+			[Bindable]public var app:Tentube=Tentube(Application.application);
+			
+			public var fifth:XML=<Node id="CDOppLabel" name="{app.label_fifth_videoCategory}" >
+			</Node>;
+			
+			public var sixth:XML=<Node id="CDOppLabel" name="{app.label_sixth_videoCategory}" >
+			</Node>;
+			
+			
+			public var fourth:XML=<Node id="CDOppLabel" name="{app.label_fourth_videoCategory}" >
+			</Node>;	
+			public var ckHasInterest:XML=<Node state='unchecked' id="ckHasInterest" name="Has Given" >
+			</Node>	;
+			public var ckHasbeeninvolved:XML=<Node state='unchecked' id="ckHasbeeninvolved" name="Has been Involved in " >
+			</Node>	;
+			public var ckHascommented:XML=<Node state='unchecked' id="ckHascommented" name="Has Commented" >
+			</Node>	;
+			public var ckrelatesto:XML=<Node state='unchecked' id="ckrelatesto" name="Relates To" >
+			</Node>	;
+			public var ckHasrated:XML=<Node state='unchecked' id="ckHasrated" name="Has Rated" >
+			</Node>	;
+			
+			
+			
+			//[Bindable]public var app:Tentube=Tentube(Application.application); 
+	    	 //[Bindable]public var vidlist:Array=app.videos_list; 
+	     	
+	     [Bindable]public var i:int; 
+	     public var allvideos:XML;
+	     public var fourth1:XML=<Node id="CDOppLabel" name="{app.label_fourth_videoCategory}" >
+			</Node>;
+			
+		public var fifth1:XML=<Node id="CDOppLabel" name="{app.label_fifth_videoCategory}" >
+			</Node>;
+	    
+	    public var sixth1:XML=<Node id="CDOppLabel" name="{app.label_sixth_videoCategory}" >
+			</Node>;
+	    	
+	     		
+	    //public var dataProvidervid:ListCollectionView;
+    
+	    public var dataProvidervid:XMLListCollection = new XMLListCollection();
+	 
+	
+	
+public function generate_allusers():void{
+	     if(app.enableFourth_videoCategory==true){
+				allvidnodes.appendChild(fourth);
+	     }
+	      if(app.enableFifth_videoCategory==true){
+				allvidnodes.appendChild(fifth);
+	     }
+	     if(app.enableSixth_videoCategory==true){
+				allvidnodes.appendChild(sixth);
+	     }
+	     
+	    
+	     
+				var hbx:HBox = new HBox();
+				hbx.width = 250;
+				hbx.height = 20;
+				var btn:Button = new Button();
+				btn.label ="Display Relationships";
+				btn.height=20;
+				hbx.addChild(btn);
+				btn.addEventListener(MouseEvent.CLICK, Closethispop);
+				vidcheck.addChild(hbx);
+				
+			//if(app.enableFourth_videoCategory==true)
+				//allvideonodes.appendChild(fourth);	
+	
+			var userslist:Array=app.people_list;
+			var allusers:XML=new XML(userstructure);	
+			
+			allvideos=new XML(allvidnodes);
+			
+	     	for each(var li:Object in app.people_list)
+		 		{	
+		 			var uservidlist:XML = new XML(<Node state='checked' name="Node"  />);
+		 			li.@state = "checked";
+		 			li.@label = li.@name;
+		 			uservidlist.@state = li.@state;
+		 			uservidlist.@name = li.@label;
+		 			uservidlist.@id = li.@id;
+		 			var userxml:XMLList = new XMLList(allvideos.children());
+		 			userxml[1].appendChild(uservidlist);
+		 			
+		 		}
+		 		
+		 		var loopVideoCategory:String=new String();
+	     	for each(var li:Object in app.videos_list)
+		 		{	
+		 			var uservidlist:XML = new XML(<Node state='checked' name="Node"  />);
+		 			var vidxml:XMLList = new XMLList(allvideos.children());
+		 			trace(vidxml);
+		 			li.@state = "checked";
+		 			li.@label = li.@name;
+		 			uservidlist.@state = li.@state;
+		 			uservidlist.@name = li.@label;
+		 			uservidlist.@id = li.@id;
+		 			loopVideoCategory=li.@category.toString();
+		 			if(loopVideoCategory==app.videoCategory_CDExpertsLabel)
+		 			vidxml[0].Node[2].appendChild(uservidlist);
+		 			else if(loopVideoCategory==app.videoCategory_CDOppLabel)
+		 			vidxml[0].Node[1].appendChild(uservidlist);
+		 			else if(loopVideoCategory==app.videoCategory_CDLabel)
+		 			 vidxml[0].Node[0].appendChild(uservidlist);
+		 			else li.@state = "unchecked";  
+		 			
+		 			
+		 		}
+		 		if(app.islab())
+		 		{
+		 			allvideos.appendChild(ckHasInterest);
+		 			allvideos.appendChild(ckHasbeeninvolved);
+		 			allvideos.appendChild(ckHascommented);
+		 			allvideos.appendChild(ckrelatesto);
+		 			allvideos.appendChild(ckHasrated);
+		 			
+		 		}
+		 		//allvideos.sortOn("@name");
+		 		//networktree.dataProvider=allvideos;
+		 		var vidnodeList:XMLList = allvideos.Node;
+		 		
+				//dataProvidervid = new XMLListCollection(vidnodeList);
+				dataProvidervid.source = vidnodeList;
+		 		vidcheck.dataProvider = dataProvidervid;
+		 		vidcheck.enabled = true;
+		 		
+		 	
+	     }
+	//This functon is called when Display relation ships is clicked
+	   public function Closethispop(evt:MouseEvent):void{
+	   app.usernodelist =	new XML(<Node state='checked' name="Node"  />);
+	    var flag1:Boolean = false;
+	    var tlag1:Boolean = false;
+	    
+	    var relationarray:Array = new Array();
+	    app.relnarray = relationarray;
+	   /* for each(var abc:Object in app.relnarray)
+	   {
+	   	app.relnarray.pop();
+	   }
+	    */
+	    var userxml:XMLList = new XMLList(allvideos.children());
+	for each(var li:Object in userxml[1].children())
+		 		{
+		 			
+		 			
+		 				for each(var li1:Object in app.people_list)
+		 				{
+		 				
+		 				if(li.@id == li1.@id)
+		 				{
+		 				
+		 				li1.@state = li.@state ;
+		 				break;
+		 				}
+		 				}
+		 			if(li.@state == "checked")
+		 			flag1 = true;
+		 			
+		 		}
+		
+		for each(var lii:Object in userxml[0].Node[0].children())
+		{ 
+			
+			for each(var lii1:Object in app.videos_list)
+		 				{
+		 				
+		 				if(lii1.@id == lii.@id)
+		 				{
+		 				
+		 				lii1.@state = lii.@state ;
+		 				break;
+		 				}
+		 				}
+			if(lii.@state == "checked")
+		 			{
+		 				//app.usernodelist.appendChild(lii);
+		 				tlag1 = true;
+		 			}		
+	   	
+		
+		}  
+		for each(var lii:Object in userxml[0].Node[1].children())
+		{ 
+			
+			for each(var lii1:Object in app.videos_list)
+		 				{
+		 				
+		 				if(lii1.@id == lii.@id)
+		 				{
+		 				
+		 				lii1.@state = lii.@state ;
+		 				break;
+		 				}
+		 				}
+			if(lii.@state == "checked")
+		 			{
+		 				//app.usernodelist.appendChild(lii);
+		 				tlag1 = true;
+		 			}		
+	   	
+		
+		}  
+		// removed var
+		for each(lii in userxml[0].Node[2].children())
+		{ 
+			
+			for each(var lii1:Object in app.videos_list)
+		 				{
+		 				
+		 				if(lii1.@id == lii.@id)
+		 				{
+		 				
+		 				lii1.@state = lii.@state ;
+		 				break;
+		 				}
+		 				}
+			if(lii.@state == "checked")
+		 			{
+		 				//app.usernodelist.appendChild(lii);
+		 				tlag1 = true;
+		 			}		
+	   	
+		
+		}  
+		
+		/* if(tlag1 == false)		
+		 {
+		 Alert.show('Please select atleast one video','Success');
+		 return;
+		 } */
+		
+		var relnxml:XMLList = new XMLList(allvideos.children());
+				if(relnxml[2].@state == "checked")
+				{
+			
+				if(flag1 == false)		
+		 			{
+					 Alert.show('Please select atleast one user','Alert');
+		 			return;
+		 			}
+		 			else
+				app.relnarray.push(app.knowField);
+				}
+				if(relnxml[3].@state == "checked")
+				{
+			
+				if(flag1 == false)		
+		 			{
+					 Alert.show('Please select atleast one user','Alert');
+		 			return;
+		 			}
+		 			else
+				app.relnarray.push(app.submitField);
+				}
+				if(relnxml[4].@state == "checked")
+				{
+			
+				if(flag1 == false)		
+		 			{
+					 Alert.show('Please select atleast one user','Alert');
+		 			return;
+		 			}
+		 			else
+				app.relnarray.push(app.seenField);
+				}
+				if(relnxml[5].@state == "checked")
+				{
+			
+				if(tlag1 == false)		
+		 			{
+					Alert.show('Please select atleast one Video','Alert');
+		 			return;
+		 			}
+		 			else
+				app.relnarray.push(app.tagsField);
+				}
+				if(relnxml[6].@state == "checked")
+				{
+			
+				if(tlag1 == false)		
+		 			{
+					 Alert.show('Please select atleast one Video','Alert');
+		 			return;
+		 			}
+		 			else
+				app.relnarray.push(app.prevField);
+				}
+				if(relnxml[7].@state == "checked")
+				{
+			
+				if(tlag1 == false)		
+		 			{
+					 Alert.show('Please select atleast one Video','Alert');
+		 			return;
+		 			}
+		 			else
+				app.relnarray.push(app.relatesField);
+				}
+				if(relnxml[8].@state == "checked")
+				{
+			
+				if(flag1 == false)		
+		 			{
+					 Alert.show('Please select atleast one user','Alert');
+		 			return;
+		 			}
+		 			else
+				app.relnarray.push(app.interestField);
+				}
+				
+				if(app.islab())
+				{
+				if(relnxml[9].@state == "checked")
+				app.relnarray.push(app.givenField);
+				if(relnxml[10].@state == "checked")
+				app.relnarray.push(app.involvedField);
+				if(relnxml[11].@state == "checked")
+				app.relnarray.push(app.commentedField);
+				if(relnxml[12].@state == "checked")
+				app.relnarray.push(app.relatesField);
+				if(relnxml[13].@state == "checked")
+				app.relnarray.push(app.ratesField);
+				}
+				
+		if(app.relnarray.length == 0)
+		{
+					 Alert.show('Please select atleast one Relationships to display among Nodes','Alert');
+		 			return;
+		 }
+				
+				//app.drawmultedgetypes(relnarray);
+		//if(app.usernodelist.children().length() > 0)
+		//{
+		//app.Selectrelnodes();
+		//}
+		//app.Selectrelnodes();
+		app.drawmultedgetypes2(app.relnarray);
+	}
+	 
+	 
+	 public function Closethispop2():void{  
+			PopUpManager.removePopUp(this);
+		
+			}  
+	]]>
+	
+	
+
+		</mx:Script>
+	
+	<!--</mx:Canvas>-->	
+	
+</mx:Module>	
+
