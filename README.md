@@ -1,6 +1,5 @@
 # COLLAGE-GMPTube-SAS
 
-
 /*
 	 * Copyright (c) 2015, CEDEP France,
  	 * Authors: Albert A. Angehrn, Marco Luccini, Pradeep Kumar Mittal
