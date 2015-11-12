@@ -33,12 +33,13 @@ Software’s Requirement to Deploy the CALTTubes
 
 CALTTubes have been tested on the machine having 4 GB of RAM and Intel® Xeon 5130 @2.00 GHZ. Ideally it would be good to have such a powerful machine as video streaming requires expensive CPU Usage.
 
-Here is the list of the software’s that should be installed on the machine.
+Here is the list of the software’s that should be installed on the machine
 
 1.	Windows Server
 2.	PHP 5
 3.	My SQL 5.0 Server 
 4.	WAMP Server
+5.      Adobe Flex Builder 3.0
 
 
 Technical Steps to Install the CALTTubes
